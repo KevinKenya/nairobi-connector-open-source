@@ -1,0 +1,53 @@
+# File: /home/chege/nairobi-connector-open-source/crates/nairobi-axum-refinery/Cargo.toml
+# Author: Kevin Chege
+# Date: 2026-05-06
+
+# nairobi-open-source-release/crates/nairobi-axum-refinery/Cargo.toml
+[package]
+name = "nairobi-axum-refinery"
+version = "0.1.0"
+edition = "2021"
+authors = ["Kevin Chege <kevin@nairobi.os>"]
+license-file = "LICENSE"
+
+description = "The Data Service Daemon — io_uring + Huge Page ingestion with D-Bus interface"
+
+[[bin]]
+name = "nairobi-axum-refinery"
+path = "src/main.rs"
+
+[lib]
+name = "nairobi_axum_refinery"
+path = "src/lib.rs"
+
+[dependencies]
+# The Constitution
+nairobi-protocol = { path = "../nairobi-protocol" }
+
+# D-Bus / GVariant
+zbus = { version = "3.15", features = ["gvariant", "tokio"] }
+
+# Async runtime
+tokio = { version = "1", features = ["full"] }
+
+# io_uring — raw control, no opinionated wrappers
+io-uring = "0.7"
+
+# Zero-copy memory infrastructure
+memmap2 = "0.9"
+memfd   = "0.6"
+libc    = "0.2"
+
+# Vectorized analytics engine
+polars = { version = "0.34.2", features = ["lazy", "temporal", "strings", "json", "moment"] }
+polars-sql = "0.34.2"
+sha2   = "0.10"
+rayon  = "1.10"
+
+# Logging
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+[dev-dependencies]
+# Cross-crate integration tests (decoder correlation report validation)
+nairobi-hub = { path = "../nairobi-hub" }

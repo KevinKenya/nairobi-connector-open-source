@@ -1,0 +1,6 @@
+# nairobi-benchmarks/workloads/workload_statistical_distillation.yaml
+name: "Statistical Distillation (10M Rows)"
+description: "Calculate Mean, Std Dev, Skewness, and Kurtosis on a 10-million row dataset."
+dataset: "datasets/synthetic/tall_10m.csv"
+column: "points"
+iterations: 10

@@ -1,0 +1,40 @@
+# Rust
+target/
+**/*.rs.bk
+*.so
+*.dylib
+*.dll
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+test_venv/
+.env
+.pytest_cache/
+.coverage
+htmlcov/
+build/
+dist/
+*.egg-info/
+
+# Nairobi OS Artifacts
+*.log
+.nairobi_refinery.log
+# Only ignore the compiled binary, not the source directory
+**/bin/nairobi-axum-refinery
+**/target/wheels/
+
+# Datasets & Large Files
+**/*.csv
+**/results/raw/*.json
+
+# IDE & OS
+.idea/
+.vscode/
+.DS_Store
+.gemini/
+scripts/scratch/
+brain/

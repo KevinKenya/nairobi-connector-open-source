@@ -1,0 +1,7 @@
+# nairobi-benchmarks/workloads/workload_streaming_correlation.yaml
+name: "Relational Strike (Streaming Correlation)"
+description: "Calculate Pearson correlation across two massive columns."
+dataset: "datasets/synthetic/tall_10m.csv"
+column: "points"
+corr_columns: ["points", "assists"]
+iterations: 10

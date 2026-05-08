@@ -1,0 +1,6 @@
+# nairobi-benchmarks/workloads/workload_wide_dataset.yaml
+name: "Wide Dataset Memory Pressure (1000 Columns)"
+description: "Parse and aggregate a dataset with 1,000 columns to test cache locality and memory explosion."
+dataset: "datasets/synthetic/wide_1000c.csv"
+column: "col_999"
+iterations: 10

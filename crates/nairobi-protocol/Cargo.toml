@@ -1,0 +1,31 @@
+# File: /home/chege/nairobi-connector-open-source/crates/nairobi-protocol/Cargo.toml
+# Author: Kevin Chege
+# Date: 2026-05-06
+
+# nairobi-open-source-release/crates/nairobi-protocol/Cargo.toml
+[package]
+name = "nairobi-protocol"
+version = "0.1.0"
+edition = "2021"
+authors = ["Kevin Chege <kevin@nairobi.os>"]
+license-file = "LICENSE"
+
+description = "The Constitution — shared GVariant signatures, D-Bus interface definitions, MemoryPipe, and error types for the Nairobi microservice stack"
+
+[lib]
+name = "nairobi_protocol"
+path = "src/lib.rs"
+
+[dependencies]
+# D-Bus / GVariant — the shared language of the Empire
+zbus        = { version = "3.15", features = ["gvariant"] }
+
+# Serialisation
+serde       = { version = "1", features = ["derive"] }
+
+# Error handling
+thiserror   = "2"
+
+# Zero-copy memory infrastructure
+memfd       = "0.6"
+memmap2     = "0.9"

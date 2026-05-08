@@ -1,0 +1,28 @@
+# File: /home/chege/nairobi-connector-open-source/crates/nairobi-python/pyproject.toml
+# Author: Kevin Chege
+# Date: 2026-05-06
+
+# nairobi-open-source-release/crates/nairobi-python/pyproject.toml
+[build-system]
+requires = ["maturin>=1.0,<2.0"]
+build-backend = "maturin"
+
+[project]
+name = "nairobi-os"
+version = "0.2.0"
+description = "Nairobi Connector OS: Heavy Iron AI Infrastructure"
+authors = [{name = "Kevin Chege", email = "kevin@nairobi.os"}]
+license = {file = "LICENSE"}
+readme = "README.md"
+requires-python = ">=3.12"
+
+dependencies = []
+
+
+[tool.maturin]
+# Point to the directory containing the nairobi_os folder
+python-source = "."
+# Tell Maturin to place the compiled Rust binary inside the nairobi_os package
+module-name = "nairobi_os._core"
+# Ensure the bundled refinery binary is included
+include = ["nairobi_os/bin/*"]

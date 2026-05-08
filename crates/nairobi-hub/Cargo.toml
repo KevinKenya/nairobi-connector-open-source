@@ -1,0 +1,39 @@
+# File: /home/chege/nairobi-connector-open-source/crates/nairobi-hub/Cargo.toml
+# Author: Kevin Chege
+# Date: 2026-05-06
+
+# nairobi-open-source-release/crates/nairobi-hub/Cargo.toml
+[package]
+name = "nairobi-hub"
+version = "0.1.0"
+edition = "2021"
+authors = ["Kevin Chege <kevin@nairobi.os>"]
+license-file = "LICENSE"
+
+description = "The Orchestrator — D-Bus client proxy to Axum Refinery with Semantic Decoder"
+
+[lib]
+name = "nairobi_hub"
+path = "src/lib.rs"
+
+[dependencies]
+# The Constitution
+nairobi-protocol = { path = "../nairobi-protocol" }
+
+# D-Bus / GVariant
+zbus = { version = "3.15", features = ["gvariant"] }
+
+# Async runtime (rt only — the Hub is a library, not a daemon)
+tokio = { version = "1", features = ["rt"] }
+
+# Logging
+tracing = "0.1"
+
+# Cryptographic hashing (DORA Compliance)
+sha2 = "0.10"
+
+# Time handling
+chrono = "0.4"
+
+# Hex encoding (DORA Compliance — content hash)
+hex = "0.4"

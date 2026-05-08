@@ -1,0 +1,6 @@
+name: "NBA Pipeline Stage Latency"
+description: "Measure ingestion, crunch, and correlation latencies on NBA Player Statistics dataset"
+dataset: "/home/chege/nairobi-connector-open-source/simulator/PlayerStatisticsExtended.csv"
+column: "points"
+corr_columns: ["points", "assists", "rebounds", "fieldGoalsMade", "fieldGoalsAttempted"]
+iterations: 10

@@ -1,0 +1,12 @@
+# File: ~/nairobi-connector-open-source/Cargo.toml
+# Author: Kevin Chege
+# Date: 2026-05-06
+
+[workspace]
+resolver = "2"
+members = [
+    "crates/nairobi-protocol",
+    "crates/nairobi-axum-refinery",
+    "crates/nairobi-hub",
+    "crates/nairobi-python",
+]
