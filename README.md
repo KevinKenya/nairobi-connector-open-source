@@ -1,5 +1,7 @@
 # Nairobi OS: Heavy Iron Data Science Infrastructure
 
+[![Run on Kaggle](https://kaggle.com/static/images/open-in-kaggle.svg)](https://kaggle.com/kernels/welcome?src=https://github.com/KevinKenya/nairobi-connector-open-source/blob/main/nairobi-benchmarks/Nairobi_OS_Benchmarks.ipynb)
+
 **Author**: Kevin Chege. Location: Nairobi  
 **License**: PolyForm Noncommercial License 1.0.0
 

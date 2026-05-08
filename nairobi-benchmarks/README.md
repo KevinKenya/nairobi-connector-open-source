@@ -2,6 +2,8 @@
 
 # Nairobi Benchmark Suite (Scaffold)
 
+[![Run on Kaggle](https://kaggle.com/static/images/open-in-kaggle.svg)](https://kaggle.com/kernels/welcome?src=https://github.com/KevinKenya/nairobi-connector-open-source/blob/main/nairobi-benchmarks/Nairobi_OS_Benchmarks.ipynb)
+
 This repository contains the rigorous, academic-grade benchmarking suite for **Nairobi OS**. It is designed to prove the performance superiority of "Fused analytics execution" on large-scale structured data.
 
 ## 📁 Repository Structure
