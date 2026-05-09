@@ -8,7 +8,7 @@
 **License**: PolyForm Noncommercial License 1.0.0
 
 ## Thankyou to the rust community on Reddit for challenging the validity of my claims. This version has improved on those deficiencies. 
-Thanks especially to SkiFire13 and evilgipsy. 
+Thanks especially to SkiFire13. 
 
 Nairobi OS is a distributed microservice architecture designed for high-performance, zero-copy data analysis. It enables processing of massive datasets in extreme resource-constrained environments (Edge, IoT, Serverless) by offloading heavy lifting to a specialized Rust-based refinery daemon.
 
