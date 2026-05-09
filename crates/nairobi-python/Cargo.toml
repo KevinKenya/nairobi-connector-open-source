@@ -5,7 +5,7 @@
 # nairobi-open-source-release/crates/nairobi-python/Cargo.toml
 [package]
 name = "nairobi-python"
-version = "0.2.0"
+version = "0.2.1"
 edition = "2021"
 authors = ["Kevin Chege <kevin@nairobi.os>"]
 license-file = "LICENSE"

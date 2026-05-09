@@ -1,4 +1,4 @@
-# Nairobi OS: Public Launch Benchmark Report (v0.2.0)
+# Nairobi OS: Public Launch Benchmark Report (v0.2.1)
 
 This report documents the performance of Nairobi OS against a standard, unoptimized Pandas implementation. These results represent the "Real World Developer" scenario: comparing a high-performance system-call-driven engine (Nairobi) against the default data science toolchain used by the majority of junior-to-mid-level developers.
 
@@ -20,7 +20,7 @@ This report documents the performance of Nairobi OS against a standard, unoptimi
 ## 3. Test Environment
 - **OS**: Linux (kernel 6.x)
 - **Hardware**: Local Workstation (Vectorized CPU saturation)
-- **Dataset**: `PlayerStatisticsExtended.csv` (450 MB, 1M+ rows)
+- **Dataset**: `PlayerStatisticsExtended.csv` (450 MB, 800k rows)
 - **Methodology**: 5 iterations per workload, cold cache dropped between engine sessions.
 
 ## 4. Stage-Level Performance Audit

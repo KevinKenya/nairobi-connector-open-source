@@ -1,5 +1,8 @@
 # Nairobi OS: Heavy Iron Data Science Infrastructure
 
+> [!IMPORTANT]
+> **Linux & WSL2 Only.** We do not compromise on kernel physics.
+
 
 **Author**: Kevin Chege. Location: Nairobi  
 **License**: PolyForm Noncommercial License 1.0.0
@@ -14,11 +17,11 @@ Nairobi OS is built on a triad of specialized components connected via D-Bus:
 3.  **[Nairobi Python](crates/nairobi-python/)**: The high-level bridge. A PyO3-powered interface that brings Rust's performance to the Python ecosystem with sub-millisecond IPC overhead.
 4.  **[Nairobi Protocol](crates/nairobi-protocol/)**: The shared GVariant signatures and interface definitions ensuring cross-crate type safety.
 
-## 🚀 Key Innovation: The Fused Strike (v0.2.0)
-Nairobi OS v0.2.0 introduces **Fused Pipeline Execution**. By executing the entire ingestion -> analysis -> correlation pipeline in a single atomic D-Bus call, we eliminate redundant inter-process round trips and file re-parsing.
+## 🚀 Key Innovation: The Fused Strike (v0.2.1)
+Nairobi OS v0.2.1 introduces **Fused Pipeline Execution**. By executing the entire ingestion -> analysis -> correlation pipeline in a single atomic D-Bus call, we eliminate redundant inter-process round trips and file re-parsing.
 
-### Performance vs. Standard Pandas
-| Metric | Pandas (Unoptimized) | Nairobi OS (v0.2.0) | Speedup |
+### 📊 Performance Benchmark (v0.2.1)
+| Metric | Pandas (Unoptimized) | Nairobi OS (v0.2.1) | Speedup |
 |--------|--------|---------------------|---------|
 | **Ingestion Latency** | 6.38s | **0.52s** | **12.2x** |
 | **Statistical Distillation** | 8.79s | **1.59s** | **5.5x** |
@@ -67,7 +70,7 @@ nairobi_os.stop_refinery()
 
 ## 📊 Benchmarking & Reports
 We maintain a rigorous, academic-grade benchmarking suite to validate our "Hardware-First" approach.
-- **[Benchmark Report](nairobi-benchmarks/BENCHMARK_REPORT.md)**: Latest comparison against standard Pandas baselines.
+- **[Benchmark Report (v0.2.1)](nairobi-benchmarks/BENCHMARK_REPORT.md)**: Latest comparison against standard Pandas baselines.
 - **[Methodology](nairobi-benchmarks/methodology.md)**: Our scientific ground rules for fair comparison.
 
 ## ⚖️ License
