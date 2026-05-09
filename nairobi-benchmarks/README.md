@@ -4,15 +4,15 @@
 
 [![Run on Kaggle](https://kaggle.com/static/images/open-in-kaggle.svg)](https://kaggle.com/kernels/welcome?src=https://github.com/KevinKenya/nairobi-connector-open-source/blob/main/nairobi-benchmarks/Nairobi_OS_Benchmarks.ipynb)
 
-This repository contains the rigorous, academic-grade benchmarking suite for **Nairobi OS**. It is designed to prove the performance superiority of "Fused analytics execution" on large-scale structured data.
+This repository contains the rigorous benchmarking suite for **Nairobi OS**. It is designed to evaluate the performance of "Fused analytics execution" against standard, unoptimized Pandas implementations.
 
 ## 📁 Repository Structure
-*   `engines/`: Standardized wrappers for Pandas, Polars, DuckDB, and Nairobi OS.
-*   `orchestration/`: The core benchmarking logic, metrics collection, and validation.
+*   `engines/`: Standardized wrappers for Pandas and Nairobi OS.
+*   `orchestration/`: Core benchmarking logic, metrics collection, and validation.
 *   `datasets/`: Scripts to download real-world data and generate synthetic scaling datasets.
-*   `workloads/`: YAML definitions of the "WOW" benchmarks.
+*   `workloads/`: YAML definitions of analytical benchmarks (NBA statistics, correlation pipelines).
 *   `visualization/`: Tools to generate latency and memory scaling curves.
-*   `methodology.md`: The scientific ground rules for the benchmarks.
+*   `methodology.md`: The scientific ground rules and mathematical validation logic.
 
 ## 🚀 Quick Start (Scaffold Only)
 

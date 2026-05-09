@@ -9,20 +9,20 @@ Nairobi OS is a distributed microservice architecture designed for high-performa
 ## 🏗️ Architecture
 Nairobi OS is built on a triad of specialized components connected via D-Bus:
 
-1.  **[Nairobi Axum Refinery](crates/nairobi-axum-refinery/)**: The high-performance engine. Uses `io_uring` and 1GB Huge Pages for zero-copy ingestion and Rayon-parallelized Rust analytics.
-2.  **[Nairobi Hub](crates/nairobi-hub/)**: The orchestrator. Manages `memfd` handles and provides a high-level client proxy for the Refinery.
-3.  **[Nairobi Python](crates/nairobi-python/)**: The bridge. A PyO3-powered interface that brings Rust's performance to the Python ecosystem with sub-millisecond IPC overhead.
-4.  **[Nairobi Protocol](crates/nairobi-protocol/)**: The constitution. Shared GVariant signatures and interface definitions that ensure type safety across the stack.
+1.  **[Nairobi Axum Refinery](crates/nairobi-axum-refinery/)**: The high-performance Rust core. Uses `io_uring` and 1GB Huge Pages for zero-copy ingestion and Rayon-parallelized analytics.
+2.  **[Nairobi Hub](crates/nairobi-hub/)**: The IPC orchestrator. Manages `memfd` handles and provides high-level client proxies.
+3.  **[Nairobi Python](crates/nairobi-python/)**: The high-level bridge. A PyO3-powered interface that brings Rust's performance to the Python ecosystem with sub-millisecond IPC overhead.
+4.  **[Nairobi Protocol](crates/nairobi-protocol/)**: The shared GVariant signatures and interface definitions ensuring cross-crate type safety.
 
 ## 🚀 Key Innovation: The Fused Strike (v0.2.0)
-Nairobi OS v0.2.0 introduces **Fused Pipeline Execution**. Traditionally, inter-process analytics suffer from multiple D-Bus round trips and redundant file parsing. The Fused Strike architecture eliminates this by executing the entire ingestion -> analysis -> correlation pipeline in a **single atomic D-Bus call**.
+Nairobi OS v0.2.0 introduces **Fused Pipeline Execution**. By executing the entire ingestion -> analysis -> correlation pipeline in a single atomic D-Bus call, we eliminate redundant inter-process round trips and file re-parsing.
 
-### Performance vs. Pandas
-| Metric | Pandas | Nairobi OS (v0.2.0) |
-|--------|--------|---------------------|
-| **RAM Usage** | 4,285 MB | **20.5 MB** (209x lower) |
-| **CPU Usage** | 1,158% | **10%** (116x lower) |
-| **Pipeline Latency** | 912 ms | 1,160 ms (Competitive) |
+### Performance vs. Standard Pandas
+| Metric | Pandas (Unoptimized) | Nairobi OS (v0.2.0) | Speedup |
+|--------|--------|---------------------|---------|
+| **Ingestion Latency** | 6.38s | **0.52s** | **12.2x** |
+| **Statistical Distillation** | 8.79s | **1.59s** | **5.5x** |
+| **Total Pipeline** | 6.42s | **2.29s** | **2.8x** |
 
 ## 🛠️ Installation
 
@@ -66,10 +66,9 @@ nairobi_os.stop_refinery()
 ```
 
 ## 📊 Benchmarking & Reports
-We maintain a rigorous, academic-grade benchmarking suite.
-- **[Benchmark Report](nairobi-benchmarks/BENCHMARK_REPORT.md)**: Comparison against Polars, Pandas, and DuckDB.
-- **[Use Case Report](nairobi-benchmarks/NAIROBI_USE_CASE_REPORT.md)**: Guidance on when to deploy Nairobi OS.
-- **[Stage Analysis](nairobi-benchmarks/PIPELINE_STAGE_REPORT.md)**: Deep dive into IPC vs Compute latency.
+We maintain a rigorous, academic-grade benchmarking suite to validate our "Hardware-First" approach.
+- **[Benchmark Report](nairobi-benchmarks/BENCHMARK_REPORT.md)**: Latest comparison against standard Pandas baselines.
+- **[Methodology](nairobi-benchmarks/methodology.md)**: Our scientific ground rules for fair comparison.
 
 ## ⚖️ License
 This project is licensed under the **PolyForm Noncommercial License 1.0.0**. It is free for non-commercial use (Personal, Educational, Research). 
