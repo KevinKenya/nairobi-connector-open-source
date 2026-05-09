@@ -10,3 +10,6 @@ members = [
     "crates/nairobi-hub",
     "crates/nairobi-python",
 ]
+
+[workspace.dependencies]
+iceoryx2 = "0.3.0"

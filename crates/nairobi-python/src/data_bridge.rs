@@ -1,10 +1,14 @@
 // File: /home/chege/nairobi-connector-open-source/crates/nairobi-python/src/data_bridge.rs
 // Author: Kevin Chege. Location: Nairobi
-// Date: 2026-05-06
+// Date: 2026-05-08
 
 // nairobi-open-source-release/crates/nairobi-python/src/data_bridge.rs
 //
-// LATENCY FIX: All bridge functions now use a persistent Tokio runtime and
+// v0.1.2 REFIT: The Hub client now handles SHM_READY routing internally.
+// The Python bridge API is unchanged — the iceoryx2 data plane is transparent
+// to Python consumers. All functions still return JSON strings.
+//
+// LATENCY FIX: All bridge functions use a persistent Tokio runtime and
 // cached D-Bus connection instead of creating new ones per call. This
 // eliminates ~300-400ms of overhead per invocation.
 use pyo3::{exceptions::PyRuntimeError, prelude::*};
@@ -65,7 +69,10 @@ pub fn crunch(py: Python, handle_id: String, query: String) -> PyResult<String> 
 
             let client = ensure_client().await
                 .map_err(map_imperial_error)?;
-            let analytics: nairobi_protocol::DistilledAnalytics = client.analyze(fd, &query).await
+
+            // The Hub client handles SHM_READY routing internally.
+            // analyze() returns a deserialized DistilledAnalytics struct.
+            let analytics = client.analyze(fd, &query).await
                 .map_err(map_imperial_error)?;
 
             serde_json::to_string(&analytics)
@@ -86,6 +93,8 @@ pub fn correlate(py: Python, handle_id: String, query: String) -> PyResult<Strin
 
             let client = ensure_client().await
                 .map_err(map_imperial_error)?;
+
+            // The Hub client handles SHM_READY routing internally.
             let correlation = client.correlation(fd, &query).await
                 .map_err(map_imperial_error)?;
 
@@ -98,6 +107,7 @@ pub fn correlate(py: Python, handle_id: String, query: String) -> PyResult<Strin
 /// Fused pipeline: ingest → crunch → correlate in a single D-Bus round trip.
 /// Returns a JSON string containing all analytics and correlation results.
 /// This is the highest-performance path for the full pipeline.
+/// Data flows through iceoryx2 shared memory when available.
 #[pyfunction]
 pub fn pipeline(py: Python, file_path: String, column: String, corr_columns: String) -> PyResult<String> {
     let rt = get_runtime();
@@ -106,6 +116,8 @@ pub fn pipeline(py: Python, file_path: String, column: String, corr_columns: Str
         rt.block_on(async {
             let client = ensure_client().await
                 .map_err(map_imperial_error)?;
+
+            // The Hub client handles SHM_READY routing internally.
             let result = client.ingest_crunch_correlate(&file_path, &column, &corr_columns).await
                 .map_err(map_imperial_error)?;
 
@@ -117,6 +129,7 @@ pub fn pipeline(py: Python, file_path: String, column: String, corr_columns: Str
 
 /// Fused crunch + correlate on an already-ingested handle.
 /// Single D-Bus round trip, single CSV parse.
+/// Data flows through iceoryx2 shared memory when available.
 #[pyfunction]
 pub fn crunch_and_correlate(py: Python, handle_id: String, column: String, corr_columns: String) -> PyResult<String> {
     let rt = get_runtime();
@@ -129,6 +142,8 @@ pub fn crunch_and_correlate(py: Python, handle_id: String, column: String, corr_
 
             let client = ensure_client().await
                 .map_err(map_imperial_error)?;
+
+            // The Hub client handles SHM_READY routing internally.
             let result = client.crunch_and_correlate(fd, &column, &corr_columns).await
                 .map_err(map_imperial_error)?;
 

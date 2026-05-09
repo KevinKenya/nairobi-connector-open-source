@@ -51,8 +51,13 @@ pub unsafe fn allocate_huge_page(size: usize) -> ImperialResult<*mut c_void> {
 }
 
 /// The Dirac Ingestion Engine — Hardware-accelerated zero-copy ingestion.
+///
+/// 3-Tier Ingestion Strategy:
+///   Tier 1: io_uring Read → Huge Page → write to memfd (hardware DMA path)
+///   Tier 2: copy_file_range (kernel splice)
+///   Tier 3: mmap fallback
 pub struct DiracEngine {
-    _ring: IoUring,
+    ring: IoUring,
     buffer_ptr: *mut c_void,
     buffer_size: usize,
 }
@@ -62,7 +67,7 @@ unsafe impl Sync for DiracEngine {}
 
 impl DiracEngine {
     pub fn new(buffer_size: usize) -> ImperialResult<Self> {
-        let _ring = match IoUring::builder()
+        let ring = match IoUring::builder()
             .setup_sqpoll(2000)
             .build(256)
         {
@@ -72,7 +77,7 @@ impl DiracEngine {
             }
             Err(e) => {
                 warn!(
-                    "[DIRAC] SQPOLL initialization failed ({}). Falling back to standard io_uring.",
+                    "[WARNING] SQPOLL requires elevated privileges. Falling back to standard io_uring. ({})",
                     e
                 );
                 IoUring::new(256).map_err(|e| {
@@ -84,13 +89,16 @@ impl DiracEngine {
         let buffer_ptr = unsafe { allocate_huge_page(buffer_size)? };
 
         Ok(Self {
-            _ring,
+            ring,
             buffer_ptr,
             buffer_size,
         })
     }
 
-    /// Ingests a file into a MemoryPipe using Zero-Copy Kernel Splice (copy_file_range).
+    /// Ingests a file using the 3-Tier strategy:
+    ///   Tier 1: io_uring Read into Huge Page buffer → write to memfd
+    ///   Tier 2: copy_file_range kernel splice → memfd
+    ///   Tier 3: mmap fallback → memfd
     pub async fn ingest(&mut self, file_path: &str) -> ImperialResult<OwnedFd> {
         let file = File::open(file_path).map_err(|e| {
             ImperialError::Ingestion(format!("Failed to open {}: {}", file_path, e))
@@ -108,54 +116,102 @@ impl DiracEngine {
             )));
         }
 
-        info!("[DIRAC] Initializing Zero-Copy Ingestion for {} (Size: {})", file_path, file_size);
+        info!("[DIRAC] Initializing 3-Tier Ingestion for {} (Size: {})", file_path, file_size);
 
         let mut pipe = MemoryPipe::new(file_size)?;
         let dst_fd = pipe.get_fd();
 
-        let mut off_in: libc::loff_t = 0;
-        let mut off_out: libc::loff_t = 0;
+        // === TIER 1: io_uring Read into Huge Page ===
+        let uring_success = unsafe {
+            let read_e = io_uring::opcode::Read::new(
+                io_uring::types::Fd(src_fd),
+                self.buffer_ptr as *mut u8,
+                file_size as u32,
+            )
+            .build()
+            .user_data(0x42);
 
-        // Attempt True Zero-Copy Kernel Splice
-        let ret = unsafe {
-            libc::copy_file_range(src_fd, &mut off_in, dst_fd, &mut off_out, file_size, 0)
+            let mut success = false;
+            if self.ring.submission().push(&read_e).is_ok() {
+                match self.ring.submit_and_wait(1) {
+                    Ok(_) => {
+                        if let Some(cqe) = self.ring.completion().next() {
+                            let bytes_read = cqe.result();
+                            if bytes_read >= 0 && bytes_read as usize == file_size {
+                                info!(
+                                    "[DIRAC] io_uring ingestion complete. Huge Page mapped at: {:p}. {} bytes DMA'd.",
+                                    self.buffer_ptr, file_size
+                                );
+                                // Write from Huge Page buffer into memfd
+                                let buf = std::slice::from_raw_parts(
+                                    self.buffer_ptr as *const u8,
+                                    file_size,
+                                );
+                                pipe.write_and_seal(buf)?;
+                                success = true;
+                            } else {
+                                warn!(
+                                    "[DIRAC] io_uring partial/failed read: result={}, expected={}. Falling to Tier 2.",
+                                    bytes_read, file_size
+                                );
+                            }
+                        }
+                    }
+                    Err(e) => {
+                        warn!("[DIRAC] io_uring submit_and_wait failed: {}. Falling to Tier 2.", e);
+                    }
+                }
+            } else {
+                warn!("[DIRAC] io_uring SQ full. Falling to Tier 2.");
+            }
+            success
         };
 
-        if ret < 0 {
-            let err = std::io::Error::last_os_error();
-            warn!("[DIRAC] Kernel Splice failed ({}), falling back to Mmap...", err);
+        if !uring_success {
+            // === TIER 2: copy_file_range kernel splice ===
+            let mut off_in: libc::loff_t = 0;
+            let mut off_out: libc::loff_t = 0;
 
-            // Fallback: Mmap Zero-Copy (No intermediate userspace Vec allocation)
-            let mmap = unsafe {
-                memmap2::Mmap::map(&file).map_err(|e| {
-                    ImperialError::Ingestion(format!("Mmap fallback failed: {}", e))
-                })?
+            let ret = unsafe {
+                libc::copy_file_range(src_fd, &mut off_in, dst_fd, &mut off_out, file_size, 0)
             };
-            pipe.write_and_seal(&mmap)?;
-        } else {
-            let mut total_copied = ret as usize;
-            while total_copied < file_size {
-                let bytes_to_copy = std::cmp::min(1024 * 1024 * 1024, file_size - total_copied);
-                let ret = unsafe {
-                    libc::copy_file_range(
-                        src_fd,
-                        &mut off_in,
-                        dst_fd,
-                        &mut off_out,
-                        bytes_to_copy,
-                        0,
-                    )
+
+            if ret < 0 {
+                let err = std::io::Error::last_os_error();
+                warn!("[DIRAC] Kernel Splice failed ({}). Falling to Tier 3 (Mmap).", err);
+
+                // === TIER 3: Mmap Zero-Copy fallback ===
+                let mmap = unsafe {
+                    memmap2::Mmap::map(&file).map_err(|e| {
+                        ImperialError::Ingestion(format!("Mmap fallback failed: {}", e))
+                    })?
                 };
-                if ret <= 0 {
-                    if ret < 0 {
-                        warn!("[DIRAC] Mid-splice failure: {}", std::io::Error::last_os_error());
+                pipe.write_and_seal(&mmap)?;
+            } else {
+                let mut total_copied = ret as usize;
+                while total_copied < file_size {
+                    let bytes_to_copy = std::cmp::min(1024 * 1024 * 1024, file_size - total_copied);
+                    let ret = unsafe {
+                        libc::copy_file_range(
+                            src_fd,
+                            &mut off_in,
+                            dst_fd,
+                            &mut off_out,
+                            bytes_to_copy,
+                            0,
+                        )
+                    };
+                    if ret <= 0 {
+                        if ret < 0 {
+                            warn!("[DIRAC] Mid-splice failure: {}", std::io::Error::last_os_error());
+                        }
+                        break;
                     }
-                    break;
+                    total_copied += ret as usize;
                 }
-                total_copied += ret as usize;
+                pipe.seal()?;
+                info!("[DIRAC] Kernel Splice complete (Tier 2). Total bytes: {}", total_copied);
             }
-            pipe.seal()?;
-            info!("[DIRAC] Kernel Splice complete. Total bytes: {}", total_copied);
         }
 
         let duped = unsafe { libc::dup(dst_fd) };
@@ -174,3 +230,4 @@ impl Drop for DiracEngine {
         }
     }
 }
+

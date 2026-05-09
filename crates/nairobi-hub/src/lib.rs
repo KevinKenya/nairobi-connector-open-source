@@ -9,7 +9,9 @@
 
 pub mod client;
 pub mod decoder;
+pub mod shm_subscriber;
 
 pub use client::RefineryClient;
 pub use decoder::generate_correlation_report;
 pub use decoder::generate_report;
+pub use shm_subscriber::ShmSubscriber;

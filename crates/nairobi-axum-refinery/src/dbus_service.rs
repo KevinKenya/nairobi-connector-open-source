@@ -1,21 +1,31 @@
 // File: /home/chege/nairobi-connector-open-source/crates/nairobi-axum-refinery/src/dbus_service.rs
 // Author: Kevin Chege. Location: Nairobi
-// Date: 2026-05-06
+// Date: 2026-05-08
 
 // nairobi-open-source-release/crates/nairobi-axum-refinery/src/dbus_service.rs
+//
+// v0.1.2 REFIT: D-Bus is now the Control Plane only.
+// The Data Plane uses iceoryx2 shared memory arenas.
+// Methods return "SHM_READY" when data is available in the arena,
+// or fall back to GVariant JSON payloads if iceoryx2 is unavailable.
+
 use crate::analyze::AnalyzeEngine;
 use crate::ingest::DiracEngine;
+use crate::shm_publisher::ShmPublisher;
 use nairobi_protocol::{
     CleanDataStrategy, CorrelationResult, DistilledAnalytics, FusedAnalyticsResult,
-    ImperialError, SchemaInspection,
+    ImperialError, PayloadType, SchemaInspection,
 };
-use tracing::{error, info};
+use tracing::{error, info, warn};
 use zbus::dbus_interface;
 use zbus::zvariant::OwnedFd;
 
 pub struct AxumRefineryService {
     ingest_engine: DiracEngine,
     analyze_engine: AnalyzeEngine,
+    /// iceoryx2 shared memory publisher (Data Plane).
+    /// `None` if iceoryx2 initialization failed — graceful degradation to D-Bus GVariant.
+    shm_publisher: Option<ShmPublisher>,
 }
 
 impl AxumRefineryService {
@@ -23,16 +33,52 @@ impl AxumRefineryService {
         let ingest_engine = DiracEngine::new(buffer_size)?;
         let analyze_engine = AnalyzeEngine::new()?;
 
+        // Attempt iceoryx2 Data Plane initialization
+        let shm_publisher = match ShmPublisher::new() {
+            Ok(publisher) => {
+                info!("[ICEORYX2] Data Plane initialized. D-Bus relegated to Control Plane.");
+                Some(publisher)
+            }
+            Err(e) => {
+                warn!(
+                    "[WARNING] iceoryx2 initialization failed: {}. \
+                     Falling back to D-Bus GVariant data plane. \
+                     Check /dev/shm permissions and OS shared memory limits.",
+                    e
+                );
+                None
+            }
+        };
+
         Ok(Self {
             ingest_engine,
             analyze_engine,
+            shm_publisher,
         })
+    }
+
+    /// Publish bytes to the iceoryx2 arena if available.
+    /// Returns true if published, false if fallback needed.
+    fn try_publish(&mut self, data: &[u8], payload_type: PayloadType) -> bool {
+        if let Some(ref mut publisher) = self.shm_publisher {
+            match publisher.publish(data, payload_type) {
+                Ok(()) => true,
+                Err(e) => {
+                    error!("[ICEORYX2] Publish failed: {}. Falling back to D-Bus.", e);
+                    false
+                }
+            }
+        } else {
+            false
+        }
     }
 }
 
 #[dbus_interface(name = "org.nairobi.NairobiAxumRefinery1")]
 impl AxumRefineryService {
     /// Ingest a file into a memfd buffer.
+    /// Ingestion always returns an FD — the data plane optimization
+    /// applies to analytical results, not raw file handles.
     async fn ingest(&mut self, file_path: &str) -> zbus::fdo::Result<OwnedFd> {
         info!("[DBUS] Ingest requested for: {}", file_path);
         self.ingest_engine.ingest(file_path).await.map_err(|e| {
@@ -46,7 +92,7 @@ impl AxumRefineryService {
         &mut self,
         handle: OwnedFd,
         query: &str,
-    ) -> zbus::fdo::Result<DistilledAnalytics> {
+    ) -> zbus::fdo::Result<String> {
         info!("[DBUS] Analyze requested for query: {}", query);
 
         let analytics =
@@ -57,7 +103,19 @@ impl AxumRefineryService {
                     zbus::fdo::Error::Failed(e.to_string())
                 })?;
 
-        Ok(analytics)
+        // Serialize to JSON
+        let json = serde_json::to_string(&analytics).map_err(|e| {
+            zbus::fdo::Error::Failed(format!("JSON serialization failed: {}", e))
+        })?;
+
+        // Try iceoryx2 data plane
+        if self.try_publish(json.as_bytes(), PayloadType::JsonResult) {
+            info!("[ICEORYX2] Analyze result published to arena. {} bytes. Zero kernel copies.", json.len());
+            Ok("SHM_READY".to_string())
+        } else {
+            // Graceful degradation: return JSON over D-Bus
+            Ok(json)
+        }
     }
 
     /// Inspect the schema of a memfd buffer.
@@ -97,7 +155,7 @@ impl AxumRefineryService {
         Ok(new_handle)
     }
 
-    /// Execute a SQL query on a memfd buffer and return a new memfd buffer.
+    /// Execute a SQL query on a memfd buffer and return result via arena or D-Bus.
     async fn sql_query(&mut self, handle: OwnedFd, query: &str) -> zbus::fdo::Result<OwnedFd> {
         info!("[DBUS] SQL Query requested: {}", query);
 
@@ -118,7 +176,7 @@ impl AxumRefineryService {
         &mut self,
         handle: OwnedFd,
         query: &str,
-    ) -> zbus::fdo::Result<CorrelationResult> {
+    ) -> zbus::fdo::Result<String> {
         info!("[DBUS] Correlation requested: {}", query);
 
         let result =
@@ -129,7 +187,16 @@ impl AxumRefineryService {
                     zbus::fdo::Error::Failed(e.to_string())
                 })?;
 
-        Ok(result)
+        let json = serde_json::to_string(&result).map_err(|e| {
+            zbus::fdo::Error::Failed(format!("JSON serialization failed: {}", e))
+        })?;
+
+        if self.try_publish(json.as_bytes(), PayloadType::JsonResult) {
+            info!("[ICEORYX2] Correlation result published to arena. {} bytes.", json.len());
+            Ok("SHM_READY".to_string())
+        } else {
+            Ok(json)
+        }
     }
 
     /// Fused crunch + correlate in a single D-Bus call.
@@ -139,7 +206,7 @@ impl AxumRefineryService {
         handle: OwnedFd,
         column: &str,
         corr_columns: &str,
-    ) -> zbus::fdo::Result<FusedAnalyticsResult> {
+    ) -> zbus::fdo::Result<String> {
         info!(
             "[DBUS] Fused CrunchAndCorrelate: column={}, corr={}",
             column, corr_columns
@@ -153,7 +220,16 @@ impl AxumRefineryService {
                 zbus::fdo::Error::Failed(e.to_string())
             })?;
 
-        Ok(result)
+        let json = serde_json::to_string(&result).map_err(|e| {
+            zbus::fdo::Error::Failed(format!("JSON serialization failed: {}", e))
+        })?;
+
+        if self.try_publish(json.as_bytes(), PayloadType::JsonResult) {
+            info!("[ICEORYX2] CrunchAndCorrelate result published to arena. {} bytes. Zero kernel copies.", json.len());
+            Ok("SHM_READY".to_string())
+        } else {
+            Ok(json)
+        }
     }
 
     /// Full pipeline in a single D-Bus call: ingest → crunch → correlate.
@@ -163,7 +239,7 @@ impl AxumRefineryService {
         file_path: &str,
         column: &str,
         corr_columns: &str,
-    ) -> zbus::fdo::Result<FusedAnalyticsResult> {
+    ) -> zbus::fdo::Result<String> {
         info!(
             "[DBUS] Fused IngestCrunchCorrelate: file={}, column={}, corr={}",
             file_path, column, corr_columns
@@ -184,6 +260,18 @@ impl AxumRefineryService {
                 zbus::fdo::Error::Failed(e.to_string())
             })?;
 
-        Ok(result)
+        let json = serde_json::to_string(&result).map_err(|e| {
+            zbus::fdo::Error::Failed(format!("JSON serialization failed: {}", e))
+        })?;
+
+        if self.try_publish(json.as_bytes(), PayloadType::JsonResult) {
+            info!(
+                "[ICEORYX2] IngestCrunchCorrelate result published to arena. {} bytes. Zero kernel copies.",
+                json.len()
+            );
+            Ok("SHM_READY".to_string())
+        } else {
+            Ok(json)
+        }
     }
 }

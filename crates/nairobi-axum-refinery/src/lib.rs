@@ -10,3 +10,4 @@
 pub mod dbus_service;
 pub mod ingest;
 pub mod analyze;
+pub mod shm_publisher;

@@ -17,9 +17,11 @@ pub mod error;
 pub mod interface;
 pub mod mem_pipe;
 pub mod types;
+pub mod arena;
 
 // ── Constitutional Re-exports ──────────────────────────────────────
 pub use error::{ImperialError, ImperialResult};
 pub use interface::{INTERFACE_NAME, OBJECT_PATH, SERVICE_NAME};
 pub use mem_pipe::MemoryPipe;
 pub use types::{CleanDataStrategy, CorrelationResult, DistilledAnalytics, FusedAnalyticsResult, SchemaInspection};
+pub use arena::{ArenaHeader, PayloadType, ARENA_SERVICE_NAME, ARENA_SHM_NAME, ARENA_MAX_SIZE};

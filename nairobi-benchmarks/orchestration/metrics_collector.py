@@ -18,15 +18,30 @@ class MetricsCollector:
         process = psutil.Process(pid)
         while not self.stop_event.is_set():
             try:
-                # Capture Peak CPU (interval=0.1s for precision)
+                # 1. Python process metrics (interval=0.1s for precision)
                 cpu_percent = process.cpu_percent(interval=0.1)
-                if cpu_percent > self.peak_cpu:
-                    self.peak_cpu = cpu_percent
-                
-                # Capture RAM
                 mem_info = process.memory_info()
-                if mem_info.rss > self.peak_ram_rss:
-                    self.peak_ram_rss = mem_info.rss
+                combined_cpu = cpu_percent
+                combined_rss = mem_info.rss
+
+                # 2. Hunt for the detached Rust daemon
+                for proc in psutil.process_iter(['name', 'pid']):
+                    try:
+                        if proc.info['name'] == 'nairobi-axum-refinery':
+                            rust_cpu = proc.cpu_percent(interval=0)
+                            rust_mem = proc.memory_info()
+                            combined_cpu += rust_cpu
+                            combined_rss += rust_mem.rss
+                            break  # Only one daemon instance expected
+                    except (psutil.NoSuchProcess, psutil.AccessDenied):
+                        continue
+
+                # 3. Record combined peaks (Python + Rust daemon)
+                if combined_cpu > self.peak_cpu:
+                    self.peak_cpu = combined_cpu
+                if combined_rss > self.peak_ram_rss:
+                    self.peak_ram_rss = combined_rss
+
             except (psutil.NoSuchProcess, psutil.AccessDenied):
                 break
 

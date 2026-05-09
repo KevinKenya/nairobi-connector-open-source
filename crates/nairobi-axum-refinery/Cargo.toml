@@ -44,6 +44,12 @@ polars-sql = "0.34.2"
 sha2   = "0.10"
 rayon  = "1.10"
 
+# JSON serialization (iceoryx2 arena payloads)
+serde_json = "1"
+
+# Zero-copy shared memory IPC (Data Plane)
+iceoryx2 = { workspace = true }
+
 # Logging
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
