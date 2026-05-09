@@ -13,6 +13,7 @@ use polars::prelude::*;
 use rayon::prelude::*;
 use std::os::unix::io::{AsRawFd, FromRawFd};
 use std::sync::Arc;
+use tracing::info;
 use zbus::zvariant::OwnedFd;
 
 /// Get Peak RSS (Resident Set Size) from /proc/self/status
@@ -170,6 +171,123 @@ fn compute_pearson_corr(ca1: &Float64Chunked, ca2: &Float64Chunked) -> f64 {
     }
 }
 
+
+
+/// Safe wrapper for memory-mapping an OwnedFd.
+/// Automatically handles the AsRawFd -> Mmap transition.
+pub struct SafeMmap {
+    mmap: Mmap,
+}
+
+impl SafeMmap {
+    /// Map an OwnedFd read-only.
+    pub fn map(handle: &OwnedFd) -> ImperialResult<Self> {
+        let mmap = unsafe {
+            Mmap::map(handle).map_err(|e| ImperialError::Analysis(format!("Mmap failed: {}", e)))?
+        };
+        Ok(Self { mmap })
+    }
+
+    pub fn as_slice(&self) -> &[u8] {
+        &self.mmap[..]
+    }
+}
+
+/// Consolidated statistical profile for analytical results.
+pub struct StatisticalProfile {
+    pub min: f64,
+    pub max: f64,
+    pub mean: f64,
+    pub std_dev: f64,
+    pub variance: f64,
+    pub p95: f64,
+    pub p99: f64,
+    pub skewness: f64,
+    pub kurtosis: f64,
+    pub anomalies: Vec<String>,
+}
+
+impl StatisticalProfile {
+    /// Compute the statistical profile from a Float64 series.
+    pub fn compute(
+        ca: &Float64Chunked,
+        df: &DataFrame,
+        total_rows: u64,
+    ) -> ImperialResult<Self> {
+        let mut profile = Self {
+            min: 0.0,
+            max: 0.0,
+            mean: 0.0,
+            std_dev: 0.0,
+            variance: 0.0,
+            p95: 0.0,
+            p99: 0.0,
+            skewness: 0.0,
+            kurtosis: 0.0,
+            anomalies: Vec::new(),
+        };
+
+        if total_rows > 0 {
+            profile.min = ca.min().unwrap_or(0.0);
+            profile.max = ca.max().unwrap_or(0.0);
+            profile.mean = ca.mean().unwrap_or(0.0);
+
+            if total_rows >= 2 {
+                profile.std_dev = ca.std(1).unwrap_or(0.0);
+                profile.variance = ca.var(1).unwrap_or(0.0);
+
+                if profile.std_dev > 0.0 {
+                    let mean = profile.mean;
+                    let values: Vec<f64> = ca.into_no_null_iter().collect();
+                    let (sum_cube, sum_fourth) = values
+                        .par_iter()
+                        .map(|v| {
+                            let diff = v - mean;
+                            (diff.powi(3), diff.powi(4))
+                        })
+                        .reduce(|| (0.0_f64, 0.0_f64), |a, b| (a.0 + b.0, a.1 + b.1));
+                    
+                    let n = total_rows as f64;
+                    profile.skewness = (sum_cube / n) / profile.std_dev.powi(3);
+                    profile.kurtosis = (sum_fourth / n) / profile.std_dev.powi(4) - 3.0;
+
+                    // Anomaly detection
+                    let mut anomaly_indices: Vec<usize> = Vec::new();
+                    for (i, opt_v) in ca.into_iter().enumerate() {
+                        if let Some(val) = opt_v {
+                            if (val - mean).abs() / profile.std_dev > 3.0 {
+                                anomaly_indices.push(i);
+                            }
+                        }
+                    }
+                    let limit = std::cmp::min(anomaly_indices.len(), 5);
+                    for &idx in &anomaly_indices[..limit] {
+                        if let Some(row) = df.get(idx) {
+                            let row_str: String = row
+                                .iter()
+                                .map(|v: &AnyValue<'_>| v.to_string())
+                                .collect::<Vec<String>>()
+                                .join(",");
+                            profile.anomalies.push(row_str);
+                        }
+                    }
+                }
+            }
+
+            profile.p95 = ca
+                .quantile(0.95, QuantileInterpolOptions::Linear)
+                .map_err(|e| ImperialError::Analysis(format!("P95 calculation failed: {}", e)))?
+                .unwrap_or(0.0);
+            profile.p99 = ca
+                .quantile(0.99, QuantileInterpolOptions::Linear)
+                .map_err(|e| ImperialError::Analysis(format!("P99 calculation failed: {}", e)))?
+                .unwrap_or(0.0);
+        }
+
+        Ok(profile)
+    }
+}
+
 /// Vectorized Analytics Engine using Polars.
 pub struct AnalyzeEngine {
     thread_pool: Arc<rayon::ThreadPool>,
@@ -177,8 +295,16 @@ pub struct AnalyzeEngine {
 
 impl AnalyzeEngine {
     pub fn new() -> ImperialResult<Self> {
+        // Govern threads: use half of available parallelism to avoid host starvation.
+        let threads = std::thread::available_parallelism()
+            .map(|n| n.get())
+            .unwrap_or(1) / 2;
+        let threads = std::cmp::max(1, threads);
+
+        info!("[ANALYZE] Initializing Rayon pool with {} threads", threads);
+
         let pool = rayon::ThreadPoolBuilder::new()
-            .num_threads(6)
+            .num_threads(threads)
             .build()
             .map_err(|e| ImperialError::Analysis(format!("Failed to build Rayon pool: {}", e)))?;
 
@@ -189,16 +315,12 @@ impl AnalyzeEngine {
 
     /// Executes vectorized analytics on a memfd buffer.
     pub fn analyze(&self, handle: OwnedFd, query: &str) -> ImperialResult<DistilledAnalytics> {
-        // 1. Map the handle read-only
-        // SAFETY: The handle is a valid FD from D-Bus.
-        let file = unsafe { std::fs::File::from_raw_fd(handle.as_raw_fd()) };
-        let mmap = unsafe {
-            Mmap::map(&file).map_err(|e| ImperialError::Analysis(format!("Mmap failed: {}", e)))?
-        };
+        // 1. Map the handle read-only via SafeMmap
+        let smmap = SafeMmap::map(&handle)?;
 
         // 2. Execute within the capped Rayon pool
         self.thread_pool.install(|| {
-            let cursor = std::io::Cursor::new(&mmap[..]);
+            let cursor = std::io::Cursor::new(smmap.as_slice());
 
             // Schema override for the target column
             let schema_override = Schema::from_iter(vec![Field::new(query, DataType::Float64)]);
@@ -224,111 +346,32 @@ impl AnalyzeEngine {
 
             let total_rows = df.height() as u64;
 
-            let mut analytics = DistilledAnalytics {
+            // 3. Compute Statistical Profile (DRY logic)
+            let profile = StatisticalProfile::compute(ca, &df, total_rows)?;
+
+            Ok(DistilledAnalytics {
                 total_rows,
-                min: 0.0,
-                max: 0.0,
-                mean: 0.0,
-                std_dev: 0.0,
-                variance: 0.0,
-                p95: 0.0,
-                p99: 0.0,
-                skewness: 0.0,
-                kurtosis: 0.0,
+                min: profile.min,
+                max: profile.max,
+                mean: profile.mean,
+                std_dev: profile.std_dev,
+                variance: profile.variance,
+                p95: profile.p95,
+                p99: profile.p99,
+                skewness: profile.skewness,
+                kurtosis: profile.kurtosis,
                 handle,
-                anomalies: Vec::new(),
-            };
-
-            if total_rows > 0 {
-                analytics.min = ca.min().unwrap_or(0.0);
-                analytics.max = ca.max().unwrap_or(0.0);
-                analytics.mean = ca.mean().unwrap_or(0.0);
-
-                if total_rows >= 2 {
-                    analytics.std_dev = ca.std(1).unwrap_or(0.0);
-                    analytics.variance = ca.var(1).unwrap_or(0.0);
-
-                    // Manual skewness and kurtosis calculation
-                    // Skewness = E[(X - μ)³] / σ³
-                    // Kurtosis = E[(X - μ)⁴] / σ⁴ - 3 (excess kurtosis)
-                    if analytics.std_dev > 0.0 {
-                        let mean = analytics.mean;
-                        // Collect non-null values for parallel processing
-                        let values: Vec<f64> = ca.into_no_null_iter().collect();
-                        let (sum_cube, sum_fourth) = values
-                            .par_iter()
-                            .map(|v| {
-                                let diff = v - mean;
-                                (diff.powi(3), diff.powi(4))
-                            })
-                            .reduce(|| (0.0_f64, 0.0_f64), |a, b| (a.0 + b.0, a.1 + b.1));
-                        let n = total_rows as f64;
-                        let m3 = sum_cube / n;
-                        let m4 = sum_fourth / n;
-                        let s3 = analytics.std_dev.powi(3);
-                        let s4 = analytics.std_dev.powi(4);
-
-                        analytics.skewness = m3 / s3;
-                        analytics.kurtosis = m4 / s4 - 3.0;
-                    }
-                }
-
-                analytics.p95 = ca
-                    .quantile(0.95, QuantileInterpolOptions::Linear)
-                    .map_err(|e| ImperialError::Analysis(format!("P95 calculation failed: {}", e)))?
-                    .unwrap_or(0.0);
-                analytics.p99 = ca
-                    .quantile(0.99, QuantileInterpolOptions::Linear)
-                    .map_err(|e| ImperialError::Analysis(format!("P99 calculation failed: {}", e)))?
-                    .unwrap_or(0.0);
-
-                // Z-Score Anomaly Detection (threshold > 3.0 sigma)
-                if analytics.std_dev > 0.0 {
-                    let mean = analytics.mean;
-                    let std_dev = analytics.std_dev;
-
-                    // Collect indices of anomalous rows
-                    let mut anomaly_indices: Vec<usize> = Vec::new();
-                    for (i, opt_v) in ca.into_iter().enumerate() {
-                        if let Some(val) = opt_v {
-                            if (val - mean).abs() / std_dev > 3.0 {
-                                anomaly_indices.push(i);
-                            }
-                        }
-                    }
-
-                    // Cap at 5 anomalies for token efficiency
-                    let limit = std::cmp::min(anomaly_indices.len(), 5);
-                    for &idx in &anomaly_indices[..limit] {
-                        if let Some(row) = df.get(idx) {
-                            let row_str: String = row
-                                .iter()
-                                .map(|v: &AnyValue<'_>| v.to_string())
-                                .collect::<Vec<String>>()
-                                .join(",");
-                            analytics.anomalies.push(row_str);
-                        }
-                    }
-                }
-            }
-
-            // We don't want to close the file yet because the FD is owned by 'handle'
-            // and we'll return it back. std::fs::File::from_raw_fd will close it on drop.
-            std::mem::forget(file);
-
-            Ok(analytics)
+                anomalies: profile.anomalies,
+            })
         })
     }
 
     /// Inspects the schema and returns a sample of the data.
     pub fn inspect_schema(&self, handle: OwnedFd) -> ImperialResult<SchemaInspection> {
-        let file = unsafe { std::fs::File::from_raw_fd(handle.as_raw_fd()) };
-        let mmap = unsafe {
-            Mmap::map(&file).map_err(|e| ImperialError::Analysis(format!("Mmap failed: {}", e)))?
-        };
+        let smmap = SafeMmap::map(&handle)?;
 
         self.thread_pool.install(|| {
-            let cursor = std::io::Cursor::new(&mmap[..]);
+            let cursor = std::io::Cursor::new(smmap.as_slice());
 
             let df = CsvReader::new(cursor)
                 .has_header(true)
@@ -357,8 +400,6 @@ impl AnalyzeEngine {
             let sample_df = df.head(Some(5));
             let sample_json = format!("{:?}", sample_df);
 
-            std::mem::forget(file);
-
             Ok(SchemaInspection {
                 columns,
                 data_types,
@@ -375,13 +416,10 @@ impl AnalyzeEngine {
         handle: OwnedFd,
         strategies: Vec<CleanDataStrategy>,
     ) -> ImperialResult<OwnedFd> {
-        let file = unsafe { std::fs::File::from_raw_fd(handle.as_raw_fd()) };
-        let mmap = unsafe {
-            Mmap::map(&file).map_err(|e| ImperialError::Analysis(format!("Mmap failed: {}", e)))?
-        };
+        let smmap = SafeMmap::map(&handle)?;
 
         self.thread_pool.install(|| {
-            let cursor = std::io::Cursor::new(&mmap[..]);
+            let cursor = std::io::Cursor::new(smmap.as_slice());
 
             let mut df = CsvReader::new(cursor)
                 .has_header(true)
@@ -431,29 +469,22 @@ impl AnalyzeEngine {
             let raw_fd = out_file.into_raw_fd();
             let new_handle = unsafe { OwnedFd::from_raw_fd(raw_fd) };
 
-            std::mem::forget(file);
-
             Ok(new_handle)
         })
     }
 
     /// Execute a SQL query on a memfd buffer and return a new memfd buffer.
     pub async fn sql_query(&self, handle: OwnedFd, query: &str) -> ImperialResult<OwnedFd> {
-        // We use tokio::task::spawn_blocking combined with tokio::time::timeout for the Execution Guillotine.
         let query_owned = query.to_string();
         let pool = self.thread_pool.clone();
 
         let result = tokio::time::timeout(
             std::time::Duration::from_secs(10),
             tokio::task::spawn_blocking(move || {
-                let file = unsafe { std::fs::File::from_raw_fd(handle.as_raw_fd()) };
-                let mmap = unsafe {
-                    Mmap::map(&file)
-                        .map_err(|e| ImperialError::Analysis(format!("Mmap failed: {}", e)))?
-                };
+                let smmap = SafeMmap::map(&handle)?;
 
                 pool.install(|| {
-                    let cursor = std::io::Cursor::new(&mmap[..]);
+                    let cursor = std::io::Cursor::new(smmap.as_slice());
 
                     let df = CsvReader::new(cursor)
                         .has_header(true)
@@ -493,7 +524,6 @@ impl AnalyzeEngine {
                     let raw_fd = out_file.into_raw_fd();
                     let new_handle = unsafe { OwnedFd::from_raw_fd(raw_fd) };
 
-                    std::mem::forget(file); // Ensure handle drops it later
                     Ok(new_handle)
                 })
             }),
@@ -515,15 +545,11 @@ impl AnalyzeEngine {
 
     /// Calculate correlation between two columns in a memfd buffer.
     /// Returns (Pearson, Spearman) coefficients.
-    /// Guard: Returns (0.0, 0.0) for zero variance or insufficient data.
     pub fn correlation(&self, handle: OwnedFd, query: &str) -> ImperialResult<CorrelationResult> {
-        let file = unsafe { std::fs::File::from_raw_fd(handle.as_raw_fd()) };
-        let mmap = unsafe {
-            Mmap::map(&file).map_err(|e| ImperialError::Analysis(format!("Mmap failed: {}", e)))?
-        };
+        let smmap = SafeMmap::map(&handle)?;
 
         let result = self.thread_pool.install(|| {
-            let cursor = std::io::Cursor::new(&mmap[..]);
+            let cursor = std::io::Cursor::new(smmap.as_slice());
             let df = CsvReader::new(cursor)
                 .has_header(true)
                 .with_ignore_errors(true)
@@ -582,8 +608,6 @@ impl AnalyzeEngine {
             // Spearman rank correlation — manual rank-and-correlate
             let spearman = compute_spearman_rank_corr(ca1, ca2);
 
-            std::mem::forget(file);
-
             Ok(CorrelationResult { pearson, spearman })
         });
 
@@ -595,20 +619,16 @@ impl AnalyzeEngine {
     }
 
     /// Fused crunch + correlate: single CSV parse, single D-Bus round trip.
-    /// Eliminates duplicate memfd mmap and CSV parsing.
     pub fn crunch_and_correlate(
         &self,
         handle: OwnedFd,
         column: &str,
         corr_columns: &str,
     ) -> ImperialResult<FusedAnalyticsResult> {
-        let file = unsafe { std::fs::File::from_raw_fd(handle.as_raw_fd()) };
-        let mmap = unsafe {
-            Mmap::map(&file).map_err(|e| ImperialError::Analysis(format!("Mmap failed: {}", e)))?
-        };
+        let smmap = SafeMmap::map(&handle)?;
 
         let result = self.thread_pool.install(|| {
-            let cursor = std::io::Cursor::new(&mmap[..]);
+            let cursor = std::io::Cursor::new(smmap.as_slice());
 
             let schema_override = Schema::from_iter(vec![Field::new(column, DataType::Float64)]);
 
@@ -621,7 +641,7 @@ impl AnalyzeEngine {
 
             let total_rows = df.height() as u64;
 
-            // ── Analytics ──
+            // ── Analytics (using Centralized Statistical Cortex) ──
             let series = df.column(column).map_err(|e| {
                 ImperialError::Analysis(format!("Column '{}' not found: {}", column, e))
             })?;
@@ -632,65 +652,7 @@ impl AnalyzeEngine {
                 .f64()
                 .map_err(|e| ImperialError::Analysis(format!("Not Float64: {}", e)))?;
 
-            let min = ca.min().unwrap_or(0.0);
-            let max = ca.max().unwrap_or(0.0);
-            let mean = ca.mean().unwrap_or(0.0);
-            let mut std_dev = 0.0;
-            let mut variance = 0.0;
-            let mut skewness = 0.0;
-            let mut kurtosis = 0.0;
-            let mut p95 = 0.0;
-            let mut p99 = 0.0;
-            let mut anomalies = Vec::new();
-
-            if total_rows >= 2 {
-                std_dev = ca.std(1).unwrap_or(0.0);
-                variance = ca.var(1).unwrap_or(0.0);
-
-                if std_dev > 0.0 {
-                    let values: Vec<f64> = ca.into_no_null_iter().collect();
-                    let (sum_cube, sum_fourth) = values
-                        .par_iter()
-                        .map(|v| {
-                            let diff = v - mean;
-                            (diff.powi(3), diff.powi(4))
-                        })
-                        .reduce(|| (0.0_f64, 0.0_f64), |a, b| (a.0 + b.0, a.1 + b.1));
-                    let n = total_rows as f64;
-                    skewness = (sum_cube / n) / std_dev.powi(3);
-                    kurtosis = (sum_fourth / n) / std_dev.powi(4) - 3.0;
-
-                    // Anomaly detection
-                    let mut anomaly_indices: Vec<usize> = Vec::new();
-                    for (i, opt_v) in ca.into_iter().enumerate() {
-                        if let Some(val) = opt_v {
-                            if (val - mean).abs() / std_dev > 3.0 {
-                                anomaly_indices.push(i);
-                            }
-                        }
-                    }
-                    let limit = std::cmp::min(anomaly_indices.len(), 5);
-                    for &idx in &anomaly_indices[..limit] {
-                        if let Some(row) = df.get(idx) {
-                            let row_str: String = row
-                                .iter()
-                                .map(|v: &AnyValue<'_>| v.to_string())
-                                .collect::<Vec<String>>()
-                                .join(",");
-                            anomalies.push(row_str);
-                        }
-                    }
-                }
-
-                p95 = ca
-                    .quantile(0.95, QuantileInterpolOptions::Linear)
-                    .map_err(|e| ImperialError::Analysis(format!("P95 failed: {}", e)))?
-                    .unwrap_or(0.0);
-                p99 = ca
-                    .quantile(0.99, QuantileInterpolOptions::Linear)
-                    .map_err(|e| ImperialError::Analysis(format!("P99 failed: {}", e)))?
-                    .unwrap_or(0.0);
-            }
+            let profile = StatisticalProfile::compute(ca, &df, total_rows)?;
 
             // ── Correlation (same DataFrame, no re-parse) ──
             let cols: Vec<&str> = corr_columns.split(',').map(|s| s.trim()).collect();
@@ -725,22 +687,20 @@ impl AnalyzeEngine {
                 (0.0, 0.0)
             };
 
-            std::mem::forget(file);
-
             Ok(FusedAnalyticsResult {
                 total_rows,
-                min,
-                max,
-                mean,
-                std_dev,
-                variance,
-                p95,
-                p99,
-                skewness,
-                kurtosis,
+                min: profile.min,
+                max: profile.max,
+                mean: profile.mean,
+                std_dev: profile.std_dev,
+                variance: profile.variance,
+                p95: profile.p95,
+                p99: profile.p99,
+                skewness: profile.skewness,
+                kurtosis: profile.kurtosis,
                 pearson,
                 spearman,
-                anomalies,
+                anomalies: profile.anomalies,
             })
         });
 

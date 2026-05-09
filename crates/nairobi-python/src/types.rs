@@ -15,13 +15,15 @@ use nairobi_hub::RefineryClient;
 // A single Tokio runtime and D-Bus connection shared across all bridge calls.
 // This eliminates ~300-400ms of overhead per call from Runtime::new() + Connection::session().
 
-static GLOBAL_RUNTIME: OnceLock<Runtime> = OnceLock::new();
+static GLOBAL_RUNTIME: once_cell::sync::OnceCell<Runtime> = once_cell::sync::OnceCell::new();
 static GLOBAL_CLIENT: OnceLock<tokio::sync::OnceCell<RefineryClient>> = OnceLock::new();
 
 /// Returns the shared Tokio runtime (created once on first use).
-pub fn get_runtime() -> &'static Runtime {
-    GLOBAL_RUNTIME.get_or_init(|| {
-        Runtime::new().expect("Failed to create persistent Tokio runtime")
+pub fn get_runtime() -> pyo3::PyResult<&'static Runtime> {
+    GLOBAL_RUNTIME.get_or_try_init(|| {
+        Runtime::new().map_err(|e| {
+            pyo3::exceptions::PyRuntimeError::new_err(format!("Failed to create persistent Tokio runtime: {}", e))
+        })
     })
 }
 

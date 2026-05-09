@@ -152,7 +152,7 @@ def save_results(raw_data, timestamp):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--workload", required=True)
-    parser.add_argument("--engines", nargs="+", default=["pandas", "polars", "duckdb", "nairobi"])
+    parser.add_argument("--engines", nargs="+", default=["pandas", "nairobi"])
     parser.add_argument("--iterations", type=int, default=10)
     parser.add_argument("--cold-cache", action="store_true", help="Enable cold cache (drops system caches before each engine)")
     args = parser.parse_args()

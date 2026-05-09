@@ -29,6 +29,8 @@ dist/
 
 # Datasets & Large Files
 **/*.csv
+simulator/*.csv
+simulator/*.parquet
 **/results/raw/*.json
 
 # IDE & OS

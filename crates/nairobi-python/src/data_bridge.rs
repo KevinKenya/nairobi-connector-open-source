@@ -16,7 +16,7 @@ use crate::types::{ensure_client, get_registry, get_runtime, map_imperial_error}
 
 #[pyfunction]
 pub fn ingest(py: Python, file_path: String) -> PyResult<String> {
-    let rt = get_runtime();
+    let rt = get_runtime()?;
 
     let handle_id = py.allow_threads(|| {
         rt.block_on(async {
@@ -37,7 +37,7 @@ pub fn ingest(py: Python, file_path: String) -> PyResult<String> {
 
 #[pyfunction]
 pub fn sql_query(py: Python, handle_id: String, query: String) -> PyResult<String> {
-    let rt = get_runtime();
+    let rt = get_runtime()?;
 
     py.allow_threads(|| {
         rt.block_on(async {
@@ -59,7 +59,7 @@ pub fn sql_query(py: Python, handle_id: String, query: String) -> PyResult<Strin
 
 #[pyfunction]
 pub fn crunch(py: Python, handle_id: String, query: String) -> PyResult<String> {
-    let rt = get_runtime();
+    let rt = get_runtime()?;
 
     py.allow_threads(|| {
         rt.block_on(async {
@@ -83,7 +83,7 @@ pub fn crunch(py: Python, handle_id: String, query: String) -> PyResult<String> 
 
 #[pyfunction]
 pub fn correlate(py: Python, handle_id: String, query: String) -> PyResult<String> {
-    let rt = get_runtime();
+    let rt = get_runtime()?;
 
     py.allow_threads(|| {
         rt.block_on(async {
@@ -110,7 +110,7 @@ pub fn correlate(py: Python, handle_id: String, query: String) -> PyResult<Strin
 /// Data flows through iceoryx2 shared memory when available.
 #[pyfunction]
 pub fn pipeline(py: Python, file_path: String, column: String, corr_columns: String) -> PyResult<String> {
-    let rt = get_runtime();
+    let rt = get_runtime()?;
 
     py.allow_threads(|| {
         rt.block_on(async {
@@ -132,7 +132,7 @@ pub fn pipeline(py: Python, file_path: String, column: String, corr_columns: Str
 /// Data flows through iceoryx2 shared memory when available.
 #[pyfunction]
 pub fn crunch_and_correlate(py: Python, handle_id: String, column: String, corr_columns: String) -> PyResult<String> {
-    let rt = get_runtime();
+    let rt = get_runtime()?;
 
     py.allow_threads(|| {
         rt.block_on(async {
@@ -155,7 +155,7 @@ pub fn crunch_and_correlate(py: Python, handle_id: String, column: String, corr_
 
 #[pyfunction]
 pub fn free(py: Python, handle_id: String) -> PyResult<()> {
-    let rt = get_runtime();
+    let rt = get_runtime()?;
 
     py.allow_threads(|| {
         rt.block_on(async {

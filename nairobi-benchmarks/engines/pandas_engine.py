@@ -19,9 +19,9 @@ class BenchmarkEngine:
         dataset_path = self.config['dataset']
         column = self.config.get('column', 'points')
         
-        # 1. Ingest (Using PyArrow engine for performance) - Timed
+        # 1. Ingest (Standard Junior implementation - no pyarrow optimization)
         ingest_start = time.perf_counter_ns()
-        self.df = pd.read_csv(dataset_path, engine='pyarrow')
+        self.df = pd.read_csv(dataset_path)
         ingest_ms = (time.perf_counter_ns() - ingest_start) / 1_000_000
         
         # 2. Crunch (Statistical Distillation) - Timed

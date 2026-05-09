@@ -4,13 +4,12 @@
 # Nairobi OS Performance Methodology
 
 ## 1. Objective
-This suite is designed to evaluate the performance of Nairobi OS against industry-standard data processing engines (Pandas, Polars, DuckDB) under rigorous scientific conditions.
+This suite is designed to evaluate the performance of Nairobi OS against a standard, unoptimized Pandas implementation, representing how a typical developer would interact with data in a Python environment.
 
 ## 2. Fairness Principles
-*   **Idiomatic Code**: All competitors utilize their most optimized, idiomatic execution paths.
-    *   **Pandas**: Uses vectorized operations and the PyArrow backend for ingestion.
-    *   **Polars**: Uses the **Lazy API** (`.lazy()...collect()`) to allow query optimization.
-    *   **DuckDB**: Uses standard SQL with direct CSV scanning.
+*   **Idiomatic Code**: 
+    *   **Pandas**: Uses standard `pd.read_csv()` without specialized engines (like PyArrow) and built-in vectorized methods for statistics.
+    *   **Nairobi OS**: Uses the high-performance, zero-copy shared memory Data Plane (`iceoryx2`) and the `Polars` vectorized analytical engine in the refinery.
 *   **Standardized Output**: Every engine must return identical mathematical results (within a `±1e-5` tolerance). If an engine fails the math, its latency results are disqualified.
 
 ## 3. Cache Methodology

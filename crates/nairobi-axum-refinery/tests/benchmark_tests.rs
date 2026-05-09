@@ -77,8 +77,8 @@ fn test_polars_sql_latency() {
 
     // Verify Rayon thread pool capping
     assert!(
-        file_contains(path, "num_threads(6)"),
-        "Rayon pool should be capped at 6 threads"
+        file_contains(path, "available_parallelism"),
+        "Rayon pool should be dynamically capped"
     );
 
     // Verify SQL table name
@@ -98,8 +98,8 @@ fn test_polars_sql_latency() {
 fn test_rayon_thread_capping() {
     let path = "../nairobi-axum-refinery/src/analyze.rs";
     assert!(
-        file_contains(path, "num_threads(6)"),
-        "Rayon pool not capped at 6 threads as documented"
+        file_contains(path, "available_parallelism"),
+        "Rayon pool not dynamically capped as documented"
     );
     assert!(
         file_contains(path, "Rayon"),
