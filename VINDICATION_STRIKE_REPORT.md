@@ -1,4 +1,4 @@
-# The Vindication Strike (v0.1.2) - Architectural Refit Report
+# The Vindication Strike (v0.2.1) - Architectural Refit Report
 
 **Date:** May 8, 2026
 **Author:** Kevin Chege. Location: Nairobi
