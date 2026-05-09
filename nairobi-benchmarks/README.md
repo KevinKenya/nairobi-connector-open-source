@@ -2,7 +2,7 @@
 
 # Nairobi Benchmark Suite (Scaffold)
 
-[![Run on Kaggle](https://kaggle.com/static/images/open-in-kaggle.svg)](https://kaggle.com/kernels/welcome?src=https://github.com/KevinKenya/nairobi-connector-open-source/blob/main/nairobi-benchmarks/Nairobi_OS_Benchmarks.ipynb)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/KevinKenya/nairobi-connector-open-source/blob/main/nairobi-benchmarks/nairobiOsBenchmarks.ipynb)
 
 This repository contains the rigorous benchmarking suite for **Nairobi OS**. It is designed to evaluate the performance of "Fused analytics execution" against standard, unoptimized Pandas implementations.
 

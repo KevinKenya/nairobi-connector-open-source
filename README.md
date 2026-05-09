@@ -1,5 +1,7 @@
 # Nairobi OS: Heavy Iron Data Science Infrastructure
 
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/KevinKenya/nairobi-connector-open-source/blob/main/nairobi-benchmarks/nairobiOsBenchmarks.ipynb)
+
 > [!IMPORTANT]
 > **Linux & WSL2 Only.** We do not compromise on kernel physics.
 
