@@ -8,7 +8,7 @@
 
 ## Executive Summary
 
-The **Vindication Strike (v0.1.2)** represents a high-performance architectural refit of the Nairobi OS data engine. The primary objective was to eradicate latency bottlenecks introduced by heavy D-Bus GVariant serialization, enforce high-fidelity resource telemetry, and fully leverage hardware DMA acceleration. 
+The **Vindication Strike (v0.2.1)** represents a high-performance architectural refit of the Nairobi OS data engine. The primary objective was to eradicate latency bottlenecks introduced by heavy D-Bus GVariant serialization, enforce high-fidelity resource telemetry, and fully leverage hardware DMA acceleration. 
 
 The refit successfully transitioned the system's Data Plane to zero-copy `iceoryx2` shared memory arenas while relegating D-Bus exclusively to a lightweight Control Plane. The result is a highly stable, hardware-accelerated analytical pipeline capable of processing complex datasets with a stable latency of ~1.27 seconds per iteration.
 
