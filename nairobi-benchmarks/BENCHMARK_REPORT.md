@@ -18,8 +18,8 @@ This report documents the performance of Nairobi OS against a standard, unoptimi
 *Note: Nairobi's higher footprint reflects the zero-copy shared memory allocation and the persistent Axum Refinery daemon.*
 
 ## 3. Test Environment
-- **OS**: Linux (kernel 6.x)
-- **Hardware**: Local Workstation (Vectorized CPU saturation)
+- **OS**: Linux Ubuntu 24.04
+- **Hardware**: Lenovo X13 Gen 1, AMD 
 - **Dataset**: `PlayerStatisticsExtended.csv` (450 MB, 800k rows)
 - **Methodology**: 5 iterations per workload, cold cache dropped between engine sessions.
 
