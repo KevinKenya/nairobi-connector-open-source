@@ -9,6 +9,8 @@ version = "0.2.1"
 edition = "2021"
 authors = ["Kevin Chege <kevin@nairobi.os>"]
 license-file = "LICENSE"
+readme = "README.md"
+description = "Nairobi OS: Heavy Iron AI Infrastructure"
 # The exclude array prevents Maturin/Cargo from packaging massive test files, 
 # virtual environments, and logs into the source distribution (.tar.gz).
 exclude =[

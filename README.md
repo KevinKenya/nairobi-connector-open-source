@@ -31,7 +31,7 @@ Nairobi OS v0.2.1 introduces **Fused Pipeline Execution**. By executing the enti
 
 ### Python Bindings
 ```bash
-pip install nairobi-os
+pip install nairobi-os==0.2.1
 ```
 
 ### Build from Source

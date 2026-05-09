@@ -20,7 +20,7 @@ This release introduces the **Fused Analytics Pipeline**, allowing ingestion, st
 
 ## 🛠️ Installation
 ```bash
-pip install nairobi-os
+pip install nairobi-os==0.2.1
 ```
 
 ## 💻 Quick Start
