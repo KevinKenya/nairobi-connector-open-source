@@ -12,7 +12,7 @@
 use iceoryx2::prelude::*;
 use nairobi_protocol::arena::*;
 use nairobi_protocol::{ImperialError, ImperialResult};
-use tracing::{error, info, warn};
+use tracing::info;
 
 /// The Refinery-side iceoryx2 publisher + POSIX shm arena manager.
 ///
@@ -20,7 +20,7 @@ use tracing::{error, info, warn};
 ///   - iceoryx2 publish-subscribe: sends fixed-size `ArenaHeader` (zero-copy)
 ///   - POSIX shm_open: hosts the variable-length bulk payload data
 pub struct ShmPublisher {
-    service: iceoryx2::service::port_factory::publish_subscribe::PortFactory<
+    _service: iceoryx2::service::port_factory::publish_subscribe::PortFactory<
         iceoryx2::service::zero_copy::Service,
         ArenaHeader,
     >,
@@ -110,7 +110,7 @@ impl ShmPublisher {
         );
 
         Ok(Self {
-            service,
+            _service: service,
             publisher,
             shm_ptr: shm_ptr as *mut u8,
             shm_fd,

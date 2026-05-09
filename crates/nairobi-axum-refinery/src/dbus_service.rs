@@ -13,10 +13,9 @@ use crate::analyze::AnalyzeEngine;
 use crate::ingest::DiracEngine;
 use crate::shm_publisher::ShmPublisher;
 use nairobi_protocol::{
-    CleanDataStrategy, CorrelationResult, DistilledAnalytics, FusedAnalyticsResult,
-    ImperialError, PayloadType, SchemaInspection,
+    CleanDataStrategy, ImperialError, PayloadType, SchemaInspection,
 };
-use tracing::{error, info, warn};
+use tracing::{info, warn, error};
 use zbus::dbus_interface;
 use zbus::zvariant::OwnedFd;
 

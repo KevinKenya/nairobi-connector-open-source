@@ -11,7 +11,7 @@ use nairobi_protocol::{
 use nairobi_protocol::{ImperialError, ImperialResult};
 use polars::prelude::*;
 use rayon::prelude::*;
-use std::os::unix::io::{AsRawFd, FromRawFd};
+use std::os::unix::io::FromRawFd;
 use std::sync::Arc;
 use tracing::info;
 use zbus::zvariant::OwnedFd;

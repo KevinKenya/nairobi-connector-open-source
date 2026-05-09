@@ -5,7 +5,7 @@
 // nairobi-open-source-release/crates/nairobi-axum-refinery/src/main.rs
 use nairobi_axum_refinery::dbus_service::AxumRefineryService;
 use nairobi_protocol::{OBJECT_PATH, SERVICE_NAME};
-use tracing::{error, info};
+use tracing::info;
 use tracing_subscriber::EnvFilter;
 use zbus::ConnectionBuilder;
 
