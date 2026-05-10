@@ -29,7 +29,7 @@ Nairobi OS v0.2.1 introduces **Fused Pipeline Execution**. By executing the enti
 | Metric | Pandas (Unoptimized) | Nairobi OS (v0.2.1) | Speedup |
 |--------|--------|---------------------|---------|
 | **Ingestion Latency** | 6.38s | **0.52s** | **12.2x** |
-| **Statistical Distillation** | 0.04s | **1.59s** | **5.5x** |
+| **Statistical Distillation** | 0.04s | **1.59s** | **pandas significantly faster due to numpy C backend** |
 | **Total Pipeline** | 6.42s | **2.29s** | **2.8x** |
 
 ## 🛠️ Installation
