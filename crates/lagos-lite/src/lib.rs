@@ -1,5 +1,118 @@
 pub mod device;
 pub mod pipeline;
+pub mod encoder;
+pub mod input;
+pub mod server;
+
+use std::sync::Arc;
+use tokio::sync::{mpsc, Notify};
+use crate::device::HeadlessContext;
+use crate::pipeline::{LagosPipeline, LttbPoint};
+use crate::encoder::compress_rgba_to_jpeg;
+
+pub struct SovereignStream {
+    ctx: Arc<HeadlessContext>,
+    data_notify: Arc<Notify>,
+}
+
+impl SovereignStream {
+    pub async fn new() -> Self {
+        let ctx = Arc::new(HeadlessContext::new().await);
+        Self {
+            ctx,
+            data_notify: Arc::new(Notify::new()),
+        }
+    }
+
+    pub fn notify_data_changed(&self) {
+        self.data_notify.notify_one();
+    }
+
+    pub fn start<F>(
+        self,
+        width: u32,
+        height: u32,
+        output_count: u32,
+        get_data: impl Fn() -> Vec<LttbPoint> + Send + 'static,
+        render_ui: F,
+    ) where
+        F: Fn(&egui::Context, &[LttbPoint]) + Send + Sync + 'static,
+    {
+        let (tx_telemetry, rx_telemetry) = mpsc::channel(100);
+        let (tx_frames, rx_frames) = mpsc::channel(1);
+        let data_notify = self.data_notify.clone();
+        let ctx = self.ctx.clone();
+        let render_ui = Arc::new(render_ui);
+
+        // Thread A: Tokio Runtime for WebSocket
+        std::thread::spawn(move || {
+            let rt = tokio::runtime::Builder::new_current_thread()
+                .enable_all()
+                .build()
+                .unwrap();
+
+            rt.block_on(async {
+                if let Err(e) = server::run_server(rx_frames, tx_telemetry).await {
+                    log::error!("Server error: {}", e);
+                }
+            });
+        });
+
+        // Thread B: Dedicated Render Thread
+        std::thread::spawn(move || {
+            let rt = tokio::runtime::Builder::new_current_thread()
+                .enable_all()
+                .build()
+                .unwrap();
+
+            rt.block_on(async {
+                let mut pipeline = LagosPipeline::new(ctx);
+                let mut rx_telemetry = rx_telemetry;
+                let mut events = Vec::new();
+
+                loop {
+                    // Wait for event or data change
+                    tokio::select! {
+                        _ = data_notify.notified() => {},
+                        Some(event) = rx_telemetry.recv() => {
+                            events.push(event);
+                        }
+                    }
+
+                    // Drain any remaining events
+                    while let Ok(event) = rx_telemetry.try_recv() {
+                        events.push(event);
+                    }
+
+                    let input_points = get_data();
+
+                    let raw_input = egui::RawInput {
+                        screen_rect: Some(egui::Rect::from_min_size(
+                            egui::Pos2::ZERO,
+                            egui::vec2(width as f32, height as f32),
+                        )),
+                        events: std::mem::take(&mut events),
+                        ..Default::default()
+                    };
+
+                    let render_ui_clone = render_ui.clone();
+                    let rgba_data = pipeline.process_and_render(
+                        &input_points,
+                        output_count,
+                        width,
+                        height,
+                        raw_input,
+                        move |ctx, points| render_ui_clone(ctx, points),
+                    ).await;
+
+                    if let Ok(jpeg_data) = compress_rgba_to_jpeg(width, height, &rgba_data, 80) {
+                        let _ = tx_frames.send(jpeg_data).await;
+                    }
+                }
+            });
+        });
+    }
+}
 
 #[cfg(test)]
 mod tests {
@@ -26,11 +139,20 @@ mod tests {
         let height = 1080;
         let output_count = 2000;
 
+        let raw_input = egui::RawInput {
+            screen_rect: Some(egui::Rect::from_min_size(
+                egui::Pos2::ZERO,
+                egui::vec2(width as f32, height as f32),
+            )),
+            ..Default::default()
+        };
+
         let rgba_data = pipeline.process_and_render(
             &input_points,
             output_count,
             width,
             height,
+            raw_input,
             |ctx, decimated| {
                 egui::CentralPanel::default().show(ctx, |ui| {
                     let plot_points: PlotPoints = decimated
