@@ -1,3 +1,6 @@
+// crates/lagos-lite/src/pipeline.rs
+// Author: Kevin Chege, Location: Nairobi, Date: 10th May 2026
+
 use crate::device::HeadlessContext;
 use bytemuck::{Pod, Zeroable};
 use egui_wgpu::ScreenDescriptor;
@@ -22,6 +25,7 @@ pub struct LagosPipeline {
     ctx: Arc<HeadlessContext>,
     compute_pipeline: ComputePipeline,
     egui_renderer: egui_wgpu::Renderer,
+    egui_ctx: egui::Context,
 }
 
 impl LagosPipeline {
@@ -49,6 +53,7 @@ impl LagosPipeline {
             ctx,
             compute_pipeline,
             egui_renderer,
+            egui_ctx: egui::Context::default(),
         }
     }
 
@@ -58,6 +63,7 @@ impl LagosPipeline {
         output_count: u32,
         width: u32,
         height: u32,
+        raw_input: egui::RawInput,
         render_ui: impl FnOnce(&egui::Context, &[LttbPoint]),
     ) -> Vec<u8> {
         let device = &self.ctx.device;
@@ -140,7 +146,7 @@ impl LagosPipeline {
         let buffer_slice = staging_output_buffer.slice(..);
         buffer_slice.map_async(MapMode::Read, move |v| tx.send(v).unwrap());
         device.poll(Maintain::Wait);
-        rx.recv().unwrap().expect("Failed to map staging output buffer");
+        rx.recv().unwrap().expect("Failed to map staging_output_buffer");
 
         let decimated_points: Vec<LttbPoint> = {
             let data = buffer_slice.get_mapped_range();
@@ -149,20 +155,11 @@ impl LagosPipeline {
         staging_output_buffer.unmap();
 
         // 4. Egui Rendering
-        let egui_ctx = egui::Context::default();
-        let raw_input = egui::RawInput {
-            screen_rect: Some(egui::Rect::from_min_size(
-                egui::Pos2::ZERO,
-                egui::vec2(width as f32, height as f32),
-            )),
-            ..Default::default()
-        };
-
-        let full_output = egui_ctx.run(raw_input, |ctx| {
+        let full_output = self.egui_ctx.run(raw_input, |ctx| {
             render_ui(ctx, &decimated_points);
         });
 
-        let paint_jobs = egui_ctx.tessellate(full_output.shapes, full_output.pixels_per_point);
+        let paint_jobs = self.egui_ctx.tessellate(full_output.shapes, full_output.pixels_per_point);
         let screen_descriptor = ScreenDescriptor {
             size_in_pixels: [width, height],
             pixels_per_point: full_output.pixels_per_point,
