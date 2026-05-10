@@ -1,3 +1,6 @@
+// crates/lagos-lite/src/server.rs
+// Author: Kevin Chege, Location: Nairobi, Date: 10th May 2026
+
 use std::sync::Arc;
 use tokio::net::{TcpListener, TcpStream};
 use tokio_tungstenite::accept_async;

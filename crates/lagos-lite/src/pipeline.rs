@@ -1,3 +1,6 @@
+// crates/lagos-lite/src/pipeline.rs
+// Author: Kevin Chege, Location: Nairobi, Date: 10th May 2026
+
 use crate::device::HeadlessContext;
 use bytemuck::{Pod, Zeroable};
 use egui_wgpu::ScreenDescriptor;
@@ -143,7 +146,7 @@ impl LagosPipeline {
         let buffer_slice = staging_output_buffer.slice(..);
         buffer_slice.map_async(MapMode::Read, move |v| tx.send(v).unwrap());
         device.poll(Maintain::Wait);
-        rx.recv().unwrap().expect("Failed to map staging output buffer");
+        rx.recv().unwrap().expect("Failed to map staging_output_buffer");
 
         let decimated_points: Vec<LttbPoint> = {
             let data = buffer_slice.get_mapped_range();
