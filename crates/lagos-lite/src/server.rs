@@ -10,12 +10,16 @@ use tokio::sync::mpsc;
 use crate::input::{TelemetryEvent, map_telemetry_to_egui};
 
 pub async fn run_server(
+    port: u16,
     tx_frames: mpsc::Receiver<Vec<u8>>,
     rx_telemetry: mpsc::Sender<egui::Event>,
 ) -> Result<(), Box<dyn std::error::Error>> {
-    let listener = TcpListener::bind("127.0.0.1:0").await?;
+    let addr = format!("127.0.0.1:{}", port);
+    let listener = TcpListener::bind(addr).await?;
     let addr = listener.local_addr()?;
     println!("[LAGOS_PORT: {}]", addr.port());
+    use std::io::Write;
+    std::io::stdout().flush()?; // Ensure the handshake is visible immediately
 
     let tx_frames = Arc::new(tokio::sync::Mutex::new(tx_frames));
 

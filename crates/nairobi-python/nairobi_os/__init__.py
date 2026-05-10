@@ -19,6 +19,9 @@ from . import _core
 # 2. Extract submodules from the binary into the nairobi_os namespace
 data = _core.data
 
+# 3. Import Lagos plotting integration
+from .lagos import plot_inline
+
 # Set up logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -113,4 +116,4 @@ def stop_refinery():
         _refinery_process = None
         logger.info("🛑 Refinery stopped.")
 
-__all__ = ["data", "start_refinery", "stop_refinery"]
+__all__ = ["data", "start_refinery", "stop_refinery", "plot_inline"]

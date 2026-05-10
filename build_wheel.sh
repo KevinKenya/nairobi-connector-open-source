@@ -15,23 +15,34 @@ echo "=========================================="
 echo "Nairobi OS: Heavy Iron Build Orchestrator"
 echo "=========================================="
 
-# 1. Build the Refinery Daemon
-echo "Step 1: Compiling Axum Refinery..."
+# 1. Build the Daemons
+echo "Step 1: Compiling Daemons..."
 cargo build --release -p nairobi-axum-refinery
+cargo build --release -p lagos-lite
 
-# 2. Locate and Prepare Binary
+# 2. Locate and Prepare Binaries
 REFINERY_BIN="$PROJECT_ROOT/target/release/nairobi-axum-refinery"
+LAGOS_BIN="$PROJECT_ROOT/target/release/lagos-vision-daemon"
 
 if [ ! -f "$REFINERY_BIN" ]; then
     echo "ERROR: Binary not found at $REFINERY_BIN"
     exit 1
 fi
 
-echo "Step 2: Preparing binary for distribution..."
+echo "Step 2: Preparing binaries for distribution..."
 mkdir -p "$BIN_DEST_DIR"
+
 cp "$REFINERY_BIN" "$BIN_DEST_DIR/"
 strip "$BIN_DEST_DIR/nairobi-axum-refinery" # Remove debug symbols to save space
 chmod +x "$BIN_DEST_DIR/nairobi-axum-refinery"
+
+if [ -f "$LAGOS_BIN" ]; then
+    cp "$LAGOS_BIN" "$BIN_DEST_DIR/"
+    strip "$BIN_DEST_DIR/lagos-vision-daemon"
+    chmod +x "$BIN_DEST_DIR/lagos-vision-daemon"
+else
+    echo "WARNING: lagos-vision-daemon not found at $LAGOS_BIN"
+fi
 
 # 3. Build the Python Wheel
 echo "Step 3: Forging the Python Wheel..."

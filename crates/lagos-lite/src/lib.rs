@@ -33,6 +33,7 @@ impl SovereignStream {
 
     pub fn start<F>(
         self,
+        port: u16,
         width: u32,
         height: u32,
         output_count: u32,
@@ -55,7 +56,7 @@ impl SovereignStream {
                 .unwrap();
 
             rt.block_on(async {
-                if let Err(e) = server::run_server(rx_frames, tx_telemetry).await {
+                if let Err(e) = server::run_server(port, rx_frames, tx_telemetry).await {
                     log::error!("Server error: {}", e);
                 }
             });
@@ -141,6 +142,7 @@ mod tests {
         let width = 1920;
         let height = 1080;
         let output_count = 2000;
+        let _port = 0;
 
         let raw_input = egui::RawInput {
             screen_rect: Some(egui::Rect::from_min_size(

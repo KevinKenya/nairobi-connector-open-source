@@ -154,6 +154,27 @@ pub fn crunch_and_correlate(py: Python, handle_id: String, column: String, corr_
 }
 
 #[pyfunction]
+pub fn get_fd(py: Python, handle_id: String) -> PyResult<i32> {
+    let rt = get_runtime()?;
+
+    let fd = py.allow_threads(|| {
+        rt.block_on(async {
+            let registry = get_registry();
+            let owned_fd = registry.get(&handle_id).await
+                .ok_or_else(|| PyRuntimeError::new_err("Invalid handle ID"))?;
+
+            use std::os::unix::io::AsRawFd;
+            let raw_fd = owned_fd.as_raw_fd();
+            // Duplicate the FD so it stays open after owned_fd is dropped
+            let leaked_fd = unsafe { libc::dup(raw_fd) };
+            Ok::<i32, PyErr>(leaked_fd)
+        })
+    })?;
+
+    Ok(fd)
+}
+
+#[pyfunction]
 pub fn free(py: Python, handle_id: String) -> PyResult<()> {
     let rt = get_runtime()?;
 
@@ -176,6 +197,7 @@ pub fn init_module(m: &PyModule) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(correlate, m)?)?;
     m.add_function(wrap_pyfunction!(pipeline, m)?)?;
     m.add_function(wrap_pyfunction!(crunch_and_correlate, m)?)?;
+    m.add_function(wrap_pyfunction!(get_fd, m)?)?;
     m.add_function(wrap_pyfunction!(free, m)?)?;
     Ok(())
 }
