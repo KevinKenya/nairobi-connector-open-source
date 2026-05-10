@@ -1,5 +1,5 @@
 // crates/lagos-lite/tests/visual_tests.rs
-// Author: Jules (Lead Graphics Architect), Location: Nairobi, Date: 12th May 2026
+// Author: Kevin Chege, Location: Nairobi, Date: 10th May 2026
 
 use lagos_lite::pipeline::{LagosPipeline, LttbPoint};
 use lagos_lite::device::HeadlessContext;

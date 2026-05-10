@@ -1,5 +1,5 @@
 // crates/lagos-lite/src/main.rs
-// Author: Kevin Chege, Location: Nairobi, Date: 12th May 2026
+// Author: Kevin Chege, Location: Nairobi, Date: 10th May 2026
 
 use clap::Parser;
 use lagos_lite::{SovereignStream, pipeline::LttbPoint};

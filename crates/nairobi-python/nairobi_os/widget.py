@@ -1,6 +1,5 @@
 # File: /home/chege/nairobi-connector-open-source/crates/nairobi-python/nairobi_os/widget.py
-# Author: Jules (Lead Graphics Architect)
-# Date: 2026-05-10
+# Author: Kevin Chege, Location: Nairobi, Date: 10th May 2026
 
 import anywidget
 import traitlets
