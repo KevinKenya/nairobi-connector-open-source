@@ -27,7 +27,7 @@ class LagosWidget(anywidget.AnyWidget):
       el.appendChild(canvas);
       
       const ctx = canvas.getContext("2d");
-      const port = model.get("port");
+      const ws_url = model.get("ws_url");
       
       // Draw loading state
       ctx.fillStyle = "#111";
@@ -36,13 +36,13 @@ class LagosWidget(anywidget.AnyWidget):
       ctx.font = "20px Inter, system-ui";
       ctx.fillText("👁️ Connecting to Lagos Visual Cortex...", 20, 40);
 
-      if (!port) return;
+      if (!ws_url) return;
 
-      const ws = new WebSocket(`ws://127.0.0.1:${port}`);
+      const ws = new WebSocket(ws_url);
       ws.binaryType = "blob";
 
       ws.onopen = () => {
-        console.log(`[LAGOS] Connected to WebSocket port ${port}`);
+        console.log(`[LAGOS] Connected to WebSocket: ${ws_url}`);
         ctx.fillStyle = "#111";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         ctx.fillStyle = "#fff";
@@ -83,7 +83,7 @@ class LagosWidget(anywidget.AnyWidget):
       };
     }
     """
-    port = traitlets.Int(0).tag(sync=True)
+    ws_url = traitlets.Unicode("").tag(sync=True)
     width = traitlets.Int(1000).tag(sync=True)
     height = traitlets.Int(400).tag(sync=True)
 
@@ -155,6 +155,16 @@ def plot_inline(handle_id, width=1000, height=400):
         process.kill()
         raise RuntimeError(f"Lagos Vision Daemon failed to ignite. Stderr: {stderr}")
 
-    logger.info(f"✅ Lagos Vision live on WebSocket port {port}")
+    # 5. Construct the WebSocket URL (Colab-Aware Proxy Routing)
+    import sys
+    if 'google.colab' in sys.modules:
+        from google.colab.output import eval_js
+        logger.info(f"🧬 Colab detected. Routing WebSocket through proxy port {port}")
+        proxy_url = eval_js(f"google.colab.kernel.proxyPort({port})")
+        ws_url = proxy_url.replace("http://", "ws://").replace("https://", "wss://")
+    else:
+        ws_url = f"ws://127.0.0.1:{port}"
 
-    return LagosWidget(port=port, width=width, height=height)
+    logger.info(f"✅ Lagos Vision live on WebSocket: {ws_url}")
+
+    return LagosWidget(ws_url=ws_url, width=width, height=height)
