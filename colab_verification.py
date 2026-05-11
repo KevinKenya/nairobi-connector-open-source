@@ -47,8 +47,8 @@ except Exception as e:
 print("🚀 Ingesting NBA dataset...")
 handle = nairobi_os.data.ingest(csv_path)
 
-print("🔍 Filtering for 'PTS' (Points) column...")
-points_handle = nairobi_os.data.sql_query(handle, "SELECT PTS FROM dataset")
+print("🔍 Filtering for 'points' (Points) column...")
+points_handle = nairobi_os.data.sql_query(handle, "SELECT points FROM dataset")
 
 print("👁️ Launching Lagos Visual Cortex...")
 nairobi_os.lagos.plot_inline(points_handle)
