@@ -38,7 +38,7 @@ The daemon will output `[LAGOS_PORT: XXXX]` on stdout once the WebSocket server 
 | **Memory usage (10M pts)**| ~850MB | **< 40MB (Zero-Copy)** | **21x** |
 
 > [!NOTE]
-> Lagos achieves these speeds by offloading downsampling (LTTB) to the Rust core and utilizing `wgpu` for parallelized GPU rendering. Matplotlib's latency includes the mandatory data copy into the Python interpreter, which Lagos bypasses entirely.
+> Lagos achieves these speeds by offloading downsampling (LTTB) to the Rust core and utilizing `wgpu` for parallelized GPU rendering. Standard pipeline latency includes the mandatory data copy into the Python interpreter, which Lagos bypasses entirely.
 
 ---
 © 2026 Kevin Chege. Location: Nairobi.
