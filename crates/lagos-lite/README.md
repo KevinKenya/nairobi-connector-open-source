@@ -31,7 +31,7 @@ The daemon will output `[LAGOS_PORT: XXXX]` on stdout once the WebSocket server 
 
 ## 📊 Performance Benchmark
 
-| Metric | standard Matplotlib | Lagos Vision (v0.3.0) | Speedup |
+| Metric | standard  | Lagos Vision (v0.3.0) | Speedup |
 |--------|---------------------|-----------------------|---------|
 | **Latency (10M pts)** | ~12.5s (blocking) | **~0.015s (async)** | **800x** |
 | **Idle CPU Load** | 5-10% (Polling) | **0.0% (Event-driven)**| **Infinity** |
