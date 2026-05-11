@@ -169,6 +169,24 @@ pub fn free(py: Python, handle_id: String) -> PyResult<()> {
     Ok(())
 }
 
+#[pyfunction]
+pub fn get_fd(py: Python, handle_id: String) -> PyResult<i32> {
+    let rt = get_runtime()?;
+
+    py.allow_threads(|| {
+        rt.block_on(async {
+            let registry = get_registry();
+            let fd = registry.get(&handle_id).await
+                .ok_or_else(|| PyRuntimeError::new_err("Invalid handle ID"))?;
+            
+            // Transfer ownership to Python. The FD will NOT be closed
+            // when OwnedFd is dropped — Python now owns this descriptor.
+            use std::os::unix::io::IntoRawFd;
+            Ok::<i32, PyErr>(fd.into_raw_fd())
+        })
+    })
+}
+
 pub fn init_module(m: &PyModule) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(ingest, m)?)?;
     m.add_function(wrap_pyfunction!(sql_query, m)?)?;
@@ -177,5 +195,6 @@ pub fn init_module(m: &PyModule) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(pipeline, m)?)?;
     m.add_function(wrap_pyfunction!(crunch_and_correlate, m)?)?;
     m.add_function(wrap_pyfunction!(free, m)?)?;
+    m.add_function(wrap_pyfunction!(get_fd, m)?)?;
     Ok(())
 }

@@ -205,8 +205,7 @@ impl LagosPipeline {
         }
 
         // 5. Copy Texture to Staging Buffer
-        let staging_buffer = self.ctx.create_staging_buffer(width, height);
-        let bytes_per_row = width * 4;
+        let (staging_buffer, aligned_bytes_per_row) = self.ctx.create_staging_buffer(width, height);
         encoder.copy_texture_to_buffer(
             ImageCopyTexture {
                 texture: &target_texture,
@@ -218,7 +217,7 @@ impl LagosPipeline {
                 buffer: &staging_buffer,
                 layout: ImageDataLayout {
                     offset: 0,
-                    bytes_per_row: Some(bytes_per_row),
+                    bytes_per_row: Some(aligned_bytes_per_row),
                     rows_per_image: Some(height),
                 },
             },
@@ -231,7 +230,7 @@ impl LagosPipeline {
 
         queue.submit(Some(encoder.finish()));
 
-        // 6. Map and extract
+        // 6. Map and extract (stripping row padding)
         let (tx, rx) = std::sync::mpsc::channel();
         let buffer_slice = staging_buffer.slice(..);
         buffer_slice.map_async(MapMode::Read, move |v| tx.send(v).unwrap());
@@ -239,7 +238,11 @@ impl LagosPipeline {
         rx.recv().unwrap().expect("Failed to map staging buffer");
 
         let data = buffer_slice.get_mapped_range();
-        let result = data.to_vec();
+        let mut result = Vec::with_capacity((width * height * 4) as usize);
+        let row_size = (width * 4) as usize;
+        for row in data.chunks_exact(aligned_bytes_per_row as usize) {
+            result.extend_from_slice(&row[..row_size]);
+        }
         drop(data);
         staging_buffer.unmap();
 

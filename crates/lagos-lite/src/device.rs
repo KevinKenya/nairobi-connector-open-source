@@ -60,13 +60,19 @@ impl HeadlessContext {
         })
     }
 
-    pub fn create_staging_buffer(&self, width: u32, height: u32) -> Buffer {
-        let u32_size = std::mem::size_of::<u32>() as u64;
-        self.device.create_buffer(&BufferDescriptor {
+    pub fn create_staging_buffer(&self, width: u32, height: u32) -> (Buffer, u32) {
+        let bytes_per_pixel = 4;
+        let unaligned_bytes_per_row = width * bytes_per_pixel;
+        let align = COPY_BYTES_PER_ROW_ALIGNMENT;
+        let aligned_bytes_per_row = (unaligned_bytes_per_row + align - 1) & !(align - 1);
+        
+        let buffer = self.device.create_buffer(&BufferDescriptor {
             label: Some("Staging Buffer"),
-            size: width as u64 * height as u64 * u32_size,
+            size: aligned_bytes_per_row as u64 * height as u64,
             usage: BufferUsages::MAP_READ | BufferUsages::COPY_DST,
             mapped_at_creation: false,
-        })
+        });
+        
+        (buffer, aligned_bytes_per_row)
     }
 }

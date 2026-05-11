@@ -9,9 +9,9 @@ build-backend = "maturin"
 
 [project]
 name = "nairobi-os"
-version = "0.2.1"
-description = "Nairobi Connector OS: Heavy Iron AI Infrastructure"
-authors = [{name = "Kevin Chege", email = "kevin@nairobi.os"}]
+version = "0.3.0"
+description = "Nairobi OS: Heavy Iron Data Science Infrastructure with Lagos Vision (Hardware-Accelerated Zero-Copy Rendering)"
+authors = [{name = "Kevin Chege", email = "aiwithafrica@gmail.com"}]
 license = {file = "LICENSE"}
 readme = "README.md"
 requires-python = ">=3.12"

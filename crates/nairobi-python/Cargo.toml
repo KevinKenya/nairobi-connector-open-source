@@ -5,9 +5,9 @@
 # nairobi-open-source-release/crates/nairobi-python/Cargo.toml
 [package]
 name = "nairobi-python"
-version = "0.2.1"
+version = "0.3.0"
 edition = "2021"
-authors = ["Kevin Chege <kevin@nairobi.os>"]
+authors = ["Kevin Chege <aiwithafrica@gmail.com>"]
 license-file = "LICENSE"
 readme = "README.md"
 description = "Nairobi OS: Heavy Iron AI Infrastructure"

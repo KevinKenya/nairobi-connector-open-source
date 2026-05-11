@@ -13,7 +13,7 @@
 use iceoryx2::prelude::*;
 use nairobi_protocol::arena::*;
 use nairobi_protocol::{ImperialError, ImperialResult};
-use tracing::{info, warn};
+use tracing::info;
 
 /// The Hub-side iceoryx2 subscriber + POSIX shm reader.
 ///

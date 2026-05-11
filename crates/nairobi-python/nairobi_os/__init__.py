@@ -17,6 +17,7 @@ from pathlib import Path
 from . import _core
 
 # 2. Extract submodules from the binary into the nairobi_os namespace
+from . import lagos
 data = _core.data
 
 # Set up logging
@@ -113,4 +114,4 @@ def stop_refinery():
         _refinery_process = None
         logger.info("🛑 Refinery stopped.")
 
-__all__ = ["data", "start_refinery", "stop_refinery"]
+__all__ = ["data", "lagos", "start_refinery", "stop_refinery"]

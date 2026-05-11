@@ -23,9 +23,13 @@ dist/
 # Nairobi OS Artifacts
 *.log
 .nairobi_refinery.log
-# Only ignore the compiled binary, not the source directory
+# Only ignore the compiled binaries, not the source directory
 **/bin/nairobi-axum-refinery
+**/bin/lagos-vision-daemon
 **/target/wheels/
+zig_dist/
+*.tar.xz
+Cross.toml
 
 # Datasets & Large Files
 **/*.csv

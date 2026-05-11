@@ -1,37 +1,48 @@
-# File: ~/nairobi-connector-open-source/build_wheel.sh
-# Author: Kevin Chege
-# Date: 2026-05-06
-
 #!/bin/bash
 # nairobi-connector-open-source/build_wheel.sh
 set -e
 
 PROJECT_ROOT=$(pwd)
 PYTHON_CRATE_DIR="$PROJECT_ROOT/crates/nairobi-python"
-REFINERY_CRATE_DIR="$PROJECT_ROOT/crates/nairobi-axum-refinery"
 BIN_DEST_DIR="$PYTHON_CRATE_DIR/nairobi_os/bin"
 
 echo "=========================================="
-echo "Nairobi OS: Heavy Iron Build Orchestrator"
+echo "Nairobi OS v0.3.0: Heavy Iron Build Orchestrator"
 echo "=========================================="
 
-# 1. Build the Refinery Daemon
+# 1. Build the Microservice Binaries
 echo "Step 1: Compiling Axum Refinery..."
 cargo build --release -p nairobi-axum-refinery
 
-# 2. Locate and Prepare Binary
+echo "Step 1b: Compiling Lagos Vision Daemon..."
+cargo build --release -p lagos-lite --bin lagos-vision-daemon
+
+# 2. Locate and Prepare Binaries
 REFINERY_BIN="$PROJECT_ROOT/target/release/nairobi-axum-refinery"
+LAGOS_BIN="$PROJECT_ROOT/target/release/lagos-vision-daemon"
 
 if [ ! -f "$REFINERY_BIN" ]; then
-    echo "ERROR: Binary not found at $REFINERY_BIN"
+    echo "ERROR: Refinery binary not found at $REFINERY_BIN"
     exit 1
 fi
 
-echo "Step 2: Preparing binary for distribution..."
+if [ ! -f "$LAGOS_BIN" ]; then
+    echo "ERROR: Lagos binary not found at $LAGOS_BIN"
+    exit 1
+fi
+
+echo "Step 2: Preparing binaries for distribution..."
 mkdir -p "$BIN_DEST_DIR"
+
 cp "$REFINERY_BIN" "$BIN_DEST_DIR/"
-strip "$BIN_DEST_DIR/nairobi-axum-refinery" # Remove debug symbols to save space
+cp "$LAGOS_BIN" "$BIN_DEST_DIR/"
+
+# Remove debug symbols to save space
+strip "$BIN_DEST_DIR/nairobi-axum-refinery"
+strip "$BIN_DEST_DIR/lagos-vision-daemon"
+
 chmod +x "$BIN_DEST_DIR/nairobi-axum-refinery"
+chmod +x "$BIN_DEST_DIR/lagos-vision-daemon"
 
 # 3. Build the Python Wheel
 echo "Step 3: Forging the Python Wheel..."

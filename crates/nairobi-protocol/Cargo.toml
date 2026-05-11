@@ -5,7 +5,7 @@
 # nairobi-open-source-release/crates/nairobi-protocol/Cargo.toml
 [package]
 name = "nairobi-protocol"
-version = "0.1.0"
+version = "0.3.0"
 edition = "2021"
 authors = ["Kevin Chege <kevin@nairobi.os>"]
 license-file = "LICENSE"

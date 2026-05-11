@@ -31,6 +31,12 @@ impl SovereignStream {
         self.data_notify.notify_one();
     }
 
+    /// Returns a clone of the notification handle.
+    /// Use this to trigger the initial render after start() consumes self.
+    pub fn get_notifier(&self) -> Arc<Notify> {
+        self.data_notify.clone()
+    }
+
     pub fn start<F>(
         self,
         width: u32,
