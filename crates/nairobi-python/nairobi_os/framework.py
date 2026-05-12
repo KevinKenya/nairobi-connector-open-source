@@ -1,5 +1,5 @@
 # File: /home/chege/nairobi-connector-open-source/crates/nairobi-python/nairobi_os/framework.py
-# Author: Jules (Lead DX Engineer)
+# Author: Kevin Chege. Location: Nairobi
 # Date: 2026-05-15
 
 import json
