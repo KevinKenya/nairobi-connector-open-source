@@ -7,6 +7,7 @@ import traitlets
 import subprocess
 import os
 import re
+import sys
 import logging
 from pathlib import Path
 
@@ -27,7 +28,7 @@ class LagosWidget(anywidget.AnyWidget):
       el.appendChild(canvas);
       
       const ctx = canvas.getContext("2d");
-      const port = model.get("port");
+      const ws_url = model.get("ws_url");
       
       // Draw loading state
       ctx.fillStyle = "#111";
@@ -36,13 +37,13 @@ class LagosWidget(anywidget.AnyWidget):
       ctx.font = "20px Inter, system-ui";
       ctx.fillText("👁️ Connecting to Lagos Visual Cortex...", 20, 40);
 
-      if (!port) return;
+      if (!ws_url) return;
 
-      const ws = new WebSocket(`ws://127.0.0.1:${port}`);
+      const ws = new WebSocket(ws_url);
       ws.binaryType = "blob";
 
       ws.onopen = () => {
-        console.log(`[LAGOS] Connected to WebSocket port ${port}`);
+        console.log(`[LAGOS] Connected to WebSocket at ${ws_url}`);
         ctx.fillStyle = "#111";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         ctx.fillStyle = "#fff";
@@ -83,7 +84,7 @@ class LagosWidget(anywidget.AnyWidget):
       };
     }
     """
-    port = traitlets.Int(0).tag(sync=True)
+    ws_url = traitlets.Unicode("").tag(sync=True)
     width = traitlets.Int(1000).tag(sync=True)
     height = traitlets.Int(400).tag(sync=True)
 
@@ -132,9 +133,7 @@ def plot_inline(handle_id, width=1000, height=400):
     # 4. Extract the dynamic port assigned by the OS
     port = None
     # We wait for the daemon to signal its port on stdout
-    # Note: We need to read from the pipe which is now shared with log_file? 
-    # No, stdout is still a PIPE.
-    for _ in range(50): # Increased timeout
+    for _ in range(50):
         line = process.stdout.readline()
         if not line:
             break
@@ -151,10 +150,23 @@ def plot_inline(handle_id, width=1000, height=400):
             break
 
     if port is None:
-        stderr = process.stderr.read()
+        stderr = ""
+        if process.stderr:
+            stderr = process.stderr.read()
         process.kill()
         raise RuntimeError(f"Lagos Vision Daemon failed to ignite. Stderr: {stderr}")
 
-    logger.info(f"✅ Lagos Vision live on WebSocket port {port}")
+    logger.info(f"✅ Lagos Vision live on port {port}")
 
-    return LagosWidget(port=port, width=width, height=height)
+    # 5. Construct the WebSocket URL (Handling Google Colab Proxying)
+    if 'google.colab' in sys.modules:
+        from google.colab.output import eval_js
+        # Colab proxies ports via a special URL
+        proxy_url = eval_js(f"google.colab.kernel.proxyPort({port})")
+        # Replace http with ws
+        ws_url = proxy_url.replace("http", "ws")
+        logger.info(f"🔗 Colab Proxy URL: {ws_url}")
+    else:
+        ws_url = f"ws://127.0.0.1:{port}"
+
+    return LagosWidget(ws_url=ws_url, width=width, height=height)
