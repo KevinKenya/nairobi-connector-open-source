@@ -18,6 +18,8 @@ from . import _core
 
 # 2. Extract submodules from the binary into the nairobi_os namespace
 from . import lagos
+from .framework import SovereignFrame
+
 data = _core.data
 
 # Set up logging
@@ -39,7 +41,12 @@ def start_refinery(binary_path=None, timeout=15):
     
     binary_path = Path(binary_path)
     if not binary_path.exists():
-        raise RuntimeError(f"Refinery binary not found at {binary_path}")
+        # Fallback for development mode
+        dev_path = Path(__file__).parents[3] / "target" / "release" / "nairobi-axum-refinery"
+        if dev_path.exists():
+            binary_path = dev_path
+        else:
+            raise RuntimeError(f"Refinery binary not found at {binary_path}")
     
     if _refinery_process is not None:
         if _refinery_process.poll() is None:
@@ -114,4 +121,28 @@ def stop_refinery():
         _refinery_process = None
         logger.info("🛑 Refinery stopped.")
 
-__all__ = ["data", "lagos", "start_refinery", "stop_refinery"]
+def connect():
+    """
+    Semantic alias for start_refinery().
+    """
+    return start_refinery()
+
+def read_csv(path):
+    """
+    Automatically ignites the refinery (if possible) and returns a SovereignFrame.
+    Implements Lazy Ignition: retries once if daemon is offline.
+    """
+    try:
+        handle_id = data.ingest(str(path))
+        return SovereignFrame(handle_id)
+    except Exception as e:
+        logger.info("⚠️ Refinery offline or connection failed. Attempting Lazy Ignition...")
+        try:
+            start_refinery()
+            time.sleep(2) # Wait for bus registration
+            handle_id = data.ingest(str(path))
+            return SovereignFrame(handle_id)
+        except Exception as retry_err:
+            raise RuntimeError(f"Failed to ingest CSV after Lazy Ignition: {retry_err}") from e
+
+__all__ = ["data", "lagos", "start_refinery", "stop_refinery", "connect", "read_csv", "SovereignFrame"]
