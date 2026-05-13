@@ -8,6 +8,48 @@ from . import lagos
 
 data = _core.data
 
+class ColumnAccessor:
+    """
+    Helper class to allow fluent column access like df.PTS.mean()
+    """
+    def __init__(self, frame, column):
+        self._frame = frame
+        self._column = column
+        
+    def crunch(self):
+        return self._frame.crunch(self._column)
+        
+    def mean(self):
+        return self._frame.mean(self._column)
+        
+    def max(self):
+        return self._frame.max(self._column)
+        
+    def min(self):
+        return self._frame.min(self._column)
+        
+    def std_dev(self):
+        return self._frame.std_dev(self._column)
+        
+    def variance(self):
+        return self._frame.variance(self._column)
+        
+    def skewness(self):
+        return self._frame.skewness(self._column)
+        
+    def kurtosis(self):
+        return self._frame.kurtosis(self._column)
+        
+    def p95(self):
+        return self._frame.p95(self._column)
+        
+    def p99(self):
+        return self._frame.p99(self._column)
+        
+    def calculate(self):
+        return self._frame.calculate(self._column)
+
+
 class SovereignFrame:
     """
     A high-level, fluent interface for Nairobi OS data handles.
@@ -16,6 +58,21 @@ class SovereignFrame:
     def __init__(self, handle_id):
         self.handle_id = handle_id
         self._crunch_cache = {}  # Cache for crunch results by column
+
+    def __getattr__(self, name):
+        """Allow column access via attribute: df.PTS"""
+        # Exclude internal/private attributes from column accessor
+        if name.startswith('_'):
+            raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{name}'")
+        return ColumnAccessor(self, name)
+
+    def __getitem__(self, name):
+        """Allow column access via dictionary syntax: df['PTS']"""
+        return ColumnAccessor(self, name)
+
+    def free(self):
+        """Frees the underlying D-Bus memfd handle."""
+        data.free(self.handle_id)
 
     def _get_crunch_result(self, column):
         """Get crunch result for column, computing and caching if necessary."""
@@ -124,3 +181,4 @@ class SovereignFrame:
         Spawns the Lagos Vision widget for the current frame.
         """
         return lagos.plot_inline(self.handle_id, width=width, height=height)
+
