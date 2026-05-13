@@ -15,13 +15,83 @@ class SovereignFrame:
     """
     def __init__(self, handle_id):
         self.handle_id = handle_id
+        self._crunch_cache = {}  # Cache for crunch results by column
+
+    def _get_crunch_result(self, column):
+        """Get crunch result for column, computing and caching if necessary."""
+        if column not in self._crunch_cache:
+            result_json = data.crunch(self.handle_id, column)
+            self._crunch_cache[column] = json.loads(result_json)
+        return self._crunch_cache[column]
 
     def crunch(self, column):
         """
         Returns the Axiom Crunch statistics for the specified column.
         """
-        result_json = data.crunch(self.handle_id, column)
-        return json.loads(result_json)
+        return self._get_crunch_result(column)
+
+    def mean(self, column):
+        """
+        Returns the mean value for the specified column.
+        """
+        result = self._get_crunch_result(column)
+        return result['mean']
+
+    def max(self, column):
+        """
+        Returns the maximum value for the specified column.
+        """
+        result = self._get_crunch_result(column)
+        return result['max']
+
+    def min(self, column):
+        """
+        Returns the minimum value for the specified column.
+        """
+        result = self._get_crunch_result(column)
+        return result['min']
+
+    def std_dev(self, column):
+        """
+        Returns the standard deviation for the specified column.
+        """
+        result = self._get_crunch_result(column)
+        return result['std_dev']
+
+    def variance(self, column):
+        """
+        Returns the variance for the specified column.
+        """
+        result = self._get_crunch_result(column)
+        return result['variance']
+
+    def skewness(self, column):
+        """
+        Returns the skewness for the specified column.
+        """
+        result = self._get_crunch_result(column)
+        return result['skewness']
+
+    def kurtosis(self, column):
+        """
+        Returns the kurtosis for the specified column.
+        """
+        result = self._get_crunch_result(column)
+        return result['kurtosis']
+
+    def p95(self, column):
+        """
+        Returns the 95th percentile for the specified column.
+        """
+        result = self._get_crunch_result(column)
+        return result['p95']
+
+    def p99(self, column):
+        """
+        Returns the 99th percentile for the specified column.
+        """
+        result = self._get_crunch_result(column)
+        return result['p99']
 
     def calculate(self, column=None):
         """
