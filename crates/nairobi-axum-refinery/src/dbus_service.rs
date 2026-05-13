@@ -78,9 +78,9 @@ impl AxumRefineryService {
     /// Ingest a file into a memfd buffer.
     /// Ingestion always returns an FD — the data plane optimization
     /// applies to analytical results, not raw file handles.
-    async fn ingest(&mut self, file_path: &str) -> zbus::fdo::Result<OwnedFd> {
-        info!("[DBUS] Ingest requested for: {}", file_path);
-        self.ingest_engine.ingest(file_path).await.map_err(|e| {
+    async fn ingest(&mut self, file_path: &str, delimiter: &str, encoding: &str) -> zbus::fdo::Result<OwnedFd> {
+        info!("[DBUS] Ingest requested for: {} (delimiter: {}, encoding: {})", file_path, delimiter, encoding);
+        self.ingest_engine.ingest(file_path, delimiter, encoding).await.map_err(|e| {
             error!("[DBUS] Ingest failed: {}", e);
             zbus::fdo::Error::Failed(e.to_string())
         })
@@ -236,16 +236,18 @@ impl AxumRefineryService {
     async fn ingest_crunch_correlate(
         &mut self,
         file_path: &str,
+        delimiter: &str,
+        encoding: &str,
         column: &str,
         corr_columns: &str,
     ) -> zbus::fdo::Result<String> {
         info!(
-            "[DBUS] Fused IngestCrunchCorrelate: file={}, column={}, corr={}",
-            file_path, column, corr_columns
+            "[DBUS] Fused IngestCrunchCorrelate: file={} (delimiter: {}, encoding: {}), column={}, corr={}",
+            file_path, delimiter, encoding, column, corr_columns
         );
 
         // 1. Ingest
-        let handle = self.ingest_engine.ingest(file_path).await.map_err(|e| {
+        let handle = self.ingest_engine.ingest(file_path, delimiter, encoding).await.map_err(|e| {
             error!("[DBUS] IngestCrunchCorrelate ingest failed: {}", e);
             zbus::fdo::Error::Failed(e.to_string())
         })?;

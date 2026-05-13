@@ -11,14 +11,14 @@
 /// The D-Bus interface name exposed by the Axum Refinery daemon.
 ///
 /// Methods on this interface:
-/// - `Ingest(s file_path) → h memfd_handle`
+/// - `Ingest(s file_path, s delimiter, s encoding) → h memfd_handle`
 /// - `Analyze(h memfd_handle, s query) → v gvariant_result`
 /// - `InspectSchema(h memfd_handle) → v schema_inspection`
 /// - `CleanData(h memfd_handle, a(sss) strategies) → h memfd_handle`
 /// - `SqlQuery(h memfd_handle, s query) → h memfd_handle`
 /// - `Correlation(h memfd_handle, s query) → (dd)`
 /// - `CrunchAndCorrelate(h memfd_handle, s column, s corr_columns) → v fused_result`
-/// - `IngestCrunchCorrelate(s file_path, s column, s corr_columns) → v fused_result`
+/// - `IngestCrunchCorrelate(s file_path, s delimiter, s encoding, s column, s corr_columns) → v fused_result`
 ///
 /// GVariant signature for `Analyze` return value `v`: `(tdddddddddhas)`
 /// GVariant signature for fused results `v`: `(tdddddddddddasdd)`

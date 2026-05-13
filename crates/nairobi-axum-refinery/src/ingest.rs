@@ -95,11 +95,11 @@ impl DiracEngine {
         })
     }
 
-    /// Ingests a file using the 3-Tier strategy:
-    ///   Tier 1: io_uring Read into Huge Page buffer → write to memfd
-    ///   Tier 2: copy_file_range kernel splice → memfd
-    ///   Tier 3: mmap fallback → memfd
-    pub async fn ingest(&mut self, file_path: &str) -> ImperialResult<OwnedFd> {
+/// Ingests a file using the 3-Tier strategy:
+///   Tier 1: io_uring Read into Huge Page buffer → write to memfd
+///   Tier 2: copy_file_range kernel splice → memfd
+///   Tier 3: mmap fallback → memfd
+pub async fn ingest(&mut self, file_path: &str, delimiter: &str, encoding: &str) -> ImperialResult<OwnedFd> {
         let file = File::open(file_path).map_err(|e| {
             ImperialError::Ingestion(format!("Failed to open {}: {}", file_path, e))
         })?;

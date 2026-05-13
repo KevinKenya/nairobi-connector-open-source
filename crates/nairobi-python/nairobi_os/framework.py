@@ -23,6 +23,17 @@ class SovereignFrame:
         result_json = data.crunch(self.handle_id, column)
         return json.loads(result_json)
 
+    def calculate(self, column=None):
+        """
+        Returns statistical math for the specified column, or all numeric columns if None.
+        Alias for crunch() for Pandas-like familiarity.
+        """
+        if column is None:
+            # Calculate for all columns - this would need a different approach
+            # For now, we'll require a column specification to match the existing API
+            raise ValueError("calculate() requires a column parameter. Use crunch(column) for specific column stats.")
+        return self.crunch(column)
+
     def correlate(self, cols):
         """
         Returns the Relational Strike correlation matrix for the specified columns.

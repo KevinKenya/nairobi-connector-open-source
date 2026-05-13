@@ -123,24 +123,69 @@ def stop_refinery():
 
 def connect():
     """
-    Semantic alias for start_refinery().
+    Auto-configures XDG_RUNTIME_DIR, starts D-Bus (if needed), and ignites the background daemons.
+    Includes Colab environment armor for headless operation.
     """
+    # Colab Environment Armor: XDG_RUNTIME_DIR provisioning
+    if 'XDG_RUNTIME_DIR' not in os.environ:
+        runtime_dir = Path("/tmp/runtime-root")
+        try:
+            runtime_dir.mkdir(mode=0o700, exist_ok=True)
+            os.environ['XDG_RUNTIME_DIR'] = str(runtime_dir)
+            logger.info(f"🔧 Created XDG_RUNTIME_DIR: {runtime_dir} (0o700)")
+        except Exception as e:
+            logger.warning(f"⚠️ Failed to create XDG_RUNTIME_DIR: {e}")
+    
+    # D-Bus Auto-Ignition for Colab/headless environments
+    try:
+        # Check if D-Bus session already exists
+        result = subprocess.run(
+            ["busctl", "--user", "status", "org.freedesktop.DBus"],
+            capture_output=True,
+            text=True,
+            timeout=2
+        )
+        if result.returncode != 0:
+            logger.info("🔌 No D-Bus session detected. Launching dbus-launch...")
+            # Launch dbus-launch and capture environment
+            dbus_launch = subprocess.Popen(
+                ["dbus-launch", "--autolaunch=" + str(os.getpid())],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True
+            )
+            stdout, stderr = dbus_launch.communicate(timeout=5)
+            
+            # Parse and inject DBUS_SESSION_BUS_ADDRESS
+            for line in stdout.split('\n'):
+                if line.startswith('DBUS_SESSION_BUS_ADDRESS='):
+                    os.environ['DBUS_SESSION_BUS_ADDRESS'] = line.split('=', 1)[1]
+                    logger.info(f"🔗 Injected DBUS_SESSION_BUS_ADDRESS: {os.environ['DBUS_SESSION_BUS_ADDRESS'][:50]}...")
+                elif line.startswith('DBUS_SESSION_BUS_PID='):
+                    os.environ['DBUS_SESSION_BUS_PID'] = line.split('=', 1)[1]
+            
+            # Small delay for D-Bus to settle
+            time.sleep(1)
+            logger.info("✅ D-Bus session launched successfully")
+    except Exception as e:
+        logger.warning(f"⚠️ D-Bus auto-launch warning (may be OK if already running): {e}")
+    
     return start_refinery()
 
-def read_csv(path):
+def read_csv(path, delimiter=",", encoding="utf-8"):
     """
-    Automatically ignites the refinery (if possible) and returns a SovereignFrame.
-    Implements Lazy Ignition: retries once if daemon is offline.
+    Ingests data via Axum and returns a SovereignFrame object.
+    Automatically ignites the refinery (if possible) and implements Lazy Ignition.
     """
     try:
-        handle_id = data.ingest(str(path))
+        handle_id = data.ingest(str(path), delimiter, encoding)
         return SovereignFrame(handle_id)
     except Exception as e:
         logger.info("⚠️ Refinery offline or connection failed. Attempting Lazy Ignition...")
         try:
             start_refinery()
             time.sleep(2) # Wait for bus registration
-            handle_id = data.ingest(str(path))
+            handle_id = data.ingest(str(path), delimiter, encoding)
             return SovereignFrame(handle_id)
         except Exception as retry_err:
             raise RuntimeError(f"Failed to ingest CSV after Lazy Ignition: {retry_err}") from e
