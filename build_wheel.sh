@@ -1,3 +1,4 @@
+# File: ~/nairobi-connector-open-source/build_wheel.sh
 #!/bin/bash
 # nairobi-connector-open-source/build_wheel.sh
 set -e
@@ -7,7 +8,7 @@ PYTHON_CRATE_DIR="$PROJECT_ROOT/crates/nairobi-python"
 BIN_DEST_DIR="$PYTHON_CRATE_DIR/nairobi_os/bin"
 
 echo "=========================================="
-echo "Nairobi OS v0.3.0: Heavy Iron Build Orchestrator"
+echo "Nairobi OS v0.3.1: Heavy Iron Build Orchestrator"
 echo "=========================================="
 
 # 1. Build the Microservice Binaries

@@ -5,13 +5,13 @@
 # nairobi-open-source-release/crates/nairobi-python/Cargo.toml
 [package]
 name = "nairobi-python"
-version = "0.3.0"
+version = "0.3.1"
 edition = "2021"
 authors = ["Kevin Chege <aiwithafrica@gmail.com>"]
 license-file = "LICENSE"
 readme = "README.md"
 description = "Nairobi OS: Heavy Iron AI Infrastructure"
-# The exclude array prevents Maturin/Cargo from packaging massive test files, 
+# The exclude array prevents Maturin/Cargo from packaging massive test files,
 # virtual environments, and logs into the source distribution (.tar.gz).
 exclude =[
     "simulator/*",
