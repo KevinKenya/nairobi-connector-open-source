@@ -29,7 +29,7 @@ pip install nairobi-os==0.3.1
 ### Build from Source
 ```bash
 # Clone the repository
-git clone https://github.com/chege/nairobi-connector-open-source
+git clone https://github.com/KevinKenya/nairobi-connector-open-source
 cd nairobi-connector-open-source
 
 # Set up Python environment

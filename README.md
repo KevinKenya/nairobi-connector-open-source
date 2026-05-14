@@ -3,7 +3,7 @@
 ## v0.3.1: The Jupyter Glass. Zero-copy, hardware-accelerated plotting directly from memfd.
 ![Lagos Vision in Jupyter](lagos_vision_jupyter.png)
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/chege/nairobi-connector-open-source/blob/main/nairobi-benchmarks/nairobiOsBenchmarks.ipynb)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/KevinKenya/nairobi-connector-open-source/blob/main/nairobi-benchmarks/nairobiOsBenchmarks.ipynb)
 
 > [!IMPORTANT]
 > **Linux & WSL2 Only.** We do not compromise on kernel physics.
@@ -69,7 +69,7 @@ pip install maturin pyo3-build-config zbus anywidget traitlets
 ### Step 2: Build the entire stack
 ```bash
 # Clone the repository
-git clone https://github.com/chege/nairobi-connector-open-source
+git clone https://github.com/KevinKenya/nairobi-connector-open-source
 cd nairobi-connector-open-source
 
 # Build the entire stack (compiles Rust + forges the Python wheel)
