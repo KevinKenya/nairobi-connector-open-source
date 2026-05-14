@@ -11,12 +11,9 @@ echo "=========================================="
 echo "Nairobi OS v0.3.1: Heavy Iron Build Orchestrator"
 echo "=========================================="
 
-# 1. Build the Microservice Binaries
-echo "Step 1: Compiling Axum Refinery..."
-cargo build --release -p nairobi-axum-refinery
-
-echo "Step 1b: Compiling Lagos Vision Daemon..."
-cargo build --release -p lagos-lite --bin lagos-vision-daemon
+# 1. Build the Microservice Binaries in parallel
+echo "Step 1: Compiling Microservices (Refinery & Lagos)..."
+cargo build --release -p nairobi-axum-refinery -p lagos-lite --bin lagos-vision-daemon
 
 # 2. Locate and Prepare Binaries
 REFINERY_BIN="$PROJECT_ROOT/target/release/nairobi-axum-refinery"
@@ -51,9 +48,9 @@ cd "$PYTHON_CRATE_DIR"
 
 # Use maturin from virtual environment if it exists
 if [ -f "$PROJECT_ROOT/.venv/bin/maturin" ]; then
-    "$PROJECT_ROOT/.venv/bin/maturin" build --release --compatibility manylinux
+    "$PROJECT_ROOT/.venv/bin/maturin" build --release --skip-auditwheel
 elif command -v maturin &> /dev/null; then
-    maturin build --release --compatibility manylinux
+    maturin build --release --skip-auditwheel
 else
     echo "ERROR: maturin not found. Please install it in the virtual environment."
     exit 1

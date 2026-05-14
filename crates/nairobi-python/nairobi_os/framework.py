@@ -1,4 +1,4 @@
-# File: /home/chege/nairobi-connector-open-source/crates/nairobi-python/nairobi_os/framework.py
+# File: /home/KevinKenya/nairobi-connector-open-source/crates/nairobi-python/nairobi_os/framework.py
 # Author: Kevin Chege. Location: Nairobi
 # Date: 2026-05-15
 

@@ -1,4 +1,4 @@
-# File: /home/chege/nairobi-connector-open-source/crates/nairobi-python/nairobi_os/__init__.py
+# File: /home/KevinKenya/nairobi-connector-open-source/crates/nairobi-python/nairobi_os/__init__.py
 # Author: Kevin Chege. Location: Nairobi
 # Date: 2026-05-06
 

@@ -8,8 +8,19 @@ members = [
     "crates/nairobi-protocol",
     "crates/nairobi-axum-refinery",
     "crates/nairobi-hub",
-    "crates/nairobi-python", "crates/lagos-lite",
+    "crates/nairobi-python",
+    "crates/lagos-lite",
 ]
 
 [workspace.dependencies]
 iceoryx2 = "0.3.0"
+zbus = { version = "3.15", features = ["gvariant"] }
+tokio = { version = "1.36", features = ["full"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+libc = "0.2"
+memmap2 = "0.9"
+memfd = "0.6"
+sha2 = "0.10"
+tracing = "0.1"
+pyo3 = { version = "0.20", features = ["extension-module"] }
