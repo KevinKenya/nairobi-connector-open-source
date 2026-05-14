@@ -51,9 +51,9 @@ cd "$PYTHON_CRATE_DIR"
 
 # Use maturin from virtual environment if it exists
 if [ -f "$PROJECT_ROOT/.venv/bin/maturin" ]; then
-    "$PROJECT_ROOT/.venv/bin/maturin" build --release
+    "$PROJECT_ROOT/.venv/bin/maturin" build --release --compatibility manylinux
 elif command -v maturin &> /dev/null; then
-    maturin build --release
+    maturin build --release --compatibility manylinux
 else
     echo "ERROR: maturin not found. Please install it in the virtual environment."
     exit 1
