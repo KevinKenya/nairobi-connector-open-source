@@ -14,14 +14,26 @@ impl HeadlessContext {
             ..Default::default()
         });
 
-        let adapter = instance
+        let mut adapter = instance
             .request_adapter(&RequestAdapterOptions {
                 power_preference: PowerPreference::HighPerformance,
                 compatible_surface: None,
                 force_fallback_adapter: false,
             })
-            .await
-            .expect("Failed to find an appropriate adapter");
+            .await;
+
+        if adapter.is_none() {
+            log::info!("HighPerformance adapter not found, trying software fallback");
+            adapter = instance
+                .request_adapter(&RequestAdapterOptions {
+                    power_preference: PowerPreference::None,
+                    compatible_surface: None,
+                    force_fallback_adapter: true,
+                })
+                .await;
+        }
+
+        let adapter = adapter.expect("Failed to find an appropriate adapter");
 
         let (device, queue) = adapter
             .request_device(
