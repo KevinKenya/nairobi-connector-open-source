@@ -15,14 +15,18 @@ use pyo3::{exceptions::PyRuntimeError, prelude::*};
 use crate::types::{ensure_client, get_registry, get_runtime, map_imperial_error};
 
 #[pyfunction]
-pub fn ingest(py: Python, file_path: String) -> PyResult<String> {
+#[pyo3(signature = (file_path, delimiter=None, encoding=None))]
+pub fn ingest(py: Python, file_path: String, delimiter: Option<String>, encoding: Option<String>) -> PyResult<String> {
     let rt = get_runtime()?;
+
+    let delimiter = delimiter.unwrap_or_else(|| ",".to_string());
+    let encoding = encoding.unwrap_or_else(|| "utf-8".to_string());
 
     let handle_id = py.allow_threads(|| {
         rt.block_on(async {
             let client = ensure_client().await
                 .map_err(map_imperial_error)?;
-            let fd = client.ingest(&file_path).await
+            let fd = client.ingest(&file_path, &delimiter, &encoding).await
                 .map_err(map_imperial_error)?;
 
             let uuid = uuid::Uuid::new_v4().to_string();
@@ -109,8 +113,19 @@ pub fn correlate(py: Python, handle_id: String, query: String) -> PyResult<Strin
 /// This is the highest-performance path for the full pipeline.
 /// Data flows through iceoryx2 shared memory when available.
 #[pyfunction]
-pub fn pipeline(py: Python, file_path: String, column: String, corr_columns: String) -> PyResult<String> {
+#[pyo3(signature = (file_path, column, corr_columns, delimiter=None, encoding=None))]
+pub fn pipeline(
+    py: Python,
+    file_path: String,
+    column: String,
+    corr_columns: String,
+    delimiter: Option<String>,
+    encoding: Option<String>,
+) -> PyResult<String> {
     let rt = get_runtime()?;
+
+    let delimiter = delimiter.unwrap_or_else(|| ",".to_string());
+    let encoding = encoding.unwrap_or_else(|| "utf-8".to_string());
 
     py.allow_threads(|| {
         rt.block_on(async {
@@ -118,7 +133,9 @@ pub fn pipeline(py: Python, file_path: String, column: String, corr_columns: Str
                 .map_err(map_imperial_error)?;
 
             // The Hub client handles SHM_READY routing internally.
-            let result = client.ingest_crunch_correlate(&file_path, &column, &corr_columns).await
+            let result = client
+                .ingest_crunch_correlate(&file_path, &column, &corr_columns, &delimiter, &encoding)
+                .await
                 .map_err(map_imperial_error)?;
 
             serde_json::to_string(&result)

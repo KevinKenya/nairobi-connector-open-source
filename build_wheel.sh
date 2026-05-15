@@ -13,7 +13,7 @@ echo "=========================================="
 
 # 1. Build the Microservice Binaries in parallel
 echo "Step 1: Compiling Microservices (Refinery & Lagos)..."
-cargo build --release -p nairobi-axum-refinery -p lagos-lite --bin lagos-vision-daemon
+cargo build --release -p nairobi-axum-refinery -p lagos-lite
 
 # 2. Locate and Prepare Binaries
 REFINERY_BIN="$PROJECT_ROOT/target/release/nairobi-axum-refinery"

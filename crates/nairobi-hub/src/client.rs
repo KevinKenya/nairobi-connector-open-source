@@ -27,7 +27,7 @@ use zbus::Connection;
     default_path = "/org/nairobi/NairobiAxumRefinery1"
 )]
 pub trait AxumRefinery {
-    async fn ingest(&self, file_path: &str) -> zbus::Result<OwnedFd>;
+    async fn ingest(&self, file_path: &str, delimiter: &str, encoding: &str) -> zbus::Result<OwnedFd>;
     async fn analyze(&self, handle: OwnedFd, query: &str) -> zbus::Result<String>;
     async fn inspect_schema(&self, handle: OwnedFd) -> zbus::Result<SchemaInspection>;
     async fn clean_data(
@@ -50,6 +50,8 @@ pub trait AxumRefinery {
     async fn ingest_crunch_correlate(
         &self,
         file_path: &str,
+        delimiter: &str,
+        encoding: &str,
         column: &str,
         corr_columns: &str,
     ) -> zbus::Result<String>;
@@ -127,8 +129,13 @@ impl RefineryClient {
     }
 
     /// Ingests a file into the backend.
-    pub async fn ingest(&self, file_path: &str) -> Result<OwnedFd, ImperialError> {
-        self.proxy.ingest(file_path).await.map_err(|e| {
+    pub async fn ingest(
+        &self,
+        file_path: &str,
+        delimiter: &str,
+        encoding: &str,
+    ) -> Result<OwnedFd, ImperialError> {
+        self.proxy.ingest(file_path, delimiter, encoding).await.map_err(|e| {
             ImperialError::SystemicSeizure(format!(
                 "Heavy Iron Engine is offline during ingest: {}",
                 e
@@ -158,7 +165,7 @@ impl RefineryClient {
     /// Orchestrates the data strike.
     pub async fn distill(&self, file_path: &str, query: &str) -> Result<String, ImperialError> {
         // 1. Call ingest() to get the FD.
-        let fd = self.proxy.ingest(file_path).await.map_err(|e| {
+        let fd = self.proxy.ingest(file_path, ",", "utf-8").await.map_err(|e| {
             ImperialError::SystemicSeizure(format!(
                 "Heavy Iron Engine is offline during ingest: {}",
                 e
@@ -286,10 +293,12 @@ impl RefineryClient {
         file_path: &str,
         column: &str,
         corr_columns: &str,
+        delimiter: &str,
+        encoding: &str,
     ) -> Result<FusedAnalyticsResult, ImperialError> {
         let signal = self
             .proxy
-            .ingest_crunch_correlate(file_path, column, corr_columns)
+            .ingest_crunch_correlate(file_path, delimiter, encoding, column, corr_columns)
             .await
             .map_err(|e| {
                 ImperialError::SystemicSeizure(format!(
