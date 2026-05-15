@@ -106,7 +106,16 @@ def _check_dbus_service():
             capture_output=True,
             text=True
         )
-        return result.returncode == 0
+        if result.returncode == 0:
+            return True
+
+        # Alternative check using dbus-send if busctl is picky or unavailable
+        result = subprocess.run(
+            ["dbus-send", "--session", "--dest=org.freedesktop.DBus", "--type=method_call", "--print-reply", "/org/freedesktop/DBus", "org.freedesktop.DBus.ListNames"],
+            capture_output=True,
+            text=True
+        )
+        return "org.nairobi.NairobiAxumRefinery1" in result.stdout
     except Exception:
         return False
 
@@ -126,50 +135,49 @@ def connect():
     Auto-configures XDG_RUNTIME_DIR, starts D-Bus (if needed), and ignites the background daemons.
     Includes Colab environment armor for headless operation.
     """
-    # Colab Environment Armor: XDG_RUNTIME_DIR provisioning
+    # 1. Environment Setup: Ensure XDG_RUNTIME_DIR exists
     if 'XDG_RUNTIME_DIR' not in os.environ:
         runtime_dir = Path("/tmp/runtime-root")
         try:
             runtime_dir.mkdir(mode=0o700, exist_ok=True)
             os.environ['XDG_RUNTIME_DIR'] = str(runtime_dir)
-            logger.info(f"🔧 Created XDG_RUNTIME_DIR: {runtime_dir} (0o700)")
+            logger.info(f"🔧 Created XDG_RUNTIME_DIR: {runtime_dir}")
         except Exception as e:
             logger.warning(f"⚠️ Failed to create XDG_RUNTIME_DIR: {e}")
-    
-    # D-Bus Auto-Ignition for Colab/headless environments
-    try:
-        # Check if D-Bus session already exists
-        result = subprocess.run(
-            ["busctl", "--user", "status", "org.freedesktop.DBus"],
-            capture_output=True,
-            text=True,
-            timeout=2
-        )
-        if result.returncode != 0:
-            logger.info("🔌 No D-Bus session detected. Launching dbus-launch...")
-            # Launch dbus-launch and capture environment
-            dbus_launch = subprocess.Popen(
-                ["dbus-launch", "--autolaunch=" + str(os.getpid())],
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                text=True
-            )
-            stdout, stderr = dbus_launch.communicate(timeout=5)
+
+    # 2. D-Bus Auto-Ignition for Headless Environments (Colab, SSH, etc.)
+    # We check multiple environment variables and try to connect to the session bus.
+    dbus_ready = False
+    if 'DBUS_SESSION_BUS_ADDRESS' in os.environ:
+        try:
+            # Test if existing address works
+            subprocess.run(["busctl", "--user", "status", "org.freedesktop.DBus"],
+                           capture_output=True, timeout=2, check=True)
+            dbus_ready = True
+        except Exception:
+            logger.info("🔗 DBUS_SESSION_BUS_ADDRESS is set but connection failed. Re-initializing...")
+
+    if not dbus_ready:
+        try:
+            # Use dbus-launch to spawn a new session and capture its variables
+            output = subprocess.check_output(["dbus-launch"], text=True)
+            for line in output.splitlines():
+                if '=' in line:
+                    key, val = line.split('=', 1)
+                    # Remove trailing semicolon and quotes
+                    val = val.strip().rstrip(';').strip("'").strip('"')
+                    os.environ[key] = val
+                    logger.debug(f"DBUS ENV: {key}={val}")
             
-            # Parse and inject DBUS_SESSION_BUS_ADDRESS
-            for line in stdout.split('\n'):
-                if line.startswith('DBUS_SESSION_BUS_ADDRESS='):
-                    os.environ['DBUS_SESSION_BUS_ADDRESS'] = line.split('=', 1)[1]
-                    logger.info(f"🔗 Injected DBUS_SESSION_BUS_ADDRESS: {os.environ['DBUS_SESSION_BUS_ADDRESS'][:50]}...")
-                elif line.startswith('DBUS_SESSION_BUS_PID='):
-                    os.environ['DBUS_SESSION_BUS_PID'] = line.split('=', 1)[1]
-            
-            # Small delay for D-Bus to settle
-            time.sleep(1)
-            logger.info("✅ D-Bus session launched successfully")
-    except Exception as e:
-        logger.warning(f"⚠️ D-Bus auto-launch warning (may be OK if already running): {e}")
-    
+            if 'DBUS_SESSION_BUS_ADDRESS' in os.environ:
+                logger.info(f"✅ D-Bus Session Started: {os.environ['DBUS_SESSION_BUS_ADDRESS'][:40]}...")
+                dbus_ready = True
+            else:
+                logger.error("❌ dbus-launch failed to provide DBUS_SESSION_BUS_ADDRESS")
+        except Exception as e:
+            logger.error(f"💥 Failed to launch D-Bus session: {e}")
+
+    # 3. Refinery Ignition
     return start_refinery()
 
 def read_csv(path, delimiter=",", encoding="utf-8"):
