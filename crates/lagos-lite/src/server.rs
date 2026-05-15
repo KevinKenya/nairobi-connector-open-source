@@ -13,7 +13,7 @@ pub async fn run_server(
     tx_frames: mpsc::Receiver<Vec<u8>>,
     rx_telemetry: mpsc::Sender<egui::Event>,
 ) -> Result<(), Box<dyn std::error::Error>> {
-    let listener = TcpListener::bind("127.0.0.1:0").await?;
+    let listener = TcpListener::bind("0.0.0.0:0").await?;
     let addr = listener.local_addr()?;
     println!("[LAGOS_PORT: {}]", addr.port());
 
