@@ -50,7 +50,7 @@ La suite sigue una metodología de benchmarking "Hardware-First", asegurando que
 - Todos los cálculos se verifican para la identidad matemática (±1e-5) utilizando `result_validator.py`.
 
 ## Licencia
-Esta suite es parte del proyecto Nairobi OS y está licenciada bajo la **PolyForm Noncommercial License 1.0.0**.
+Esta suite es parte del proyecto Nairobi OS y está licenciada bajo la **Apache License 2.0**.
 
 ---
 © 2026 Kevin Chege. Todos los derechos reservados.

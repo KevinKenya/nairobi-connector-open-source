@@ -56,7 +56,7 @@
   **Solution**: [Resolution]
 
 ## License
-This project is licensed under the **PolyForm Noncommercial License 1.0.0**.
+This project is licensed under the **Apache License 2.0**.
 
 ---
 © 2026 Kevin Chege. All Rights Reserved.

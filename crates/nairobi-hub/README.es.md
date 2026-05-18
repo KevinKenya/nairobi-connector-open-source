@@ -30,7 +30,7 @@ cargo test -p nairobi-hub
 ```
 
 ## Licencia
-Este proyecto está licenciado bajo la **PolyForm Noncommercial License 1.0.0**.
+Este proyecto está licenciado bajo la **Apache License 2.0**.
 
 ---
 © 2026 Kevin Chege. Todos los derechos reservados.

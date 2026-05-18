@@ -12,7 +12,7 @@ name = "nairobi-os"
 version = "0.3.1"
 description = "Nairobi OS: Heavy Iron Data Science Infrastructure with Lagos Vision (Hardware-Accelerated Zero-Copy Rendering)"
 authors = [{name = "Kevin Chege", email = "aiwithafrica@gmail.com"}]
-license = {file = "LICENSE"}
+license = "Apache-2.0"
 readme = "README.md"
 requires-python = ">=3.12"
 

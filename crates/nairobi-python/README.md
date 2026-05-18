@@ -83,7 +83,7 @@ To test in isolation without the full refinery, you can mock the `_core.data` mo
 - **Handle Not Found**: Data handles are session-bound. If the refinery restarts, previous `SovereignFrame` handles will become invalid.
 
 ## License
-This project is licensed under the **PolyForm Noncommercial License 1.0.0**.
+This project is licensed under the **Apache License 2.0**.
 
 ---
 © 2026 Kevin Chege. All Rights Reserved.
