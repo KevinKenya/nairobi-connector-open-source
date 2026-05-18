@@ -1,54 +1,67 @@
-# Lagos Vision: The Visual Cortex of Nairobi OS
+# Lagos Vision (lagos-lite)
 
-**Version**: 0.3.1
+## Overview
+Lagos Vision is the high-performance rendering engine for Nairobi OS. It is designed to visualize millions of data points with sub-millisecond latency by memory-mapping analytical data directly into the GPU pipeline. Lagos operates as a headless daemon that streams JPEG-encoded frames to Jupyter notebook widgets via WebSockets.
 
-Lagos Vision is a hardware-accelerated, event-driven rendering engine designed for high-performance data visualization in Jupyter environments. It adheres to the **Zero-Copy Doctrine**, memory-mapping distilled analytical data directly from `memfd` handles into the GPU pipeline.
+## Key Features
+- **Zero-Copy Rendering**: Data is memory-mapped from `memfd` handles directly into `wgpu` buffers.
+- **Hardware Acceleration**: Uses `egui` and `wgpu` (Vulkan, Metal, DX12, or OpenGL) for high-performance plotting.
+- **LTTB Downsampling**: Implements the Largest-Triangle-Three-Buckets algorithm on the GPU to maintain visual accuracy while rendering massive datasets.
+- **Event-Driven Architecture**: Consumes zero CPU when idle; only renders on data updates or user interaction.
 
-## 🚀 Physics of Performance
+## Architecture
+Lagos Vision consists of:
+- **Lagos Lite**: The core library providing the rendering pipeline.
+- **Lagos Vision Daemon**: The binary process that manages the `wgpu` surface and WebSocket server.
+- **Lagos Widget**: An `anywidget` Python component that displays the stream.
 
-- **Zero-Copy Ingestion**: Raw data never enters the Python interpreter. Lagos maps the refinery's output directly into its process space.
-- **Hardware Acceleration**: Uses `egui` and `wgpu` to render millions of points via Vulkan, Metal, or OpenGL.
-- **Event-Driven Rendering**: 0% CPU usage when idle. Lagos only renders when data changes or user interaction occurs.
-- **LTTB Downsampling**: Dynamically decimates massive datasets into visually accurate representations for sub-millisecond interactivity.
+## Installation
 
-## 🛠️ Components
+### Prerequisites
+- **GPU**: A Vulkan-compatible GPU (or OSMesa for software fallback).
+- **System Libraries**: `libosmesa6-dev`, `mesa-utils`, `xvfb`.
 
-1. **Lagos Lite (Library)**: The core rendering engine, providing the `SovereignStream` and `LagosPipeline`.
-2. **Lagos Vision Daemon (Binary)**: A specialized background process spawned by the Python orchestrator to manage the rendering loop and WebSocket communication.
-3. **Lagos Widget (Jupyter)**: An `anywidget`-powered interface that streams JPEG frames from the daemon to an HTML5 canvas.
-
-## 💻 Manual Execution
-
-While Lagos is typically orchestrated by `nairobi_os`, it can be run manually for debugging:
-
+### Build
 ```bash
-# Compile the daemon
 cargo build --release -p lagos-lite --bin lagos-vision-daemon
+```
 
-# Run the daemon (requires a memfd handle ID)
+## Usage
+
+### In Nairobi OS
+Lagos is typically used through the `SovereignFrame.plot()` method in Python.
+
+### Manual Debugging
+You can start the daemon manually to test the rendering pipeline:
+```bash
 ./target/release/lagos-vision-daemon --fd <FD_INT> --width 1000 --height 400
 ```
 
-The daemon will output `[LAGOS_PORT: XXXX]` on stdout once the WebSocket server is live.
+## Development
 
-## 📊 Performance Benchmark (v0.3.1)
+### Implementing a Custom Visualization Layer
+1.  **Modify the Pipeline**: In `src/pipeline.rs`, define your vertex and fragment shaders (WGSL).
+2.  **Update the Buffer Layout**: Map the incoming `memfd` data to your new shader's bind groups.
+3.  **UI Integration**: Add control elements (sliders, buttons) to the `egui` interface in `src/device.rs`.
 
-| Metric | Standard | Lagos Vision | Speedup |
-|--------|-----------------------|--------------|---------|
-| **Latency (10M pts)** | ~12.5s (blocking) | **~0.015s (async)** | **800x** |
-| **Idle CPU Load** | 5-10% (Polling) | **0.0% (Event-driven)** | **∞** |
-| **Memory usage (10M pts)** | ~850MB | **< 40MB (Zero-Copy)** | **21x** |
-
-> [!NOTE]
-> Lagos achieves these speeds by offloading downsampling (LTTB) to the Rust core and utilizing `wgpu` for parallelized GPU rendering. Standard pipeline latency includes the mandatory data copy into the Python interpreter, which Lagos bypasses entirely.
-
-## 🛠️ Build
+### Headless Environments
+In environments like Google Colab, Lagos uses `xvfb-run` or OSMesa to handle the lack of a physical display:
 ```bash
-cargo build --release -p lagos-lite --bin lagos-vision-daemon
+xvfb-run -s "-screen 0 1024x768x24" ./target/release/lagos-vision-daemon ...
 ```
 
-## ⚖️ Licensing
-This project is licensed under the **PolyForm Noncommercial License 1.0.0**. It is free for personal, educational, and research use.
+## Testing
+Lagos includes visual integration tests that capture frames and compare them against golden images.
+```bash
+cargo test -p lagos-lite
+```
+
+## Troubleshooting
+- **WebSocket Connection Failed**: In cloud environments (Colab/SageMaker), ensure the proxy port is correctly mapped. Nairobi Python handles this automatically if `google.colab` is detected.
+- **WGPU Adapter Not Found**: Ensure GPU drivers are installed. If using a CPU-only environment, Lagos will attempt to fall back to a software adapter.
+
+## License
+This project is licensed under the **PolyForm Noncommercial License 1.0.0**.
 
 ---
-© 2026 Kevin Chege. Location: Nairobi.
+© 2026 Kevin Chege. All Rights Reserved.

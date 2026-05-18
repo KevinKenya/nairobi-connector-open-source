@@ -1,48 +1,68 @@
-# Nairobi Axum Refinery: High-Performance Rust Core
+# Nairobi Axum Refinery
 
-**Version**: 0.3.1
+## Overview
+The Axum Refinery is the high-performance core of Nairobi OS. Written in Rust, it is designed to saturate modern hardware through kernel-bypass I/O and vectorized parallel analytics. It functions as a D-Bus service that manages the lifecycle of data ingested into anonymous memory file descriptors (`memfd`).
 
-The Refinery is the "Heavy Iron" of Nairobi OS. It is a high-performance daemon written in Rust, designed to saturate modern hardware for forensic data analysis.
+## Key Features
+- **Dirac Ingestion Engine**: A 3-tier ingestion strategy using `io_uring` (Tier 1), `copy_file_range` (Tier 2), and `mmap` (Tier 3).
+- **Axiom Crunch**: Vectorized statistical moment calculation (Mean, Variance, Skewness, Kurtosis) powered by Polars and Rayon.
+- **Relational Strike**: Optimized Pearson and Spearman correlation calculation.
+- **SQL Analytics**: Direct execution of SQL queries on memory-resident data using `polars-sql`.
+- **Zero-Copy Data Plane**: Exposes analytical results via `iceoryx2` shared memory and D-Bus.
 
-## 🚀 Key Technologies
-- **io_uring**: High-performance asynchronous I/O for disk-bound ingestion.
-- **Huge Pages**: Utilizing 1GB Huge Pages for zero-copy memory buffers.
-- **Rayon**: Parallelizing moment-based statistical calculations across all available CPU cores.
-- **Polars**: Leveraging the state-of-the-art vectorized analytical engine.
-- **SafeMmap**: Custom RAII-based file descriptor management to ensure memory and FD safety.
-- **iceoryx2**: Zero-copy shared memory publish-subscribe for the data plane.
+## Architecture
+The refinery is structured into specialized engines:
+- `DiracEngine`: Handles hardware-accelerated I/O.
+- `AnalyzeEngine`: Performs statistical calculations and SQL execution.
+- `DbusService`: Implements the `org.nairobi.NairobiAxumRefinery1` interface.
 
-## 🏗️ Internal Components
-- **DiracEngine**: The low-level I/O orchestrator for huge pages and `io_uring`. Implements a 3-tier ingestion strategy:
-  1. **Tier 1**: io_uring Read into Huge Page → write to memfd (hardware DMA path)
-  2. **Tier 2**: `copy_file_range` kernel splice → memfd
-  3. **Tier 3**: mmap fallback → memfd
-- **AnalyzeEngine**: The statistical cortex performing mean, skewness, kurtosis, quantile, and correlation calculations using Polars + Rayon.
-- **ShmPublisher**: The zero-copy data plane powered by `iceoryx2`, publishing results to a 64MB POSIX shared memory arena.
-- **AxumRefineryService**: The D-Bus interface handler, routing requests to the appropriate engine and publishing results via iceoryx2 when available.
+## Installation
 
-## 🔧 Build
+### Prerequisites
+- **Kernel**: Linux 5.10+ (WSL2 supported).
+- **Dependencies**: `libdbus-1-dev`, `pkg-config`.
+- **Huge Pages**: The engine performs best with 1GB Huge Pages enabled.
+    ```bash
+    echo 1 | sudo tee /sys/kernel/mm/hugepages/hugepages-1048576kB/nr_hugepages
+    ```
+
+### Build
 ```bash
 cargo build --release -p nairobi-axum-refinery
 ```
 
-## 🚀 Run
+## Development
+
+### Kernel-Level Configuration
+Contributors should be aware that `DiracEngine` attempts to use `IORING_SETUP_SQPOLL`. For this to work without root, you may need to adjust `/proc/sys/kernel/unprivileged_userns_clone` or run with `CAP_SYS_ADMIN`.
+
+### Tutorial: Adding a New Statistical Metric
+1.  **Define the Metric**: In `src/analyze.rs`, update the `StatisticalProfile` struct and its `compute` method.
+2.  **Update Protocol**: Add the new field to the `DistilledAnalytics` struct in `crates/nairobi-protocol/src/types.rs`.
+3.  **Export via D-Bus**: Ensure the D-Bus interface in `src/dbus_service.rs` correctly serializes the updated profile.
+
+### Testing
+The refinery uses `tokio::test` for asynchronous integration testing.
 ```bash
-./target/release/nairobi-axum-refinery
+cargo test -p nairobi-axum-refinery
 ```
 
-The daemon will register on D-Bus as `org.nairobi.NairobiAxumRefinery1` at `/org/nairobi/NairobiAxumRefinery1`.
+#### Mocking for Isolated Testing
+You can test the `AnalyzeEngine` in isolation by creating a `memfd` manually and passing it to the engine, bypassing the D-Bus layer:
+```rust
+let opts = memfd::MemfdOptions::default();
+let mfd = opts.create("test.csv")?;
+// Write test data...
+let engine = AnalyzeEngine::new()?;
+let results = engine.analyze(mfd.into_fd(), "target_column")?;
+```
 
-## 📂 Source Layout
-- `src/main.rs` — Entry point: initializes tracing, service state, and D-Bus connection
-- `src/lib.rs` — Module declarations (re-exports submodules)
-- `src/dbus_service.rs` — D-Bus interface implementation (`#[dbus_interface]`)
-- `src/ingest.rs` — `DiracEngine` for 3-tier zero-copy ingestion
-- `src/analyze.rs` — `AnalyzeEngine` for vectorized statistics, SQL, and correlation
-- `src/shm_publisher.rs` — `ShmPublisher` for iceoryx2 shared memory data plane
+## Troubleshooting
+- **`io_uring` initialization failed**: Check if your kernel supports `io_uring` (`zgrep CONFIG_IO_URING /proc/config.gz`).
+- **Huge Page allocation failed**: Ensure the host has enough contiguous memory available. Check `grep Huge /proc/meminfo`.
 
-## ⚖️ Licensing
-This project is licensed under the **PolyForm Noncommercial License 1.0.0**. It is free for personal, educational, and research use.
+## License
+This project is licensed under the **PolyForm Noncommercial License 1.0.0**.
 
 ---
 © 2026 Kevin Chege. All Rights Reserved.
