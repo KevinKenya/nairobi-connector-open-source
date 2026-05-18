@@ -1,37 +1,32 @@
-# Nairobi Protocol: The GVariant Interface Definition
+# Nairobi Protocol
 
-This crate defines the shared D-Bus interfaces and GVariant signatures used by Nairobi OS. It ensures mathematical and type-safety consistency across the Rust refinery, the Python bridge, and the Hub orchestrator.
+## Overview
+The Nairobi Protocol crate defines the shared D-Bus interfaces, GVariant signatures, and data structures used throughout the Nairobi OS ecosystem. It serves as the "source of truth" for type safety across the Rust core, the Hub orchestrator, and the Python bindings.
 
-**Version**: 0.3.1
+## Key Components
+- **Interface Definitions**: Constants for service names, object paths, and method signatures.
+- **Shared Types**: GVariant-compatible structs such as `DistilledAnalytics` and `CorrelationResult`.
+- **Memory Management**: The `MemoryPipe` wrapper for `memfd` operations and the `iceoryx2` arena definitions.
 
-## 🏗️ Interface Definition
+## D-Bus Interface
 - **Service Name**: `org.nairobi.NairobiAxumRefinery1`
 - **Object Path**: `/org/nairobi/NairobiAxumRefinery1`
 - **Interface**: `org.nairobi.NairobiAxumRefinery1`
 
-## 🛠️ Key Methods
+## Usage
+Add this crate as a dependency in any component that needs to communicate within the Nairobi OS ecosystem.
 
-### Core Operations
-- `Ingest(s file_path, s delimiter, s encoding)` -> `h memfd_handle` — Ingest a CSV file into a zero-copy memfd buffer.
-- `Analyze(h memfd_handle, s query)` -> `v gvariant_result` — Perform moment-based statistical analysis on a column.
-- `InspectSchema(h memfd_handle)` -> `v schema_inspection` — Inspect the schema of an ingested dataset.
-- `CleanData(h memfd_handle, a(sss) strategies)` -> `h memfd_handle` — Apply cleaning strategies to a dataset.
-- `SqlQuery(h memfd_handle, s query)` -> `h memfd_handle` — Execute a SQL query and return a new memfd handle.
-- `Correlation(h memfd_handle, s query)` -> `v correlation_result` — Compute Pearson/Spearman correlation between two columns.
+## Development
+Changes to this crate should be made with extreme care, as they require re-compilation of all dependent crates and may break binary compatibility between the refinery and the Python bindings.
 
-### Fused Operations (Single D-Bus Round Trip)
-- `CrunchAndCorrelate(h memfd_handle, s column, s corr_columns)` -> `v fused_result` — Analytics + correlation in one call.
-- `IngestCrunchCorrelate(s file_path, s delimiter, s encoding, s column, s corr_columns)` -> `v fused_result` — Full pipeline in one call.
+## Testing
+Integration tests ensure that the GVariant signatures match the expected D-Bus protocol:
+```bash
+cargo test -p nairobi-protocol
+```
 
-## 📦 Module Structure
-- `interface.rs` — D-Bus interface constants
-- `types.rs` — GVariant-compatible types (`DistilledAnalytics`, `FusedAnalyticsResult`, `CorrelationResult`, etc.)
-- `error.rs` — Shared `ImperialError` enum
-- `mem_pipe.rs` — `MemoryPipe` zero-copy memfd wrapper
-- `arena.rs` — iceoryx2 shared memory arena types (`ArenaHeader`, `PayloadType`)
-
-## ⚖️ Licensing
-This project is licensed under the **PolyForm Noncommercial License 1.0.0**. It is free for personal, educational, and research use.
+## License
+This project is licensed under the **PolyForm Noncommercial License 1.0.0**.
 
 ---
 © 2026 Kevin Chege. All Rights Reserved.

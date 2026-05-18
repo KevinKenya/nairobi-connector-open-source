@@ -1,51 +1,54 @@
-<!-- Author: Kevin Chege. Location: Nairobi -->
+# Nairobi Benchmark Suite
 
-# Nairobi Benchmark Suite (Scaffold)
+## Overview
+The Nairobi Benchmark Suite is a rigorous performance evaluation framework designed to compare Nairobi OS against industry-standard data processing libraries (e.g., Pandas). It focuses on end-to-end latency, memory efficiency, and the impact of "Fused Analytical Strikes" on real-world workloads.
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/KevinKenya/nairobi-connector-open-source/blob/main/nairobi-benchmarks/nairobiOsBenchmarks.ipynb)
+## Key Metrics
+- **Ingestion Latency**: Time to load data from disk into memory-resident structures.
+- **Compute Density**: Peak Resident Set Size (RSS) during heavy analytical loads.
+- **Pipeline Throughput**: Total time for fused ingest-crunch-correlate operations.
 
-This repository contains the rigorous benchmarking suite for **Nairobi OS**. It is designed to evaluate the performance of "Fused analytics execution" against standard, unoptimized Pandas implementations.
+## Installation
 
-## 📁 Repository Structure
-*   `engines/`: Standardized wrappers for Pandas and Nairobi OS.
-*   `orchestration/`: Core benchmarking logic, metrics collection, and validation.
-*   `datasets/`: Scripts to download real-world data and generate synthetic scaling datasets.
-*   `workloads/`: YAML definitions of analytical benchmarks (NBA statistics, correlation pipelines).
-*   `visualization/`: Tools to generate latency and memory scaling curves.
-*   `methodology.md`: The scientific ground rules and mathematical validation logic.
+### Prerequisites
+- Python 3.10+
+- Nairobi OS (installed and configured)
 
-## 🚀 Quick Start (Scaffold Only)
-
-### 1. Install Dependencies
+### Setup
 ```bash
+cd nairobi-benchmarks
 pip install -r requirements.txt
 ```
 
-### 2. Prepare Datasets
-```bash
-# Fetch real NBA data
-./datasets/download_scripts/fetch_nba.sh
+## Running Benchmarks
 
-# Generate 10M Row Tall Dataset
+### 1. Prepare Datasets
+Generate synthetic datasets to test scaling:
+```bash
+# Generate 10M Row Dataset
 python datasets/generators/generate_synthetic.py --type tall --output datasets/synthetic/tall_10m.csv
-
-# Generate 1000 Column Wide Dataset
-python datasets/generators/generate_synthetic.py --type wide --output datasets/synthetic/wide_1000c.csv
 ```
 
-### 3. Run Benchmarks
+### 2. Run Workloads
+Execute a specific benchmark workload:
 ```bash
-# Run the Statistical Distillation workload
-python orchestration/benchmark_runner.py --workload workloads/workload_statistical_distillation.yaml
+python orchestration/benchmark_runner.py --workload workloads/workload_statistical_distillation.yaml --iterations 10
 ```
 
-### 4. Visualize Results
+### 3. Analyze Results
+Benchmark results are stored in JSON format and can be visualized using the included plotting tools:
 ```bash
 python visualization/plot_scaling.py
 ```
 
-## 🔬 Validation
-The `result_validator.py` ensures that all engines produce mathematically identical results (±0.00001). Any engine that fails the math check is automatically flagged.
+## Methodology
+The suite follows a "Hardware-First" benchmarking methodology, ensuring that:
+- Cold and warm starts are measured separately.
+- Kernel caches are cleared (where possible) between runs.
+- All calculations are verified for mathematical identity (±1e-5) using `result_validator.py`.
 
-## ⚖️ License
-This benchmark suite is part of the Nairobi OS Open Source release.
+## License
+This suite is part of the Nairobi OS project and is licensed under the **PolyForm Noncommercial License 1.0.0**.
+
+---
+© 2026 Kevin Chege. All Rights Reserved.

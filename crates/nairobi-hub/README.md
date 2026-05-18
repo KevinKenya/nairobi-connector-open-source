@@ -1,42 +1,34 @@
-# Nairobi Hub: The IPC Orchestrator
+# Nairobi Hub
 
-**Version**: 0.3.1
+## Overview
+Nairobi Hub is the central IPC (Inter-Process Communication) orchestrator of the Nairobi OS. It manages the coordination of file descriptors, D-Bus signals, and shared memory segments between the high-performance Rust refinery and its clients.
 
-The Hub serves as the central control plane for Nairobi OS. It coordinates the flow of data handles and D-Bus signals between the high-level Python bindings and the low-level Rust refinery.
+## Key Features
+- **FD Proxying**: Safely passes `memfd` file descriptors via D-Bus using GVariant signatures.
+- **Service Management**: Monitors and manages the `org.nairobi.NairobiAxumRefinery1` lifecycle.
+- **Hybrid Data Plane**: Dynamically routes data through `iceoryx2` shared memory (for performance) or D-Bus (for compatibility).
+- **Semantic Decoding**: Decodes raw binary analytics into human-readable reports and native Python structures.
 
-## 🏗️ Responsibilities
-- **FD Proxying**: Safely passing file descriptors via D-Bus using GVariant.
-- **Service Discovery**: Managing the `org.nairobi.NairobiAxumRefinery1` life cycle.
-- **Zero-Copy Subscription**: Subscribing to `iceoryx2` shared memory segments for high-frequency data streaming.
-- **Semantic Decoding**: Converting raw analytical results into human-readable Markdown reports.
+## Architecture
+The Hub is divided into several internal modules:
+- `client.rs`: The D-Bus proxy client.
+- `shm_subscriber.rs`: Handles `iceoryx2` shared memory subscriptions.
+- `decoder.rs`: Converts GVariant results into Markdown and JSON.
 
-## 🛠️ Implementation
-The Hub uses `zbus` for modern, asynchronous D-Bus communication and `iceoryx2` for the high-performance shared memory data plane.
+## Usage
+The Hub is primarily used as a library by `nairobi-python` to communicate with the refinery.
 
-## 📦 Module Structure
-- `client.rs` — D-Bus proxy client with automatic iceoryx2 data plane routing
-- `decoder.rs` — Markdown report generators for analytics and correlation results
-- `shm_subscriber.rs` — iceoryx2 subscriber + POSIX shm reader for zero-copy data reads
+## Development
+When modifying the Hub, ensure that any changes to the D-Bus interface are also reflected in `nairobi-protocol`.
 
-## 🔑 Key Design Decisions
-
-### Hybrid Data Plane
-The Hub automatically routes responses through the most efficient path:
-1. **iceoryx2 path**: When the Refinery signals `"SHM_READY"`, the Hub reads the result directly from a POSIX shared memory arena — zero kernel copies, nanosecond latency.
-2. **D-Bus fallback**: If iceoryx2 is unavailable, the Hub accepts the JSON payload directly from D-Bus.
-
-### Iceoryx2 Architecture
-```
-Refinery (Publisher)          Hub (Subscriber)
-┌──────────────────┐          ┌──────────────────┐
-│ shm_publisher.rs │───iceoryx2──▶│ shm_subscriber.rs│
-│ POSIX /dev/shm   │  header    │ POSIX /dev/shm   │
-│ Arena (64MB)     │──▶read────▶│ Arena (mapped RO) │
-└──────────────────┘          └──────────────────┘
+## Testing
+Integration tests for the Hub verify the full IPC round trip:
+```bash
+cargo test -p nairobi-hub
 ```
 
-## ⚖️ Licensing
-This project is licensed under the **PolyForm Noncommercial License 1.0.0**. It is free for personal, educational, and research use.
+## License
+This project is licensed under the **PolyForm Noncommercial License 1.0.0**.
 
 ---
 © 2026 Kevin Chege. All Rights Reserved.

@@ -1,123 +1,87 @@
-# Nairobi OS: Heavy Iron AI Infrastructure
+# Nairobi Python
 
-> [!IMPORTANT]
-> **Linux & WSL2 Only.** We do not compromise on kernel physics.
+## Overview
+Nairobi Python provides the high-level bridge to the Nairobi OS infrastructure. It enables data scientists to harness the power of Rust-based, hardware-accelerated analytics through a familiar, Pythonic interface. The package handles daemon management, IPC coordination, and memory-mapping, allowing users to focus on data analysis.
 
-**Author**: Kevin Chege. Location: Nairobi
-**License**: PolyForm Noncommercial License 1.0.0
+## Key Features
+- **SovereignFrame**: A fluent, Pandas-like interface for managing remote data handles.
+- **Lazy Ignition**: Automatically starts and configures the refinery daemon upon first data access.
+- **Jupyter Integration**: First-class support for interactive visualizations using the Lagos Vision widget.
+- **Zero-Copy Bridge**: Directly consumes `memfd` handles from the Rust refinery with sub-millisecond overhead.
 
-Nairobi OS is a high-performance data science operating system primitive designed for extreme resource efficiency. It enables memory-constrained environments (Edge, Containers, Serverless) to process large-scale datasets with **hardware-accelerated ingestion** and vectorized Rust analytics.
+## Installation
 
-## 🚀 Version 0.3.1: The Fused Strike
-This release introduces the **Fused Analytics Pipeline**, allowing ingestion, statistical distillation, and correlation to happen in a single, high-speed D-Bus round trip.
-
-### Key Features:
-- **Fused Pipeline**: `nairobi_os.data.pipeline()` for maximum throughput.
-- **Zero-Copy Ingestion**: Powered by `memfd`, `io_uring`, and kernel `copy_file_range`.
-- **Extreme Speed**: Ingest 450MB+ datasets **12x faster** than standard Pandas.
-- **Rayon Parallelization**: Vectorized analytics leveraging multi-core hardware saturation.
-- **Persistent Infrastructure**: Cached D-Bus connections for low-latency calls.
-- **Lagos Vision**: Hardware-accelerated Jupyter plotting via zero-copy `mmap` and `wgpu`.
-
-## 🛠️ Installation
-
-### From Wheel
+### From PyPI
 ```bash
-pip install nairobi-os==0.3.1
+pip install nairobi-os
 ```
 
-### Build from Source
-```bash
-# Clone the repository
-git clone https://github.com/KevinKenya/nairobi-connector-open-source
-cd nairobi-connector-open-source
-
-# Set up Python environment
-python3 -m venv .venv
-source .venv/bin/activate
-pip install maturin pyo3-build-config zbus anywidget traitlets
-
-# Build the entire stack
-./build_wheel.sh
-
-# Install the forged wheel
-pip install target/wheels/nairobi_os-0.3.1-py3-none-any.whl
-```
-
-Or install in development mode:
+### From Source
 ```bash
 cd crates/nairobi-python
 pip install -e .
 ```
+*Note: Building from source requires the Rust toolchain and `maturin` to be installed.*
 
-## 💻 Quick Start
+## Usage
+
+### Quick Start
 ```python
 import nairobi_os
-import json
 
-# Ignite the refinery daemon
-nairobi_os.start_refinery()
+# Connect to the refinery (automatically handles D-Bus and daemon startup)
+nairobi_os.connect()
 
-# Run a fused analytics strike
-# (Ingest + Mean/StdDev/Skewness/Kurtosis + Pearson Correlation)
-result_json = nairobi_os.data.pipeline(
-    "data.csv",
-    "target_column",
-    "col1,col2" # Correlation pair
-)
+# Ingest a CSV file
+df = nairobi_os.read_csv("data.csv")
 
-result = json.loads(result_json)
-print(f"Mean: {result['mean']}")
-print(f"Correlation: {result['pearson']}")
+# Fluent API for statistics
+mean_val = df.column_name.mean()
+p99_val = df.column_name.p99()
 
-# Shutdown refinery
-nairobi_os.stop_refinery()
+# Run SQL queries directly on the engine
+tall_players = df.query("SELECT * FROM dataset WHERE height > 80")
+
+# Plot using Lagos Vision
+tall_players.plot()
 ```
 
-## 📊 Performance Benchmark (v0.3.1)
-| Metric | Pandas (Unoptimized) | Nairobi OS | Speedup |
-|--------|--------|------------|---------|
-| **Ingestion Latency** | 6.38s | **0.52s** | **12.2x** |
-| **Statistical Distillation** | 1.04s | **0.02s** | **52x** |
-| **Total Pipeline** | 6.42s | **2.29s** | **2.8x** |
-
-## 📦 Python API Reference
-
-### `nairobi_os.start_refinery(binary_path=None, timeout=15)`
-Starts the Nairobi Axum Refinery daemon. Auto-discovers the binary from the `bin/` directory or falls back to `target/release/`.
-
-### `nairobi_os.stop_refinery()`
-Terminates the refinery daemon.
+## API Reference
 
 ### `nairobi_os.connect()`
-Auto-configures `XDG_RUNTIME_DIR`, starts D-Bus (if needed on headless/Colab), and ignites the refinery.
+Initializes the environment, starts the D-Bus session if necessary, and ignites the refinery daemon.
 
 ### `nairobi_os.read_csv(path, delimiter=",", encoding="utf-8")`
-Ingests data and returns a `SovereignFrame`. Auto-starts refinery if offline.
+Ingests a CSV file using the refinery's zero-copy pipeline. Returns a `SovereignFrame`.
 
-### `nairobi_os.data.ingest(file_path)`
-Ingest a CSV file. Returns a handle ID (UUID string).
+### `SovereignFrame` Methods
+- `df.column.mean()`: Compute the arithmetic mean.
+- `df.column.std_dev()`: Compute the standard deviation.
+- `df.column.p95()`, `df.column.p99()`: Compute percentiles.
+- `df.column.skewness()`, `df.column.kurtosis()`: Compute statistical moments.
+- `df.query(sql_string)`: Execute Polars-SQL on the dataset.
+- `df.correlate("col1,col2")`: Compute Pearson and Spearman correlation.
+- `df.plot(width, height)`: Display an interactive `anywidget` visualization.
 
-### `nairobi_os.data.crunch(handle_id, column)`
-Compute statistical moments on a column. Returns JSON string.
+## Development
 
-### `nairobi_os.data.correlate(handle_id, columns)`
-Compute Pearson/Spearman correlation. `columns` is a comma-separated string. Returns JSON string.
+### Adding New Python Bindings
+Nairobi Python uses PyO3 to interface with Rust. New core functions should be added to `crates/nairobi-python/src/lib.rs` and exposed through the `nairobi_os._core.data` module.
 
-### `nairobi_os.data.pipeline(file_path, column, corr_columns)`
-Fused ingest + crunch + correlate in a single D-Bus round trip. Returns JSON string.
+### Testing
+Integration tests for the Python package can be run using `pytest` (if configured) or the provided test script:
+```bash
+python3 test_nairobi.py
+```
 
-### `nairobi_os.data.sql_query(handle_id, query)`
-Execute a SQL query on an ingested dataset. Returns a new handle ID.
+To test in isolation without the full refinery, you can mock the `_core.data` module or use the `SovereignFrame` with pre-existing handles.
 
-### `nairobi_os.data.free(handle_id)`
-Release a memfd handle.
+## Troubleshooting
+- **Refinery Failed to Register on D-Bus**: This often happens in headless environments. Ensure `dbus-launch` is available or call `nairobi_os.connect()` which attempts to fix the environment.
+- **Handle Not Found**: Data handles are session-bound. If the refinery restarts, previous `SovereignFrame` handles will become invalid.
 
-### `nairobi_os.lagos.plot_inline(handle_id, width=1000, height=400)`
-Spawn the Lagos Vision daemon and return an interactive Jupyter widget.
-
-## ⚖️ Licensing
-This project is licensed under the **PolyForm Noncommercial License 1.0.0**. It is free for personal, educational, and research use. For commercial inquiries, please contact the author.
+## License
+This project is licensed under the **PolyForm Noncommercial License 1.0.0**.
 
 ---
 © 2026 Kevin Chege. All Rights Reserved.
