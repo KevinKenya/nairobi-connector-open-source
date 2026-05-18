@@ -64,7 +64,7 @@ let results = engine.analyze(mfd.into_fd(), "target_column")?;
 - **Fallo en la asignación de Huge Pages**: Asegúrese de que el host tenga suficiente memoria contigua disponible. Verifique `grep Huge /proc/meminfo`.
 
 ## Licencia
-Este proyecto está licenciado bajo la **PolyForm Noncommercial License 1.0.0**.
+Este proyecto está licenciado bajo la **Apache License 2.0**.
 
 ---
 © 2026 Kevin Chege. Todos los derechos reservados.

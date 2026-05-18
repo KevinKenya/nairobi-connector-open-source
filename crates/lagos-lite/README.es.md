@@ -63,7 +63,7 @@ cargo test -p lagos-lite
 - **Adaptador WGPU no Encontrado**: Asegúrese de que los controladores de la GPU estén instalados. Si usa un entorno solo de CPU, Lagos intentará recurrir a un adaptador de software.
 
 ## Licencia
-Este proyecto está licenciado bajo la **PolyForm Noncommercial License 1.0.0**.
+Este proyecto está licenciado bajo la **Apache License 2.0**.
 
 ---
 © 2026 Kevin Chege. Todos los derechos reservados.

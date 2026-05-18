@@ -64,7 +64,7 @@ let results = engine.analyze(mfd.into_fd(), "target_column")?;
 - **Huge Page-Zuweisung fehlgeschlagen**: Stellen Sie sicher, dass der Host über genügend zusammenhängenden Speicher verfügt. Prüfen Sie `grep Huge /proc/meminfo`.
 
 ## Lizenz
-Dieses Projekt ist unter der **PolyForm Noncommercial License 1.0.0** lizenziert.
+Dieses Projekt ist unter der **Apache License 2.0** lizenziert.
 
 ---
 © 2026 Kevin Chege. Alle Rechte vorbehalten.

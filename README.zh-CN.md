@@ -129,7 +129,7 @@ python orchestration/benchmark_runner.py --workload workloads/workload_nba_pipel
 - **Huge Page 分配失败**：检查 `/proc/meminfo` 以确保内核预留了足够的 huge pages。
 
 ## 许可证
-该项目根据 **PolyForm Noncommercial License 1.0.0** 获得许可。个人、教育和研究用途免费。
+该项目根据 **Apache License 2.0** 获得许可。根据 Apache 许可证 2.0 版（“许可证”）授权。
 
 ---
 © 2026 Kevin Chege. 保留所有权利。

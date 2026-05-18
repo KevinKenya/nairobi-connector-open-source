@@ -28,7 +28,7 @@ cargo test -p nairobi-protocol
 ```
 
 ## 许可证
-该项目根据 **PolyForm Noncommercial License 1.0.0** 获得许可。
+该项目根据 **Apache License 2.0** 获得许可。
 
 ---
 © 2026 Kevin Chege. 保留所有权利。

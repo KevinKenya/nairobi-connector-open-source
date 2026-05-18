@@ -50,7 +50,7 @@ Die Suite folgt einer "Hardware-First" Benchmarking-Methodik, die sicherstellt, 
 - Alle Berechnungen mit `result_validator.py` auf mathematische Identität (±1e-5) überprüft werden.
 
 ## Lizenz
-Diese Suite ist Teil des Nairobi OS-Projekts und ist unter der **PolyForm Noncommercial License 1.0.0** lizenziert.
+Diese Suite ist Teil des Nairobi OS-Projekts und ist unter der **Apache License 2.0** lizenziert.
 
 ---
 © 2026 Kevin Chege. Alle Rechte vorbehalten.

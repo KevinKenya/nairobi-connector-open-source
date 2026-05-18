@@ -63,7 +63,7 @@ cargo test -p lagos-lite
 - **WGPU-Adapter nicht gefunden**: Stellen Sie sicher, dass GPU-Treiber installiert sind. Wenn Sie eine reine CPU-Umgebung verwenden, versucht Lagos, auf einen Software-Adapter auszuweichen.
 
 ## Lizenz
-Dieses Projekt ist unter der **PolyForm Noncommercial License 1.0.0** lizenziert.
+Dieses Projekt ist unter der **Apache License 2.0** lizenziert.
 
 ---
 © 2026 Kevin Chege. Alle Rechte vorbehalten.

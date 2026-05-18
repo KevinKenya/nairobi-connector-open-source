@@ -129,7 +129,7 @@ python orchestration/benchmark_runner.py --workload workloads/workload_nba_pipel
 - **Huge Page Allocation Failed**: Check `/proc/meminfo` to ensure enough huge pages are reserved by the kernel.
 
 ## License
-This project is licensed under the **PolyForm Noncommercial License 1.0.0**. It is free for personal, educational, and research use.
+This project is licensed under the **Apache License 2.0**. Licensed under the Apache License, Version 2.0.
 
 ---
 © 2026 Kevin Chege. All Rights Reserved.

@@ -39,7 +39,7 @@ Example Usage:
 
 __author__ = "Kevin Chege"
 __version__ = "0.3.1"
-__license__ = "PolyForm Noncommercial License 1.0.0"
+__license__ = "Apache License 2.0"
 
 # Import the _core module first to access its data functions
 from . import _core

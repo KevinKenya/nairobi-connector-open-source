@@ -83,7 +83,7 @@ Um isoliert ohne die vollständige Refinery zu testen, können Sie das Modul `_c
 - **Handle nicht gefunden**: Daten-Handles sind an die Sitzung gebunden. Wenn die Refinery neu startet, werden vorherige `SovereignFrame`-Handles ungültig.
 
 ## Lizenz
-Dieses Projekt ist unter der **PolyForm Noncommercial License 1.0.0** lizenziert.
+Dieses Projekt ist unter der **Apache License 2.0** lizenziert.
 
 ---
 © 2026 Kevin Chege. Alle Rechte vorbehalten.

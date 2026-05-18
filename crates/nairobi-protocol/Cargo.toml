@@ -8,7 +8,7 @@ name = "nairobi-protocol"
 version = "0.3.1"
 edition = "2021"
 authors = ["Kevin Chege <aiwithafrica@gmail.com>"]
-license-file = "LICENSE"
+license = "Apache-2.0"
 
 description = "The Constitution — shared GVariant signatures, D-Bus interface definitions, MemoryPipe, and error types for the Nairobi microservice stack"
 

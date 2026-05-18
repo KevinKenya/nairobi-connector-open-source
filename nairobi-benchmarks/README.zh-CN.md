@@ -50,7 +50,7 @@ python visualization/plot_scaling.py
 - 所有计算都使用 `result_validator.py` 进行数学恒等验证 (±1e-5)。
 
 ## 许可证
-该套件是 Nairobi OS 项目的一部分，根据 **PolyForm Noncommercial License 1.0.0** 获得许可。
+该套件是 Nairobi OS 项目的一部分，根据 **Apache License 2.0** 获得许可。
 
 ---
 © 2026 Kevin Chege. 保留所有权利。

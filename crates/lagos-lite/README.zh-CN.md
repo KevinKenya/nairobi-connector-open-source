@@ -63,7 +63,7 @@ cargo test -p lagos-lite
 - **未找到 WGPU 适配器**：确保已安装 GPU 驱动程序。如果使用仅限 CPU 的环境，Lagos 将尝试回退到软件适配器。
 
 ## 许可证
-该项目根据 **PolyForm Noncommercial License 1.0.0** 获得许可。
+该项目根据 **Apache License 2.0** 获得许可。
 
 ---
 © 2026 Kevin Chege. 保留所有权利。

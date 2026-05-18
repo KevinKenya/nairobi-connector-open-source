@@ -83,7 +83,7 @@ python3 test_nairobi.py
 - **句柄未找到 (Handle Not Found)**：数据句柄是与会话绑定的。如果 refinery 重启，之前的 `SovereignFrame` 句柄将失效。
 
 ## 许可证
-该项目根据 **PolyForm Noncommercial License 1.0.0** 获得许可。
+该项目根据 **Apache License 2.0** 获得许可。
 
 ---
 © 2026 Kevin Chege. 保留所有权利。

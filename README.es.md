@@ -129,7 +129,7 @@ python orchestration/benchmark_runner.py --workload workloads/workload_nba_pipel
 - **Fallo en la Asignación de Huge Pages**: Verifique `/proc/meminfo` para asegurarse de que el núcleo haya reservado suficientes huge pages.
 
 ## Licencia
-Este proyecto está licenciado bajo la **PolyForm Noncommercial License 1.0.0**. Es gratuito para uso personal, educativo y de investigación.
+Este proyecto está licenciado bajo la **Apache License 2.0**. Licenciado bajo la Licencia Apache, Versión 2.0.
 
 ---
 © 2026 Kevin Chege. Todos los derechos reservados.
