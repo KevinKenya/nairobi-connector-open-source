@@ -1,26 +1,72 @@
-# File: /home/KevinKenya/nairobi-connector-open-source/crates/nairobi-python/nairobi_os/__init__.py
-# Author: Kevin Chege. Location: Nairobi
-# Date: 2026-05-06
-
-# nairobi-open-source-release/crates/nairobi-python/nairobi_os/__init__.py
 """
-Nairobi OS Python Bindings - Core Wrapper Module
-"""
+Nairobi OS: High-Performance Data Science Infrastructure
 
+This package provides Python bindings to the Nairobi OS Rust core, enabling
+data scientists to leverage extreme performance through zero-copy data pipelines,
+hardware acceleration, and kernel-bypass techniques.
+
+Key Features:
+- Zero-copy data ingestion using io_uring and huge pages
+- Hardware-accelerated visualization via Lagos Vision
+- Fused analytics pipeline for minimal latency
+- Easy integration with Jupyter notebooks and pandas/numpy workflows
+- Memory-efficient processing of large-scale datasets
+
+Example Usage:
+    >>> import nairobi_os
+    >>> import pandas as pd
+    >>> 
+    >>> # Start the refinery daemon
+    >>> nairobi_os.start_refinery()
+    >>> 
+    >>> # Ingest and analyze data in a single call
+    >>> result = nairobi_os.data.pipeline(
+    ...     "large_dataset.csv",
+    ...     "value_column",
+    ...     "col1,col2"
+    ... )
+    >>> 
+    >>> # Convert results to pandas for further analysis
+    >>> df_result = pd.json_normalize([result])
+    >>> 
+    >>> # Create interactive visualization
+    >>> widget = nairobi_os.lagos.plot_inline(handle_id="abc-123")
+    >>> widget  # Display in Jupyter
+    >>> 
+    >>> # Cleanup
+    >>> nairobi_os.stop_refinery()
+    """
+
+__author__ = "Kevin Chege"
+__version__ = "0.3.1"
+__license__ = "PolyForm Noncommercial License 1.0.0"
+
+# Import the _core module first to access its data functions
+from . import _core
+
+# Expose data functions from _core.data at module level
+ingest = _core.data.ingest
+sql_query = _core.data.sql_query
+crunch = _core.data.crunch
+correlate = _core.data.correlate
+pipeline = _core.data.pipeline
+crunch_and_correlate = _core.data.crunch_and_correlate
+free = _core.data.free
+get_fd = _core.data.get_fd
+
+# Import framework and lagos modules
+from . import framework
+from . import lagos
+
+# Export specific public functions from framework that we want at module level
+from .framework import SovereignFrame, ColumnAccessor
+
+# Process management functions for starting/stopping the refinery daemon
 import os
 import time
 import subprocess
 import logging
 from pathlib import Path
-
-# 1. Import the compiled Rust binary
-from . import _core
-
-# 2. Extract submodules from the binary into the nairobi_os namespace
-from . import lagos
-from .framework import SovereignFrame
-
-data = _core.data
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -41,12 +87,7 @@ def start_refinery(binary_path=None, timeout=15):
     
     binary_path = Path(binary_path)
     if not binary_path.exists():
-        # Fallback for development mode
-        dev_path = Path(__file__).parents[3] / "target" / "release" / "nairobi-axum-refinery"
-        if dev_path.exists():
-            binary_path = dev_path
-        else:
-            raise RuntimeError(f"Refinery binary not found at {binary_path}")
+        raise RuntimeError(f"Refinery binary not found at {binary_path}")
     
     if _refinery_process is not None:
         if _refinery_process.poll() is None:
@@ -106,16 +147,7 @@ def _check_dbus_service():
             capture_output=True,
             text=True
         )
-        if result.returncode == 0:
-            return True
-
-        # Alternative check using dbus-send if busctl is picky or unavailable
-        result = subprocess.run(
-            ["dbus-send", "--session", "--dest=org.freedesktop.DBus", "--type=method_call", "--print-reply", "/org/freedesktop/DBus", "org.freedesktop.DBus.ListNames"],
-            capture_output=True,
-            text=True
-        )
-        return "org.nairobi.NairobiAxumRefinery1" in result.stdout
+        return result.returncode == 0
     except Exception:
         return False
 
@@ -130,72 +162,4 @@ def stop_refinery():
         _refinery_process = None
         logger.info("🛑 Refinery stopped.")
 
-def connect():
-    """
-    Auto-configures XDG_RUNTIME_DIR, starts D-Bus (if needed), and ignites the background daemons.
-    Includes Colab environment armor for headless operation.
-    """
-    # 1. Environment Setup: Ensure XDG_RUNTIME_DIR exists
-    if 'XDG_RUNTIME_DIR' not in os.environ:
-        runtime_dir = Path("/tmp/runtime-root")
-        try:
-            runtime_dir.mkdir(mode=0o700, exist_ok=True)
-            os.environ['XDG_RUNTIME_DIR'] = str(runtime_dir)
-            logger.info(f"🔧 Created XDG_RUNTIME_DIR: {runtime_dir}")
-        except Exception as e:
-            logger.warning(f"⚠️ Failed to create XDG_RUNTIME_DIR: {e}")
-
-    # 2. D-Bus Auto-Ignition for Headless Environments (Colab, SSH, etc.)
-    # We check multiple environment variables and try to connect to the session bus.
-    dbus_ready = False
-    if 'DBUS_SESSION_BUS_ADDRESS' in os.environ:
-        try:
-            # Test if existing address works
-            subprocess.run(["busctl", "--user", "status", "org.freedesktop.DBus"],
-                           capture_output=True, timeout=2, check=True)
-            dbus_ready = True
-        except Exception:
-            logger.info("🔗 DBUS_SESSION_BUS_ADDRESS is set but connection failed. Re-initializing...")
-
-    if not dbus_ready:
-        try:
-            # Use dbus-launch to spawn a new session and capture its variables
-            output = subprocess.check_output(["dbus-launch"], text=True)
-            for line in output.splitlines():
-                if '=' in line:
-                    key, val = line.split('=', 1)
-                    # Remove trailing semicolon and quotes
-                    val = val.strip().rstrip(';').strip("'").strip('"')
-                    os.environ[key] = val
-                    logger.debug(f"DBUS ENV: {key}={val}")
-            
-            if 'DBUS_SESSION_BUS_ADDRESS' in os.environ:
-                logger.info(f"✅ D-Bus Session Started: {os.environ['DBUS_SESSION_BUS_ADDRESS'][:40]}...")
-                dbus_ready = True
-            else:
-                logger.error("❌ dbus-launch failed to provide DBUS_SESSION_BUS_ADDRESS")
-        except Exception as e:
-            logger.error(f"💥 Failed to launch D-Bus session: {e}")
-
-    # 3. Refinery Ignition
-    return start_refinery()
-
-def read_csv(path, delimiter=",", encoding="utf-8"):
-    """
-    Ingests data via Axum and returns a SovereignFrame object.
-    Automatically ignites the refinery (if possible) and implements Lazy Ignition.
-    """
-    try:
-        handle_id = data.ingest(str(path), delimiter, encoding)
-        return SovereignFrame(handle_id)
-    except Exception as e:
-        logger.info("⚠️ Refinery offline or connection failed. Attempting Lazy Ignition...")
-        try:
-            start_refinery()
-            time.sleep(2) # Wait for bus registration
-            handle_id = data.ingest(str(path), delimiter, encoding)
-            return SovereignFrame(handle_id)
-        except Exception as retry_err:
-            raise RuntimeError(f"Failed to ingest CSV after Lazy Ignition: {retry_err}") from e
-
-__all__ = ["data", "lagos", "start_refinery", "stop_refinery", "connect", "read_csv", "SovereignFrame"]
+#
