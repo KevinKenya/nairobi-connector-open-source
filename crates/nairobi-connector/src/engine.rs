@@ -13,7 +13,7 @@
 // limitations under the License.
 
 // crates/nairobi-connector/src/engine.rs
-// Author: Kevin Chege, Location: Nairobi, Date: 11th May 2026
+// Author: Kevin Chege, Location: Nairobi, Date: 20th May 2026
 
 //! DFS Tree Traversal Engine — AT-SPI2 accessibility tree DFS with zbus 5.x / atspi 0.30.
 

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 // crates/nairobi-connector/src/main.rs
-// Author: Kevin Chege, Location: Nairobi, Date: 11th May 2026
+// Author: Kevin Chege, Location: Nairobi, Date: 20th May 2026
 
 //! Nairobi Connector — MCP server entry point.
 //!

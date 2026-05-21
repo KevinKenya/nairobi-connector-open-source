@@ -13,7 +13,7 @@
 // limitations under the License.
 
 // crates/nairobi-connector/src/server.rs
-// Author: Kevin Chege, Location: Nairobi, Date: 11th May 2026
+// Author: Kevin Chege, Location: Nairobi, Date: 20th May 2026
 
 //! MCP Server — bridges NeuralSession to LLM agents via the Model Context Protocol.
 //!

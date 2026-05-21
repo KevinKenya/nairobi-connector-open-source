@@ -13,7 +13,7 @@
 // limitations under the License.
 
 // crates/nairobi-connector/src/toon.rs
-// Author: Kevin Chege, Location: Nairobi, Date: 11th May 2026
+// Author: Kevin Chege, Location: Nairobi, Date: 20th May 2026
 
 //! TOON Compression Algorithm — Token-Oriented Object Notation.
 //!
