@@ -70,10 +70,11 @@ echo "Step 3: Forging the Python Wheel..."
 cd "$PYTHON_CRATE_DIR"
 
 # Use maturin from virtual environment if it exists
+export PATH="$PROJECT_ROOT/zig_dist:$PATH"
 if [ -f "$PROJECT_ROOT/.venv/bin/maturin" ]; then
-    "$PROJECT_ROOT/.venv/bin/maturin" build --release --compatibility manylinux
+    "$PROJECT_ROOT/.venv/bin/maturin" build --release --compatibility manylinux2014 --zig
 elif command -v maturin &> /dev/null; then
-    maturin build --release --compatibility manylinux
+    maturin build --release --compatibility manylinux2014 --zig
 else
     echo "ERROR: maturin not found. Please install it in the virtual environment."
     exit 1
