@@ -12,6 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// crates/nairobi-connector/src/safety.rs
+// Author: Kevin Chege, Location: Nairobi, Date: 11th May 2026
+
 //! Registry Lock — Safety guard to prevent AI from interacting with sensitive system windows.
 //!
 //! The RegistryLock ensures that the AI cannot click, type, or focus on:

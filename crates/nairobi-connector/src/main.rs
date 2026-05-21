@@ -12,6 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// crates/nairobi-connector/src/main.rs
+// Author: Kevin Chege, Location: Nairobi, Date: 11th May 2026
+
 //! Nairobi Connector — MCP server entry point.
 //!
 //! Bridges AT-SPI2 semantic actions (The Action Engine) to LLM agents via the
