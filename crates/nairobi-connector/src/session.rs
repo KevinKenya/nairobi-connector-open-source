@@ -24,8 +24,9 @@ use crate::safety::WindowLock;
 use crate::toon;
 use std::collections::HashMap;
 use std::sync::atomic::{AtomicBool, Ordering};
-use std::time::Instant;
+use std::time::{Duration, Instant};
 use tokio::sync::RwLock;
+use tokio::time::sleep;
 use zbus::Connection;
 
 /// The AT-SPI2 registry well-known bus name.
@@ -73,68 +74,103 @@ impl NeuralSession {
         &self.connection
     }
 
-    /// Find a window by title substring using simple DFS over registry children.
+    /// Find a window by title substring using DFS over registry children with a 10-second retry loop.
     pub async fn find_window(&self, title_substring: &str) -> Result<(String, String)> {
-        let proxy = DFSEngine::timeout_proxy_build(
-            &self.connection,
-            REGISTRY_DEST,
-            REGISTRY_ROOT_PATH,
-        )
-        .await?;
-        let apps = DFSEngine::get_children(&proxy).await;
+        let max_attempts = 20;
+        let delay = Duration::from_millis(500);
         let lower_title = title_substring.to_lowercase();
 
-        for app in &apps {
-            let app_dest = app.name_as_str().unwrap_or_default();
-            let app_path = app.path_as_str();
-            let app_proxy = match DFSEngine::timeout_proxy_build(
+        tracing::info!(
+            "[SESSION] Polling AT-SPI2 Registry for window containing '{}' (max 10s)...",
+            title_substring
+        );
+
+        for attempt in 1..=max_attempts {
+            let proxy_result = DFSEngine::timeout_proxy_build(
                 &self.connection,
-                app_dest,
-                app_path,
+                REGISTRY_DEST,
+                REGISTRY_ROOT_PATH,
             )
-            .await
-            {
+            .await;
+
+            let proxy = match proxy_result {
                 Ok(p) => p,
-                Err(_) => continue,
+                Err(e) => {
+                    tracing::debug!("[SESSION] Registry not ready (attempt {}): {}", attempt, e);
+                    sleep(delay).await;
+                    continue;
+                }
             };
-            let name = DFSEngine::get_name(&app_proxy).await;
-            if name.to_lowercase().contains(&lower_title) {
-                let mut dest_lock = self.target_destination.write().await;
-                let mut path_lock = self.target_path.write().await;
-                *dest_lock = Some(app_dest.to_string());
-                *path_lock = Some(app_path.to_string());
-                self.touch_activity().await;
-                return Ok((app_dest.to_string(), app_path.to_string()));
-            }
-            // Also check frame children
-            let windows = DFSEngine::get_children(&app_proxy).await;
-            for w in &windows {
-                let w_dest = w.name_as_str().unwrap_or_default();
-                let w_path = w.path_as_str();
-                let w_proxy = match DFSEngine::timeout_proxy_build(
+
+            let apps = DFSEngine::get_children(&proxy).await;
+
+            for app in &apps {
+                let app_dest = app.name_as_str().unwrap_or_default();
+                let app_path = app.path_as_str();
+                let app_proxy = match DFSEngine::timeout_proxy_build(
                     &self.connection,
-                    w_dest,
-                    w_path,
+                    app_dest,
+                    app_path,
                 )
                 .await
                 {
                     Ok(p) => p,
                     Err(_) => continue,
                 };
-                let w_name = DFSEngine::get_name(&w_proxy).await;
-                if w_name.to_lowercase().contains(&lower_title) {
+                
+                let name = DFSEngine::get_name(&app_proxy).await;
+                if name.to_lowercase().contains(&lower_title) {
                     let mut dest_lock = self.target_destination.write().await;
                     let mut path_lock = self.target_path.write().await;
-                    *dest_lock = Some(w_dest.to_string());
-                    *path_lock = Some(w_path.to_string());
+                    *dest_lock = Some(app_dest.to_string());
+                    *path_lock = Some(app_path.to_string());
                     self.touch_activity().await;
-                    return Ok((w_dest.to_string(), w_path.to_string()));
+                    tracing::info!(
+                        "[SESSION] Found matching window on App Name: '{}' after {}ms",
+                        name,
+                        attempt * 500
+                    );
+                    return Ok((app_dest.to_string(), app_path.to_string()));
+                }
+
+                // Check frame children
+                let windows = DFSEngine::get_children(&app_proxy).await;
+                for w in &windows {
+                    let w_dest = w.name_as_str().unwrap_or_default();
+                    let w_path = w.path_as_str();
+                    let w_proxy = match DFSEngine::timeout_proxy_build(
+                        &self.connection,
+                        w_dest,
+                        w_path,
+                    )
+                    .await
+                    {
+                        Ok(p) => p,
+                        Err(_) => continue,
+                    };
+                    
+                    let w_name = DFSEngine::get_name(&w_proxy).await;
+                    if w_name.to_lowercase().contains(&lower_title) {
+                        let mut dest_lock = self.target_destination.write().await;
+                        let mut path_lock = self.target_path.write().await;
+                        *dest_lock = Some(w_dest.to_string());
+                        *path_lock = Some(w_path.to_string());
+                        self.touch_activity().await;
+                        tracing::info!(
+                            "[SESSION] Found matching window on Frame Title: '{}' after {}ms",
+                            w_name,
+                            attempt * 500
+                        );
+                        return Ok((w_dest.to_string(), w_path.to_string()));
+                    }
                 }
             }
+
+            sleep(delay).await;
         }
 
         Err(NeuralError::NodeNotFound(format!(
-            "Window containing '{}'",
+            "Window containing '{}' not registered on the AT-SPI2 bus after 10s",
             title_substring
         )))
     }
