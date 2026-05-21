@@ -187,7 +187,9 @@ class SovereignFrame:
         Executes a SQL query on the frame and returns a new SovereignFrame
         containing the distilled result.
         """
-        new_handle_id = data.sql_query(self.handle_id, sql)
+        import re
+        rewritten_sql = re.sub(r'\bdf\b', 'dataset', sql, flags=re.IGNORECASE)
+        new_handle_id = data.sql_query(self.handle_id, rewritten_sql)
         return SovereignFrame(new_handle_id)
 
     def plot(self, width=1000, height=400):

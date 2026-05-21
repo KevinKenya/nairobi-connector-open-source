@@ -52,11 +52,25 @@ Example Usage:
     """
 
 __author__ = "Kevin Chege"
-__version__ = "0.3.1"
+__version__ = "0.4.0"
 __license__ = "Apache License 2.0"
 
 # Import the _core module first to access its data functions
 from . import _core
+
+# Define a DataNamespace class to support nairobi_os.data.ingest pattern
+class DataNamespace:
+    def __init__(self):
+        self.ingest = _core.data.ingest
+        self.sql_query = _core.data.sql_query
+        self.crunch = _core.data.crunch
+        self.correlate = _core.data.correlate
+        self.pipeline = _core.data.pipeline
+        self.crunch_and_correlate = _core.data.crunch_and_correlate
+        self.free = _core.data.free
+        self.get_fd = _core.data.get_fd
+
+data = DataNamespace()
 
 # Expose data functions from _core.data at module level
 ingest = _core.data.ingest
@@ -68,9 +82,10 @@ crunch_and_correlate = _core.data.crunch_and_correlate
 free = _core.data.free
 get_fd = _core.data.get_fd
 
-# Import framework and lagos modules
+# Import framework, lagos, and ui modules
 from . import framework
 from . import lagos
+from .ui import ui
 
 # Export specific public functions from framework that we want at module level
 from .framework import SovereignFrame, ColumnAccessor

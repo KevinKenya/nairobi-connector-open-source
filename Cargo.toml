@@ -9,7 +9,7 @@ members = [
     "crates/nairobi-axum-refinery",
     "crates/nairobi-hub",
     "crates/nairobi-python",
-    "crates/lagos-lite",
+    "crates/lagos-lite", "crates/nairobi-connector",
 ]
 
 [workspace.dependencies]
@@ -23,4 +23,15 @@ memmap2 = "0.9"
 memfd = "0.6"
 sha2 = "0.10"
 tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 pyo3 = { version = "0.20", features = ["extension-module"] }
+# AT-SPI2 / Action Engine dependencies (nairobi-connector)
+atspi = "0.30"
+async-recursion = "1"
+futures-util = "0.3"
+thiserror = "2"
+anyhow = "1"
+rmcp = { version = "1.5", features = ["server", "transport-io", "macros"] }
+schemars = "1"
+zbus_names = "4"
+zvariant = "5"

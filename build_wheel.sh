@@ -22,16 +22,17 @@ PYTHON_CRATE_DIR="$PROJECT_ROOT/crates/nairobi-python"
 BIN_DEST_DIR="$PYTHON_CRATE_DIR/nairobi_os/bin"
 
 echo "=========================================="
-echo "Nairobi OS v0.3.1: Heavy Iron Build Orchestrator"
+echo "Nairobi OS v0.4.0: Heavy Iron Build Orchestrator"
 echo "=========================================="
 
 # 1. Build the Microservice Binaries in parallel
-echo "Step 1: Compiling Microservices (Refinery & Lagos)..."
-cargo build --release -p nairobi-axum-refinery -p lagos-lite
+echo "Step 1: Compiling Microservices (Refinery, Lagos & Connector)..."
+cargo build --release -p nairobi-axum-refinery -p lagos-lite -p nairobi-connector
 
 # 2. Locate and Prepare Binaries
 REFINERY_BIN="$PROJECT_ROOT/target/release/nairobi-axum-refinery"
 LAGOS_BIN="$PROJECT_ROOT/target/release/lagos-vision-daemon"
+CONNECTOR_BIN="$PROJECT_ROOT/target/release/nairobi-connector"
 
 if [ ! -f "$REFINERY_BIN" ]; then
     echo "ERROR: Refinery binary not found at $REFINERY_BIN"
@@ -43,18 +44,26 @@ if [ ! -f "$LAGOS_BIN" ]; then
     exit 1
 fi
 
+if [ ! -f "$CONNECTOR_BIN" ]; then
+    echo "ERROR: Connector binary not found at $CONNECTOR_BIN"
+    exit 1
+fi
+
 echo "Step 2: Preparing binaries for distribution..."
 mkdir -p "$BIN_DEST_DIR"
 
 cp "$REFINERY_BIN" "$BIN_DEST_DIR/"
 cp "$LAGOS_BIN" "$BIN_DEST_DIR/"
+cp "$CONNECTOR_BIN" "$BIN_DEST_DIR/"
 
 # Remove debug symbols to save space
 strip "$BIN_DEST_DIR/nairobi-axum-refinery"
 strip "$BIN_DEST_DIR/lagos-vision-daemon"
+strip "$BIN_DEST_DIR/nairobi-connector"
 
 chmod +x "$BIN_DEST_DIR/nairobi-axum-refinery"
 chmod +x "$BIN_DEST_DIR/lagos-vision-daemon"
+chmod +x "$BIN_DEST_DIR/nairobi-connector"
 
 # 3. Build the Python Wheel
 echo "Step 3: Forging the Python Wheel..."

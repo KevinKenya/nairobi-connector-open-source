@@ -1,0 +1,40 @@
+[package]
+name = "nairobi-connector"
+version = "0.4.0"
+edition = "2021"
+description = "AT-SPI2 semantic bridge + MCP server — Computer Use without pixels"
+
+[lib]
+name = "nairobi_connector"
+path = "src/lib.rs"
+
+[[bin]]
+name = "nairobi-connector"
+path = "src/main.rs"
+
+[dependencies]
+# AT-SPI2 accessibility (latest stable — uses zbus 5.x internally)
+atspi = "0.30"
+# D-Bus communication — must match atspi 0.30's zbus 5.x requirement
+zbus = "5"
+zbus_names = "4"
+zvariant = "5"
+# Async runtime
+tokio = { version = "1", features = ["full"] }
+# Serialization
+serde = { version = "1", features = ["derive"] }
+serde_json = "1.0"
+# Logging
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+# Error handling
+thiserror = "2"
+anyhow = "1"
+# Async recursion macro
+async-recursion = "1"
+# Futures utilities
+futures-util = "0.3"
+# MCP protocol
+rmcp = { version = "1.5", features = ["server", "transport-io", "macros"] }
+# JSON Schema generation for MCP tool parameters (must match rmcp's schemars version)
+schemars = "1"
