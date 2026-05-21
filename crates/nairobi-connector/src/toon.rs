@@ -53,7 +53,13 @@ fn is_interactive(role: Role) -> bool {
     )
 }
 
-/// Non-interactive roles stripped from TOON output.
+/// Static context roles that provide semantic anchoring but no interaction.
+fn is_static_context(role: Role) -> bool {
+    matches!(role, Role::Label | Role::Heading | Role::Alert | Role::LevelBar)
+}
+
+/// Non-interactive roles stripped from TOON output (but we continue to children).
+#[allow(dead_code)]
 fn is_noise(role: Role) -> bool {
     matches!(
         role,
@@ -66,6 +72,7 @@ fn is_noise(role: Role) -> bool {
             | Role::StatusBar
             | Role::Header
             | Role::Footer
+            | Role::Section
     )
 }
 
@@ -85,7 +92,7 @@ pub fn generate_toon(
     let mut id_map: HashMap<u32, (String, String)> = HashMap::new();
 
     serialize_toon(
-        snapshot, 0, max_depth, &mut output, &mut next_id, &mut node_count, &mut id_map,
+        snapshot, 0, 0, max_depth, &mut output, &mut next_id, &mut node_count, &mut id_map,
     );
 
     let elapsed = start.elapsed().as_millis();
@@ -96,6 +103,7 @@ pub fn generate_toon(
 fn serialize_toon(
     node: &UISnapshot,
     depth: u32,
+    visible_depth: u32,
     max_depth: u32,
     output: &mut String,
     next_id: &mut u32,
@@ -106,26 +114,26 @@ fn serialize_toon(
         return;
     }
 
-    // Strip noise nodes entirely (don't descend into their children)
-    if is_noise(node.role) {
-        return;
-    }
+    let is_interactive = is_interactive(node.role);
+    let is_static = is_static_context(node.role);
+    let mut next_visible_depth = visible_depth;
 
-    // Assign ID only to interactive nodes
-    if is_interactive(node.role) {
-        let id = *next_id;
-        *next_id += 1;
-        *count += 1;
-
-        // Cache the D-Bus coordinates for this node ID
-        id_map.insert(id, (node.destination.clone(), node.object_path.clone()));
-
-        // Indentation
-        let indent = "  ".repeat(depth as usize);
+    if is_interactive || is_static {
+        // Indentation based on visible_depth
+        let indent = "  ".repeat(visible_depth as usize);
         output.push_str(&indent);
 
-        // [ID: N] Role: "Label" (States)
-        output.push_str(&format!("[ID: {}] ", id));
+        if is_interactive {
+            let id = *next_id;
+            *next_id += 1;
+            *count += 1;
+
+            // Cache the D-Bus coordinates for this node ID
+            id_map.insert(id, (node.destination.clone(), node.object_path.clone()));
+
+            // [ID: N] Role: "Label" (States)
+            output.push_str(&format!("[ID: {}] ", id));
+        }
 
         // Human-readable role name (using atspi 0.30 variant names)
         let role_name = match node.role {
@@ -148,6 +156,10 @@ fn serialize_toon(
             Role::RadioButton => "RadioButton",
             Role::DocumentText => "TextArea",
             Role::Terminal => "Terminal",
+            Role::Label => "Label",
+            Role::Heading => "Heading",
+            Role::Alert => "Alert",
+            Role::LevelBar => "LevelBar",
             _ => "Widget",
         };
         output.push_str(role_name);
@@ -165,19 +177,39 @@ fn serialize_toon(
         }
 
         // Compact state badges
-        let states: Vec<&str> = Vec::new();
-        // (In a full implementation, we'd check the actual states from the proxy)
-        if !states.is_empty() {
+        let mut state_badges = Vec::new();
+        use atspi::State;
+        if node.states.contains(&State::Focused) { state_badges.push("Focused"); }
+        if node.states.contains(&State::Checked) { state_badges.push("Checked"); }
+        if node.states.contains(&State::Selected) { state_badges.push("Selected"); }
+
+        if node.states.contains(&State::Enabled) || node.states.contains(&State::Sensitive) {
+            state_badges.push("Enabled");
+        } else {
+            state_badges.push("Disabled");
+        }
+
+        if node.states.contains(&State::Expandable) {
+            if node.states.contains(&State::Expanded) {
+                state_badges.push("Expanded");
+            } else {
+                state_badges.push("Collapsed");
+            }
+        }
+
+        if !state_badges.is_empty() {
             output.push_str(" (");
-            output.push_str(&states.join(", "));
+            output.push_str(&state_badges.join(", "));
             output.push(')');
         }
 
         output.push('\n');
+        next_visible_depth += 1;
     }
 
-    // Recurse into children (for container roles that wrap interactive nodes)
+    // Recurse into children
+    // If it was a noise node, we didn't increment visible_depth, so hoisting happens naturally.
     for child in &node.children {
-        serialize_toon(child, depth + 1, max_depth, output, next_id, count, id_map);
+        serialize_toon(child, depth + 1, next_visible_depth, max_depth, output, next_id, count, id_map);
     }
 }
