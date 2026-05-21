@@ -1,6 +1,6 @@
 # File: /home/KevinKenya/nairobi-connector-open-source/crates/nairobi-python/pyproject.toml
 # Author: Kevin Chege
-# Date: 2026-05-06
+# Date: 2026-05-21
 
 # nairobi-open-source-release/crates/nairobi-python/pyproject.toml
 [build-system]
@@ -9,7 +9,7 @@ build-backend = "maturin"
 
 [project]
 name = "nairobi-os"
-version = "0.4.1"
+version = "0.4.2"
 description = "Nairobi OS: Heavy Iron Data Science Infrastructure with Lagos Vision (Hardware-Accelerated Zero-Copy Rendering)"
 authors = [{name = "Kevin Chege", email = "aiwithafrica@gmail.com"}]
 license = "Apache-2.0"

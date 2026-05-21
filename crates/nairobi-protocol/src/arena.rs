@@ -14,7 +14,7 @@
 
 // File: /home/KevinKenya/nairobi-connector-open-source/crates/nairobi-protocol/src/arena.rs
 // Author: Kevin Chege. Location: Nairobi
-// Date: 2026-05-08
+// Date: 2026-05-21
 
 //! Shared memory arena types for the iceoryx2 data plane.
 //!

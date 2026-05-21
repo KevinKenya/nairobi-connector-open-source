@@ -2199,7 +2199,7 @@ checksum = "e2db585e1d738fc771bf08a151420d3ed193d9d895a36df7f6f8a9456b911ddc"
 
 [[package]]
 name = "lagos-lite"
-version = "0.3.1"
+version = "0.4.2"
 dependencies = [
  "bytemuck",
  "clap",
@@ -2570,7 +2570,7 @@ dependencies = [
 
 [[package]]
 name = "nairobi-axum-refinery"
-version = "0.3.1"
+version = "0.4.2"
 dependencies = [
  "iceoryx2",
  "io-uring",
@@ -2592,7 +2592,7 @@ dependencies = [
 
 [[package]]
 name = "nairobi-connector"
-version = "0.4.0"
+version = "0.4.2"
 dependencies = [
  "anyhow",
  "async-recursion",
@@ -2613,7 +2613,7 @@ dependencies = [
 
 [[package]]
 name = "nairobi-hub"
-version = "0.3.1"
+version = "0.4.2"
 dependencies = [
  "chrono",
  "hex",
@@ -2629,7 +2629,7 @@ dependencies = [
 
 [[package]]
 name = "nairobi-protocol"
-version = "0.3.1"
+version = "0.4.2"
 dependencies = [
  "memfd",
  "memmap2 0.9.10",
@@ -2640,7 +2640,7 @@ dependencies = [
 
 [[package]]
 name = "nairobi-python"
-version = "0.4.1"
+version = "0.4.2"
 dependencies = [
  "libc",
  "nairobi-hub",

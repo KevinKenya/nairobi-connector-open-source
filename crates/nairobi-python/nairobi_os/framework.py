@@ -14,7 +14,7 @@
 
 # File: /home/KevinKenya/nairobi-connector-open-source/crates/nairobi-python/nairobi_os/framework.py
 # Author: Kevin Chege. Location: Nairobi
-# Date: 2026-05-15
+# Date: 2026-05-21
 
 import json
 from . import _core

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 // crates/lagos-lite/src/encoder.rs
-// Author: Kevin Chege, Location: Nairobi, Date: 10th May 2026
+// Author: Kevin Chege, Location: Nairobi, Date: 21st May 2026
 
 use jpeg_encoder::{Encoder, ColorType};
 

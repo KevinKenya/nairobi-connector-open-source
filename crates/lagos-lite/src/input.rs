@@ -13,7 +13,7 @@
 // limitations under the License.
 
 // crates/lagos-lite/src/input.rs
-// Author: Kevin Chege, Location: Nairobi, Date: 10th May 2026
+// Author: Kevin Chege, Location: Nairobi, Date: 21st May 2026
 
 use serde::Deserialize;
 use egui::{Event, Pos2, Vec2, PointerButton};

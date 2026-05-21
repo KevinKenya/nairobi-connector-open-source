@@ -13,7 +13,7 @@
 // limitations under the License.
 
 // crates/nairobi-connector/src/lib.rs
-// Author: Kevin Chege, Location: Nairobi, Date: 20th May 2026
+// Author: Kevin Chege, Location: Nairobi, Date: 21st May 2026
 
 //! Nairobi Connector — AT-SPI2 semantic bridge + MCP server.
 //!

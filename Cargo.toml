@@ -1,6 +1,6 @@
 # File: ~/nairobi-connector-open-source/Cargo.toml
 # Author: Kevin Chege
-# Date: 2026-05-06
+# Date: 2026-05-21
 
 [workspace]
 resolver = "2"

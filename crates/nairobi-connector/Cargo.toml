@@ -1,6 +1,6 @@
 [package]
 name = "nairobi-connector"
-version = "0.4.0"
+version = "0.4.2"
 edition = "2021"
 description = "AT-SPI2 semantic bridge + MCP server — Computer Use without pixels"
 
