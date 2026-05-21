@@ -74,105 +74,160 @@ impl NeuralSession {
         &self.connection
     }
 
-    /// Find a window by title substring using DFS over registry children with a 10-second retry loop.
+    /// Find a window by title substring using DFS over registry children with exponential backoff and timeout.
     pub async fn find_window(&self, title_substring: &str) -> Result<(String, String)> {
-        let max_attempts = 20;
-        let delay = Duration::from_millis(500);
         let lower_title = title_substring.to_lowercase();
+        let start_time = Instant::now();
+        let hard_timeout = Duration::from_millis(3500);
 
         tracing::info!(
-            "[SESSION] Polling AT-SPI2 Registry for window containing '{}' (max 10s)...",
+            "[SESSION] Polling AT-SPI2 Registry for window containing '{}' (max 3.5s)...",
             title_substring
         );
 
-        for attempt in 1..=max_attempts {
-            let proxy_result = DFSEngine::timeout_proxy_build(
-                &self.connection,
-                REGISTRY_DEST,
-                REGISTRY_ROOT_PATH,
-            )
-            .await;
-
-            let proxy = match proxy_result {
-                Ok(p) => p,
-                Err(e) => {
-                    tracing::debug!("[SESSION] Registry not ready (attempt {}): {}", attempt, e);
-                    sleep(delay).await;
-                    continue;
+        let search_task = async {
+            for attempt in 0..5 {
+                if attempt > 0 {
+                    let backoff_ms = 150 * (2_u64.pow(attempt - 1));
+                    let backoff_dur = Duration::from_millis(backoff_ms);
+                    if start_time.elapsed() + backoff_dur >= hard_timeout {
+                        break;
+                    }
+                    sleep(backoff_dur).await;
                 }
-            };
 
-            let apps = DFSEngine::get_children(&proxy).await;
-
-            for app in &apps {
-                let app_dest = app.name_as_str().unwrap_or_default();
-                let app_path = app.path_as_str();
-                let app_proxy = match DFSEngine::timeout_proxy_build(
+                let proxy = match DFSEngine::timeout_proxy_build(
                     &self.connection,
-                    app_dest,
-                    app_path,
+                    REGISTRY_DEST,
+                    REGISTRY_ROOT_PATH,
                 )
                 .await
                 {
                     Ok(p) => p,
                     Err(_) => continue,
                 };
-                
-                let name = DFSEngine::get_name(&app_proxy).await;
-                if name.to_lowercase().contains(&lower_title) {
-                    let mut dest_lock = self.target_destination.write().await;
-                    let mut path_lock = self.target_path.write().await;
-                    *dest_lock = Some(app_dest.to_string());
-                    *path_lock = Some(app_path.to_string());
-                    self.touch_activity().await;
-                    tracing::info!(
-                        "[SESSION] Found matching window on App Name: '{}' after {}ms",
-                        name,
-                        attempt * 500
-                    );
-                    return Ok((app_dest.to_string(), app_path.to_string()));
-                }
 
-                // Check frame children
-                let windows = DFSEngine::get_children(&app_proxy).await;
-                for w in &windows {
-                    let w_dest = w.name_as_str().unwrap_or_default();
-                    let w_path = w.path_as_str();
-                    let w_proxy = match DFSEngine::timeout_proxy_build(
+                let apps = DFSEngine::get_children(&proxy).await;
+
+                for app in apps {
+                    let app_dest = app.name_as_str().unwrap_or_default().to_string();
+                    let app_path = app.path_as_str().to_string();
+
+                    // 1. Destination Matching (Case-insensitive)
+                    let dest_match = app_dest.to_lowercase().contains(&lower_title);
+
+                    let app_proxy = match DFSEngine::timeout_proxy_build(
                         &self.connection,
-                        w_dest,
-                        w_path,
+                        &app_dest,
+                        &app_path,
                     )
                     .await
                     {
                         Ok(p) => p,
                         Err(_) => continue,
                     };
-                    
-                    let w_name = DFSEngine::get_name(&w_proxy).await;
-                    if w_name.to_lowercase().contains(&lower_title) {
-                        let mut dest_lock = self.target_destination.write().await;
-                        let mut path_lock = self.target_path.write().await;
-                        *dest_lock = Some(w_dest.to_string());
-                        *path_lock = Some(w_path.to_string());
-                        self.touch_activity().await;
-                        tracing::info!(
-                            "[SESSION] Found matching window on Frame Title: '{}' after {}ms",
-                            w_name,
-                            attempt * 500
-                        );
-                        return Ok((w_dest.to_string(), w_path.to_string()));
+
+                    // 2. Name Matching (Case-insensitive)
+                    let app_name = DFSEngine::get_name(&app_proxy).await;
+                    let name_match = app_name.to_lowercase().contains(&lower_title);
+
+                    if dest_match || name_match {
+                        // Found a candidate application.
+
+                        // 3. Handle Empty Trees: sleep 100ms and re-query once.
+                        let mut children = DFSEngine::get_children(&app_proxy).await;
+                        if children.is_empty() {
+                            sleep(Duration::from_millis(100)).await;
+                            children = DFSEngine::get_children(&app_proxy).await;
+                        }
+
+                        // If still no children after retry, do not return yet as it's not fully rendered.
+                        if children.is_empty() {
+                            tracing::debug!("[SESSION] Candidate app '{}' found but tree is empty after 100ms.", app_dest);
+                        } else {
+                            // Search depth: App -> Child (L2) -> Grandchild (L3)
+                            if name_match {
+                                return Ok((app_dest, app_path));
+                            }
+
+                            // Search children (Level 2)
+                            for child in children {
+                                let c_dest = child.name_as_str().unwrap_or_default().to_string();
+                                let c_path = child.path_as_str().to_string();
+                                let c_proxy = match DFSEngine::timeout_proxy_build(
+                                    &self.connection,
+                                    &c_dest,
+                                    &c_path,
+                                )
+                                .await
+                                {
+                                    Ok(p) => p,
+                                    Err(_) => continue,
+                                };
+
+                                let c_name = DFSEngine::get_name(&c_proxy).await;
+                                if c_name.to_lowercase().contains(&lower_title) {
+                                    return Ok((c_dest, c_path));
+                                }
+
+                                // Search grandchildren (Level 3)
+                                let grandchildren = DFSEngine::get_children(&c_proxy).await;
+                                for gc in grandchildren {
+                                    let gc_dest = gc.name_as_str().unwrap_or_default().to_string();
+                                    let gc_path = gc.path_as_str().to_string();
+                                    let gc_proxy = match DFSEngine::timeout_proxy_build(
+                                        &self.connection,
+                                        &gc_dest,
+                                        &gc_path,
+                                    )
+                                    .await
+                                    {
+                                        Ok(p) => p,
+                                        Err(_) => continue,
+                                    };
+
+                                    let gc_name = DFSEngine::get_name(&gc_proxy).await;
+                                    if gc_name.to_lowercase().contains(&lower_title) {
+                                        return Ok((gc_dest, gc_path));
+                                    }
+                                }
+                            }
+
+                            // Fallback to the application node if destination matched but no specific window title matched.
+                            if dest_match {
+                                return Ok((app_dest, app_path));
+                            }
+                        }
                     }
                 }
             }
 
-            sleep(delay).await;
-        }
+            Err(NeuralError::NodeNotFound(format!(
+                "Window containing '{}' not registered on the AT-SPI2 bus after 5 attempts",
+                title_substring
+            )))
+        };
 
-        Err(NeuralError::NodeNotFound(format!(
-            "Window containing '{}' not registered on the AT-SPI2 bus after 10s",
-            title_substring
-        )))
+        match tokio::time::timeout(hard_timeout, search_task).await {
+            Ok(inner_result) => {
+                if let Ok((ref dest, ref path)) = inner_result {
+                    let mut dest_lock = self.target_destination.write().await;
+                    let mut path_lock = self.target_path.write().await;
+                    *dest_lock = Some(dest.clone());
+                    *path_lock = Some(path.clone());
+                    self.touch_activity().await;
+                    tracing::info!(
+                        "[SESSION] Found matching window: '{}' after {}ms",
+                        title_substring,
+                        start_time.elapsed().as_millis()
+                    );
+                }
+                inner_result
+            }
+            Err(_) => Err(NeuralError::Timeout(
+                "Window search timed out after 3.5s".to_string(),
+            )),
+        }
     }
 
     /// Get the cached target window, performing a heartbeat check.

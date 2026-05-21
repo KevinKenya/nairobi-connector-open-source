@@ -38,6 +38,7 @@ pub struct UISnapshot {
     pub role: Role,
     pub name: String,
     pub actions: Vec<String>,
+    pub states: Vec<atspi::State>,
     pub children: Vec<UISnapshot>,
     pub depth: u32,
     /// D-Bus destination (bus name) for this node.
@@ -214,30 +215,32 @@ impl DFSEngine {
         conn: Connection, dest: String, path: String, semaphore: Arc<Semaphore>, depth: u32,
     ) -> UISnapshot {
         if depth > MAX_DEPTH {
-            return UISnapshot { role: Role::Unknown, name: String::new(), actions: vec![], children: vec![], depth, destination: String::new(), object_path: String::new() };
+            return UISnapshot { role: Role::Unknown, name: String::new(), actions: vec![], states: vec![], children: vec![], depth, destination: String::new(), object_path: String::new() };
         }
-        let (role, name, actions, children_raw) = {
+        let (role, name, actions, states, children_raw) = {
             let _permit = match semaphore.acquire().await {
                 Ok(p) => p,
-                Err(_) => return UISnapshot { role: Role::Unknown, name: String::new(), actions: vec![], children: vec![], depth, destination: dest, object_path: path },
+                Err(_) => return UISnapshot { role: Role::Unknown, name: String::new(), actions: vec![], states: vec![], children: vec![], depth, destination: dest, object_path: path },
             };
             let proxy = match Self::timeout_proxy_build(&conn, &dest, &path).await {
-                Ok(p) => p, Err(_) => return UISnapshot { role: Role::Unknown, name: String::new(), actions: vec![], children: vec![], depth, destination: dest, object_path: path },
+                Ok(p) => p, Err(_) => return UISnapshot { role: Role::Unknown, name: String::new(), actions: vec![], states: vec![], children: vec![], depth, destination: dest, object_path: path },
             };
             let role = Self::get_role(&proxy).await;
             let is_semantic = Self::is_semantic_role(role);
             let visible = Self::is_visible(&proxy).await || dest == "org.a11y.atspi.Registry" || role == Role::Application;
             if !visible {
-                return UISnapshot { role: Role::Unknown, name: String::new(), actions: vec![], children: vec![], depth, destination: dest, object_path: path };
+                return UISnapshot { role: Role::Unknown, name: String::new(), actions: vec![], states: vec![], children: vec![], depth, destination: dest, object_path: path };
             }
             let name = if is_semantic { Self::resolve_label(&proxy).await } else { Self::get_name(&proxy).await };
             let (dest_str, pth_str) = Self::get_proxy_info(&proxy);
             let actions = if is_semantic { Self::get_actions(&conn, &dest_str, &pth_str).await } else { vec![] };
+            let state_set = Self::get_state_set(&proxy).await;
+            let states = state_set.iter().collect::<Vec<_>>();
             let children_raw = if depth < MAX_DEPTH { Self::get_children(&proxy).await } else { vec![] };
-            (role, name, actions, children_raw)
+            (role, name, actions, states, children_raw)
         };
         if children_raw.is_empty() {
-            return UISnapshot { role, name, actions, children: vec![], depth, destination: dest, object_path: path };
+            return UISnapshot { role, name, actions, states, children: vec![], depth, destination: dest, object_path: path };
         }
         let mut futures = vec![];
         for child in children_raw {
@@ -251,6 +254,6 @@ impl DFSEngine {
         }
         let results = futures_util::future::join_all(futures).await;
         let children: Vec<UISnapshot> = results.into_iter().filter_map(|r| r.ok()).filter(|s| s.role != Role::Unknown).collect();
-        UISnapshot { role, name, actions, children, depth, destination: dest, object_path: path }
+        UISnapshot { role, name, actions, states, children, depth, destination: dest, object_path: path }
     }
 }
