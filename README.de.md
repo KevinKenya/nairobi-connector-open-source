@@ -7,6 +7,14 @@ Nairobi OS ist eine leistungsstarke, verteilte KI- und Data-Science-Infrastruktu
 
 Durch die Nutzung von Kernel-Level-Funktionen wie `io_uring`, `memfd` und Huge Pages erreicht Nairobi OS einen IPC-Overhead im Sub-Millisekundenbereich und Zero-Copy-Datenpipelines.
 
+## Demo
+
+https://github.com/user-attachments/assets/demo.webm
+
+<video src="assets/demo.webm" controls width="100%">
+  Ihr Browser unterstützt das Video-Tag nicht.
+</video>
+
 ## Hauptfunktionen
 - **Computernutzung ohne Pixel**: Interagiert direkt über AT-SPI2 und den TOON (Token-Oriented Object Notation)-Komprimierungsalgorithmus mit dem Linux-Desktop.
 - **Zero-Copy-Ingestion**: Hardwarebeschleunigtes Datenladen über `io_uring` und 1GB Huge Pages.

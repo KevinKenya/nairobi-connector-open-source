@@ -7,6 +7,14 @@ Nairobi OS 是一个高性能、分布式的 AI 和数据科学基础设施，�
 
 通过利用 `io_uring`、`memfd` 和大页 (Huge Pages) 等内核级特性，Nairobi OS 实现了亚毫秒级的 IPC 延迟和零拷贝数据管道。
 
+## 演示视频
+
+https://github.com/user-attachments/assets/demo.webm
+
+<video src="assets/demo.webm" controls width="100%">
+  您的浏览器不支持视频标签。
+</video>
+
 ## 主要特性
 - **无像素计算机使用**：直接通过 AT-SPI2 和 TOON（面向 Token 的对象表示法）压缩算法与 Linux 桌面交互，从而跳过对 AI 代理的 OCR 或视觉处理。
 - **零拷贝注入**：使用 `io_uring` 和 1GB 大页实现硬件加速的数据加载。

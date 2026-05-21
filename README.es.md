@@ -7,6 +7,14 @@ Nairobi OS es una infraestructura de ciencia de datos e IA distribuida de alto r
 
 Al utilizar características a nivel del núcleo como `io_uring`, `memfd` y Huge Pages, Nairobi OS logra una sobrecarga IPC de sub-milisegundos y canales de datos de copia cero (zero-copy).
 
+## Demostración
+
+https://github.com/user-attachments/assets/demo.webm
+
+<video src="assets/demo.webm" controls width="100%">
+  Tu navegador no soporta el elemento de video.
+</video>
+
 ## Características Principales
 - **Uso del Ordenador Sin Píxeles**: Interactúa directamente con el escritorio Linux a través de AT-SPI2 y el algoritmo de compresión TOON (Token-Oriented Object Notation), omitiendo el procesamiento visual u OCR para agentes de IA.
 - **Ingesta de Copia Cero**: Carga de datos acelerada por hardware mediante `io_uring` y Huge Pages de 1GB.
