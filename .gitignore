@@ -44,3 +44,9 @@ simulator/*.parquet
 .gemini/
 scripts/scratch/
 brain/
+IMPLEMENTATION_REPORT_PHASE_5.md
+nairobi_connector_may17th_completeness_report.md
+NAIROBI_OS_v0.4.0_ACTION_ENGINE_AUDIT.md
+NAIROBI_OS_v0.4.0_ACTION_ENGINE_PLAN.md
+WORK_REPORT.md
+crates/nairobi-axum-refinery/COMPLETENESS_REPORT.md
