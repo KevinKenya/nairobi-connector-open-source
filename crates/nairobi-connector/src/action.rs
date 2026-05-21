@@ -12,6 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// crates/nairobi-connector/src/action.rs
+// Author: Kevin Chege, Location: Nairobi, Date: 20th May 2026
+
 //! Semantic Actions — Coordinate-free widget manipulation via AT-SPI2.
 
 use crate::error::{NeuralError, Result};

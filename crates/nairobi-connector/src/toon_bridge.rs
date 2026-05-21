@@ -12,6 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// crates/nairobi-connector/src/toon_bridge.rs
+// Author: Kevin Chege, Location: Nairobi, Date: 20th May 2026
+
 //! TOON-to-MCP Bridge — wraps TOON-formatted UI snapshots into MCP Content.
 
 use rmcp::model::Content;

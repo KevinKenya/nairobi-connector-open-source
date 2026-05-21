@@ -12,6 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// crates/nairobi-connector/src/engine.rs
+// Author: Kevin Chege, Location: Nairobi, Date: 20th May 2026
+
 //! DFS Tree Traversal Engine — AT-SPI2 accessibility tree DFS with zbus 5.x / atspi 0.30.
 
 use crate::error::{NeuralError, Result};

@@ -12,6 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// crates/nairobi-connector/src/session.rs
+// Author: Kevin Chege, Location: Nairobi, Date: 20th May 2026
+
 //! NeuralSession — AT-SPI2 session management with RegistryLock and heartbeat.
 
 use crate::action;

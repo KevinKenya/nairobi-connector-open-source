@@ -12,6 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// crates/nairobi-connector/src/toon.rs
+// Author: Kevin Chege, Location: Nairobi, Date: 20th May 2026
+
 //! TOON Compression Algorithm — Token-Oriented Object Notation.
 //!
 //! Converts a raw AT-SPI2 UI tree into a hyper-dense Markdown representation
