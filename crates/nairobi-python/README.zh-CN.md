@@ -82,6 +82,11 @@ python3 test_nairobi.py
 - **Refinery 未能在 D-Bus 上注册**：这通常发生在无头环境中。确保 `dbus-launch` 可用，或调用 `nairobi_os.connect()`，它会尝试修复环境。
 - **句柄未找到 (Handle Not Found)**：数据句柄是与会话绑定的。如果 refinery 重启，之前的 `SovereignFrame` 句柄将失效。
 
+## 支持
+如果您觉得 Nairobi OS 对您有所帮助，请考虑支持该项目：
+
+[![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-PayPal-blue.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=chege.finance@gmail.com&item_name=Support+Nairobi+OS+Development)
+
 ## 许可证
 该项目根据 **Apache License 2.0** 获得许可。
 

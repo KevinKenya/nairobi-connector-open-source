@@ -49,6 +49,11 @@ python visualization/plot_scaling.py
 - 在运行之间尽可能清除内核缓存。
 - 所有计算都使用 `result_validator.py` 进行数学恒等验证 (±1e-5)。
 
+## 支持
+如果您觉得 Nairobi OS 对您有所帮助，请考虑支持该项目：
+
+[![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-PayPal-blue.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=chege.finance@gmail.com&item_name=Support+Nairobi+OS+Development)
+
 ## 许可证
 该套件是 Nairobi OS 项目的一部分，根据 **Apache License 2.0** 获得许可。
 

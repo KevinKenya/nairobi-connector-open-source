@@ -63,6 +63,11 @@ let results = engine.analyze(mfd.into_fd(), "target_column")?;
 - **`io_uring`-Initialisierung fehlgeschlagen**: Prüfen Sie, ob Ihr Kernel `io_uring` unterstützt (`zgrep CONFIG_IO_URING /proc/config.gz`).
 - **Huge Page-Zuweisung fehlgeschlagen**: Stellen Sie sicher, dass der Host über genügend zusammenhängenden Speicher verfügt. Prüfen Sie `grep Huge /proc/meminfo`.
 
+## Unterstützung
+Wenn Sie Nairobi OS nützlich finden, ziehen Sie bitte in Erwägung, das Projekt zu unterstützen:
+
+[![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-PayPal-blue.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=chege.finance@gmail.com&item_name=Support+Nairobi+OS+Development)
+
 ## Lizenz
 Dieses Projekt ist unter der **Apache License 2.0** lizenziert.
 

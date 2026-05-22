@@ -27,6 +27,11 @@ Las pruebas de integración aseguran que las firmas de GVariant coincidan con el
 cargo test -p nairobi-protocol
 ```
 
+## Soporte
+Si encuentras útil Nairobi OS, considera apoyar el proyecto:
+
+[![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-PayPal-blue.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=chege.finance@gmail.com&item_name=Support+Nairobi+OS+Development)
+
 ## Licencia
 Este proyecto está licenciado bajo la **Apache License 2.0**.
 

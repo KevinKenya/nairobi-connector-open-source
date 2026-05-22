@@ -82,6 +82,11 @@ Um isoliert ohne die vollständige Refinery zu testen, können Sie das Modul `_c
 - **Refinery konnte nicht auf D-Bus registriert werden**: Dies geschieht häufig in Headless-Umgebungen. Stellen Sie sicher, dass `dbus-launch` verfügbar ist, oder rufen Sie `nairobi_os.connect()` auf, das versucht, die Umgebung zu reparieren.
 - **Handle nicht gefunden**: Daten-Handles sind an die Sitzung gebunden. Wenn die Refinery neu startet, werden vorherige `SovereignFrame`-Handles ungültig.
 
+## Unterstützung
+Wenn Sie Nairobi OS nützlich finden, ziehen Sie bitte in Erwägung, das Projekt zu unterstützen:
+
+[![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-PayPal-blue.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=chege.finance@gmail.com&item_name=Support+Nairobi+OS+Development)
+
 ## Lizenz
 Dieses Projekt ist unter der **Apache License 2.0** lizenziert.
 

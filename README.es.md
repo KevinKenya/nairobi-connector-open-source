@@ -72,6 +72,11 @@ Los agentes de IA que usan Nairobi Connector deben seguir este bucle:
 3. Leer el TOON `[ID: N]` del elemento deseado.
 4. Ejecutar una acción vía `nairobi_interact` o `nairobi_type_text`.
 
+## Soporte
+Si encuentras útil Nairobi OS, considera apoyar el proyecto:
+
+[![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-PayPal-blue.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=chege.finance@gmail.com&item_name=Support+Nairobi+OS+Development)
+
 ## Licencia
 Este proyecto está licenciado bajo la **Licencia Apache 2.0**.
 *(Nota: Partes del formato TOON y la implementación se atribuyen a los Autores de TOON).*

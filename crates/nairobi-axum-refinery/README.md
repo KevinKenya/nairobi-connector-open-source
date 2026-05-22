@@ -63,6 +63,11 @@ let results = engine.analyze(mfd.into_fd(), "target_column")?;
 - **`io_uring` initialization failed**: Check if your kernel supports `io_uring` (`zgrep CONFIG_IO_URING /proc/config.gz`).
 - **Huge Page allocation failed**: Ensure the host has enough contiguous memory available. Check `grep Huge /proc/meminfo`.
 
+## Support
+If you find Nairobi OS useful, consider supporting the project:
+
+[![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-PayPal-blue.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=chege.finance@gmail.com&item_name=Support+Nairobi+OS+Development)
+
 ## License
 This project is licensed under the **Apache License 2.0**.
 

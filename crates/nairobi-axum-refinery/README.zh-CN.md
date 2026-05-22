@@ -63,6 +63,11 @@ let results = engine.analyze(mfd.into_fd(), "target_column")?;
 - **`io_uring` 初始化失败**：检查你的内核是否支持 `io_uring` (`zgrep CONFIG_IO_URING /proc/config.gz`)。
 - **Huge Page 分配失败**：确保主机有足够的连续内存可用。检查 `grep Huge /proc/meminfo`。
 
+## 支持
+如果您觉得 Nairobi OS 对您有所帮助，请考虑支持该项目：
+
+[![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-PayPal-blue.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=chege.finance@gmail.com&item_name=Support+Nairobi+OS+Development)
+
 ## 许可证
 该项目根据 **Apache License 2.0** 获得许可。
 
