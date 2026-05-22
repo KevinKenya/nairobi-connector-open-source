@@ -49,6 +49,11 @@ The suite follows a "Hardware-First" benchmarking methodology, ensuring that:
 - Kernel caches are cleared (where possible) between runs.
 - All calculations are verified for mathematical identity (±1e-5) using `result_validator.py`.
 
+## Support
+If you find Nairobi OS useful, consider supporting the project:
+
+[![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-PayPal-blue.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=chege.finance@gmail.com&item_name=Support+Nairobi+OS+Development)
+
 ## License
 This suite is part of the Nairobi OS project and is licensed under the **Apache License 2.0**.
 

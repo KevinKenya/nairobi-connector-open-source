@@ -82,6 +82,11 @@ Para probar de forma aislada sin la refinería completa, puede simular el módul
 - **La refinería no se pudo registrar en D-Bus**: Esto suele suceder en entornos sin cabezal. Asegúrese de que `dbus-launch` esté disponible o llame a `nairobi_os.connect()`, que intenta corregir el entorno.
 - **Manejador no encontrado**: Los manejadores de datos están vinculados a la sesión. Si la refinería se reinicia, los manejadores previos de `SovereignFrame` dejarán de ser válidos.
 
+## Soporte
+Si encuentras útil Nairobi OS, considera apoyar el proyecto:
+
+[![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-PayPal-blue.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=chege.finance@gmail.com&item_name=Support+Nairobi+OS+Development)
+
 ## Licencia
 Este proyecto está licenciado bajo la **Apache License 2.0**.
 

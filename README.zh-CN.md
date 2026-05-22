@@ -65,6 +65,11 @@ df.plot()
 3. 读取所需元素的 TOON `[ID: N]`。
 4. 通过 `nairobi_interact` 或 `nairobi_type_text` 执行操作。
 
+## 支持
+如果您觉得 Nairobi OS 对您有所帮助，请考虑支持该项目：
+
+[![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-PayPal-blue.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=chege.finance@gmail.com&item_name=Support+Nairobi+OS+Development)
+
 ## 许可证
 本项目采用 **Apache License 2.0** 许可证。
 *(注：TOON 格式的部分内容归 TOON 作者所有。)*

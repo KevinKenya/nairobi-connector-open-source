@@ -63,6 +63,11 @@ let results = engine.analyze(mfd.into_fd(), "target_column")?;
 - **Fallo en la inicialización de `io_uring`**: Compruebe si su núcleo es compatible con `io_uring` (`zgrep CONFIG_IO_URING /proc/config.gz`).
 - **Fallo en la asignación de Huge Pages**: Asegúrese de que el host tenga suficiente memoria contigua disponible. Verifique `grep Huge /proc/meminfo`.
 
+## Soporte
+Si encuentras útil Nairobi OS, considera apoyar el proyecto:
+
+[![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-PayPal-blue.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=chege.finance@gmail.com&item_name=Support+Nairobi+OS+Development)
+
 ## Licencia
 Este proyecto está licenciado bajo la **Apache License 2.0**.
 

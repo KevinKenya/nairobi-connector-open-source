@@ -62,6 +62,11 @@ cargo test -p lagos-lite
 - **Fallo en la Conexión WebSocket**: En entornos de nube (Colab/SageMaker), asegúrese de que el puerto proxy esté correctamente mapeado. Nairobi Python maneja esto automáticamente si se detecta `google.colab`.
 - **Adaptador WGPU no Encontrado**: Asegúrese de que los controladores de la GPU estén instalados. Si usa un entorno solo de CPU, Lagos intentará recurrir a un adaptador de software.
 
+## Soporte
+Si encuentras útil Nairobi OS, considera apoyar el proyecto:
+
+[![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-PayPal-blue.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=chege.finance@gmail.com&item_name=Support+Nairobi+OS+Development)
+
 ## Licencia
 Este proyecto está licenciado bajo la **Apache License 2.0**.
 

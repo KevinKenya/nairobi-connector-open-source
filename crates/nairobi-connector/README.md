@@ -29,6 +29,11 @@ Agents using the Nairobi Connector should follow this fundamental loop:
 4. Execute an action on that element via `nairobi_interact` or `nairobi_type_text`.
 5. Repeat from step 2 to get fresh IDs before interacting again.
 
+## Support
+If you find Nairobi OS useful, consider supporting the project:
+
+[![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-PayPal-blue.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=chege.finance@gmail.com&item_name=Support+Nairobi+OS+Development)
+
 ## License
 This project is licensed under the **Apache License 2.0**.
 *(Note: Portions of the TOON format and bridge implementation are credited to The TOON Authors.)*

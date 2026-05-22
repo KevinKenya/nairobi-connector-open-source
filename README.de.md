@@ -65,6 +65,11 @@ KI-Agenten sollten dieser Schleife folgen:
 3. Lesen Sie die `[ID: N]` des gewünschten Elements ab.
 4. Führen Sie eine Aktion über `nairobi_interact` oder `nairobi_type_text` aus.
 
+## Unterstützung
+Wenn Sie Nairobi OS nützlich finden, ziehen Sie bitte in Erwägung, das Projekt zu unterstützen:
+
+[![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-PayPal-blue.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=chege.finance@gmail.com&item_name=Support+Nairobi+OS+Development)
+
 ## Lizenz
 Dieses Projekt ist unter der **Apache License 2.0** lizenziert.
 *(Hinweis: Teile des TOON-Formats gehen auf die TOON-Autoren zurück).*

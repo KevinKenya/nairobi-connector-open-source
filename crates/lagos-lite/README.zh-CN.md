@@ -62,6 +62,11 @@ cargo test -p lagos-lite
 - **WebSocket 连接失败**：在云环境（Colab/SageMaker）中，确保代理端口已正确映射。如果检测到 `google.colab`，Nairobi Python 会自动处理此问题。
 - **未找到 WGPU 适配器**：确保已安装 GPU 驱动程序。如果使用仅限 CPU 的环境，Lagos 将尝试回退到软件适配器。
 
+## 支持
+如果您觉得 Nairobi OS 对您有所帮助，请考虑支持该项目：
+
+[![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-PayPal-blue.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=chege.finance@gmail.com&item_name=Support+Nairobi+OS+Development)
+
 ## 许可证
 该项目根据 **Apache License 2.0** 获得许可。
 

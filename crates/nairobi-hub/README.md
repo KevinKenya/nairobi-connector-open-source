@@ -29,6 +29,11 @@ Integration tests for the Hub verify the full IPC round trip:
 cargo test -p nairobi-hub
 ```
 
+## Support
+If you find Nairobi OS useful, consider supporting the project:
+
+[![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-PayPal-blue.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=chege.finance@gmail.com&item_name=Support+Nairobi+OS+Development)
+
 ## License
 This project is licensed under the **Apache License 2.0**.
 
