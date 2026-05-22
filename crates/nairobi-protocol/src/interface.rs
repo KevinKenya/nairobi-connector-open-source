@@ -14,7 +14,7 @@
 
 // File: /home/KevinKenya/nairobi-connector-open-source/crates/nairobi-protocol/src/interface.rs
 // Author: Kevin Chege. Location: Nairobi
-// Date: 2026-05-06
+// Date: 2026-05-21
 
 // nairobi-open-source-release/crates/nairobi-protocol/src/interface.rs
 //! D-Bus interface constants for the Axum Refinery service.

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 // crates/nairobi-connector/src/error.rs
-// Author: Kevin Chege, Location: Nairobi, Date: 20th May 2026
+// Author: Kevin Chege, Location: Nairobi, Date: 21st May 2026
 
 //! Neural error types for the Nairobi Connector semantic bridge.
 

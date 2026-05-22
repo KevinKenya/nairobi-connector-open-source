@@ -13,7 +13,7 @@
 // limitations under the License.
 
 // crates/lagos-lite/src/pipeline.rs
-// Author: Kevin Chege, Location: Nairobi, Date: 10th May 2026
+// Author: Kevin Chege, Location: Nairobi, Date: 21st May 2026
 
 use crate::device::HeadlessContext;
 use bytemuck::{Pod, Zeroable};

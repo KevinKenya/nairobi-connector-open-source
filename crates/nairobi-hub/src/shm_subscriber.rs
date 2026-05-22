@@ -14,7 +14,7 @@
 
 // File: /home/KevinKenya/nairobi-connector-open-source/crates/nairobi-hub/src/shm_subscriber.rs
 // Author: Kevin Chege. Location: Nairobi
-// Date: 2026-05-08
+// Date: 2026-05-21
 
 //! iceoryx2 Shared Memory Subscriber — The Data Plane Consumer.
 //!
