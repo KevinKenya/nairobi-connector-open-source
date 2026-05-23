@@ -5,6 +5,10 @@
 ![System](https://img.shields.io/badge/Kernel-Linux_6.17_Native-orange.svg)
 ![Arch](https://img.shields.io/badge/Architecture-x86__64_/_ARM64-red.svg)
 
+## 언어 옵션 / Language Options
+
+[English](README.md) | [简体中文](README.zh-CN.md) | [Español](README.es.md) | [Deutsch](README.de.md) | [日本語](README.ja.md) | [Русский](README.ru.md) | [한국어](README.ko.md)
+
 ---
 
 ## 기원: 용광로에서 금속으로

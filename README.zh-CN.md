@@ -5,6 +5,10 @@
 ![System](https://img.shields.io/badge/Kernel-Linux_6.17_Native-orange.svg)
 ![Arch](https://img.shields.io/badge/Architecture-x86__64_/_ARM64-red.svg)
 
+## 语言选项
+
+[English](README.md) | [简体中文](README.zh-CN.md) | [Español](README.es.md) | [Deutsch](README.de.md) | [日本語](README.ja.md) | [Русский](README.ru.md) | [한국어](README.ko.md)
+
 ---
 
 ## 起源：从熔炉到金属
