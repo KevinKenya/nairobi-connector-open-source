@@ -1,3 +1,5 @@
+[English](README.md) | [简体中文](README.zh-CN.md) | [Español](README.es.md) | [Deutsch](README.de.md) | [日本語](README.ja.md) | [Русский](README.ru.md) | [한국어](README.ko.md)
+
 # Nairobi OS: High-Performance, Zero-Copy AI & Data Science Infrastructure
 
 [![PyPI Version](https://img.shields.io/pypi/v/nairobi-os.svg)](https://pypi.org/project/nairobi-os/)
@@ -45,7 +47,7 @@ So, at the close of 2025, I set out to build an infrastructure stack that bypass
 
 ## Global Traction & Telemetry
 
-Launched on May 6, 2026, Nairobi OS has rapidly gained traction among systems programmers, quantitative researchers, and edge computing architects worldwide.
+Launched on May 6, 2026, Nairobi OS has rapidly gained traction among systems programmers, quantitative researchers, and edge computing architects worldwide. These download statistics are sourced from the live [ClickPy Nairobi OS Dashboard](https://clickpy.clickhouse.com/dashboard/nairobi-os), where you can search and explore the metrics for yourself.
 
 ### Cumulative Global Distribution (May 6, 2026 – May 23, 2026)
 
@@ -88,12 +90,6 @@ Launched on May 6, 2026, Nairobi OS has rapidly gained traction among systems pr
 If Nairobi OS is optimizing your data pipelines, reducing your cloud bills, or driving your local agentic architectures, consider supporting our independent systems research. Every contribution is directly deployed into hardware-level compiler optimizations and edge-compute testing in Nairobi.
 
 [![Support Nairobi OS Development](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-PayPal-blue.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=chege.finance@gmail.com&item_name=Support+Nairobi+OS+Development)
-
----
-
-## Language Options
-
-[English](README.md) | [简体中文](README.zh-CN.md) | [Español](README.es.md) | [Deutsch](README.de.md) | [日本語](README.ja.md) | [Русский](README.ru.md) | [한국어](README.ko.md)
 
 ---
 

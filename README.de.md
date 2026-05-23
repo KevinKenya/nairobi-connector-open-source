@@ -1,3 +1,5 @@
+[English](README.md) | [简体中文](README.zh-CN.md) | [Español](README.es.md) | [Deutsch](README.de.md) | [日本語](README.ja.md) | [Русский](README.ru.md) | [한국어](README.ko.md)
+
 # Nairobi OS: Hochleistungs-, Zero-Copy-KI & Data-Science-Infrastruktur
 
 [![PyPI Version](https://img.shields.io/pypi/v/nairobi-os.svg)](https://pypi.org/project/nairobi-os/)
@@ -45,7 +47,7 @@ Deshalb habe ich mich Ende 2025 daran gemacht, einen Infrastruktur-Stack zu entw
 
 ## Globale Akzeptanz & Telemetrie
 
-Nairobi OS wurde am 6. Mai 2026 veröffentlicht und hat bei Systemprogrammierern, quantitativen Forschern und Edge-Computing-Architekten weltweit rasch an Beliebtheit gewonnen.
+Nairobi OS wurde am 6. Mai 2026 veröffentlicht und hat bei Systemprogrammierern, quantitativen Forschern und Edge-Computing-Architekten weltweit rasch an Beliebtheit gewonnen. Diese Download-Statistiken stammen aus dem Live-[ClickPy Nairobi OS Dashboard](https://clickpy.clickhouse.com/dashboard/nairobi-os), auf dem Sie die Kennzahlen selbst suchen und untersuchen können.
 
 ### Kumulierte globale Verteilung (6. Mai 2026 – 23. Mai 2026)
 
@@ -88,12 +90,6 @@ Nairobi OS wurde am 6. Mai 2026 veröffentlicht und hat bei Systemprogrammierern
 Wenn Nairobi OS Ihre Datenpipelines optimiert, Ihre Cloud-Kosten senkt oder Ihre lokalen Agenten-Architekturen antreibt, ziehen Sie bitte in Erwägung, unsere unabhängige Systemforschung zu unterstützen. Jeder Beitrag fließt direkt in Compiler-Optimierungen auf Hardwareebene und Edge-Compute-Tests in Nairobi.
 
 [![Nairobi OS Entwicklung unterstützen](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-PayPal-blue.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=chege.finance@gmail.com&item_name=Support+Nairobi+OS+Development)
-
----
-
-## Sprachoptionen
-
-[English](README.md) | [简体中文](README.zh-CN.md) | [Español](README.es.md) | [Deutsch](README.de.md) | [日本語](README.ja.md) | [Русский](README.ru.md) | [한국어](README.ko.md)
 
 ---
 

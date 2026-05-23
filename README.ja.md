@@ -1,3 +1,5 @@
+[English](README.md) | [简体中文](README.zh-CN.md) | [Español](README.es.md) | [Deutsch](README.de.md) | [日本語](README.ja.md) | [Русский](README.ru.md) | [한국어](README.ko.md)
+
 # Nairobi OS: 高性能、ゼロコピー AI & データサイエンスインフラ
 
 [![PyPI Version](https://img.shields.io/pypi/v/nairobi-os.svg)](https://pypi.org/project/nairobi-os/)
@@ -45,7 +47,7 @@ Tumz の開発中に、私は現代のデータサイエンススタックが抱
 
 ## グローバルな普及とテレメトリ
 
-2026年5月6日にリリースされた Nairobi OS は、世界中のシステムプログラマー、クオンツ研究者、エッジコンピューティングアーキテクトの間で急速に普及しています。
+2026年5月6日にリリースされた Nairobi OS は、世界中のシステムプログラマー、クオンツ研究者、エッジコンピューティングアーキテクトの間で急速に普及しています。これらのダウンロード統計は、ライブの [ClickPy Nairobi OS ダッシュボード](https://clickpy.clickhouse.com/dashboard/nairobi-os) から取得されたもので、ご自身でメトリクスを検索・探索することができます。
 
 ### 世界累計分布（2026年5月6日 – 2026年5月23日）
 
@@ -88,12 +90,6 @@ Tumz の開発中に、私は現代のデータサイエンススタックが抱
 Nairobi OS が皆様のデータパイプラインを最適化し、クラウドコストを削減し、あるいはローカルな自律型エージェントアーキテクチャを推進している場合は、私たちの独立したシステム研究への支援をご検討ください。すべての寄付は、ナイロビでのハードウェアレベルのコンパイラ最適化とエッジコンピューティングのテストに直接投入されます。
 
 [![Nairobi OS 開発を支援](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-PayPal-blue.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=chege.finance@gmail.com&item_name=Support+Nairobi+OS+Development)
-
----
-
-## 语言选项 / Language Options
-
-[English](README.md) | [简体中文](README.zh-CN.md) | [Español](README.es.md) | [Deutsch](README.de.md) | [日本語](README.ja.md) | [Русский](README.ru.md) | [한국어](README.ko.md)
 
 ---
 

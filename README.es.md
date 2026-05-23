@@ -1,3 +1,5 @@
+[English](README.md) | [简体中文](README.zh-CN.md) | [Español](README.es.md) | [Deutsch](README.de.md) | [日本語](README.ja.md) | [Русский](README.ru.md) | [한국어](README.ko.md)
+
 # Nairobi OS: Infraestructura de IA y Ciencia de Datos de Alto Rendimiento y Copia Cero
 
 [![PyPI Version](https://img.shields.io/pypi/v/nairobi-os.svg)](https://pypi.org/project/nairobi-os/)
@@ -45,7 +47,7 @@ Así, a finales de 2025, me propuse construir un stack de infraestructura que so
 
 ## Tracción Global y Telemetría
 
-Lanzado el 6 de mayo de 2026, Nairobi OS ha ganado tracción rápidamente entre programadores de sistemas, investigadores cuantitativos y arquitectos de edge computing de todo el mundo.
+Lanzado el 6 de mayo de 2026, Nairobi OS ha ganado tracción rápidamente entre programadores de sistemas, investigadores cuantitativos y arquitectos de edge computing de todo el mundo. Estas estadísticas de descarga se obtienen del [Panel de Control en Vivo de ClickPy Nairobi OS](https://clickpy.clickhouse.com/dashboard/nairobi-os), donde puede buscar y explorar las métricas por sí mismo.
 
 ### Distribución Global Acumulada (6 de mayo de 2026 – 23 de mayo de 2026)
 
@@ -88,12 +90,6 @@ Lanzado el 6 de mayo de 2026, Nairobi OS ha ganado tracción rápidamente entre 
 Si Nairobi OS está optimizando sus pipelines de datos, reduciendo sus facturas de la nube o impulsando sus arquitecturas agénticas locales, considere apoyar nuestra investigación de sistemas independiente. Cada contribución se destina directamente a optimizaciones de compiladores a nivel de hardware y pruebas de edge computing en Nairobi.
 
 [![Apoyar el Desarrollo de Nairobi OS](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-PayPal-blue.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=chege.finance@gmail.com&item_name=Support+Nairobi+OS+Development)
-
----
-
-## Opciones de Idioma
-
-[English](README.md) | [简体中文](README.zh-CN.md) | [Español](README.es.md) | [Deutsch](README.de.md) | [日本語](README.ja.md) | [Русский](README.ru.md) | [한국어](README.ko.md)
 
 ---
 
