@@ -1,13 +1,11 @@
+[English](README.md) | [简体中文](README.zh-CN.md) | [Español](README.es.md) | [Deutsch](README.de.md) | [日本語](README.ja.md) | [Русский](README.ru.md) | [한국어](README.ko.md) | [Finnish](README.fi.md) | [Cantonese](README.yue.md)
+
 # Nairobi OS: Высокопроизводительная инфраструктура ИИ и анализа данных с нулевым копированием (Zero-Copy)
 
 [![PyPI Version](https://img.shields.io/pypi/v/nairobi-os.svg)](https://pypi.org/project/nairobi-os/)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 ![System](https://img.shields.io/badge/Kernel-Linux_6.17_Native-orange.svg)
 ![Arch](https://img.shields.io/badge/Architecture-x86__64_/_ARM64-red.svg)
-
-## Языковые параметры / Language Options
-
-[English](README.md) | [简体中文](README.zh-CN.md) | [Español](README.es.md) | [Deutsch](README.de.md) | [日本語](README.ja.md) | [Русский](README.ru.md) | [한국어](README.ko.md)
 
 ---
 
@@ -49,7 +47,7 @@ Nairobi OS — это не продукт комфортного корпора�
 
 ## Глобальное признание и телеметрия
 
-Запущенная 6 мая 2026 года, Nairobi OS быстро завоевала популярность среди системных программистов, количественных исследователей и архитекторов граничных вычислений (edge computing) по всему миру.
+Запущенная 6 мая 2026 года, Nairobi OS быстро завоевала популярность среди системных программистов, количественных исследователей и архитекторов граничных вычислений (edge computing) по всему миру. Эти статистические данные по загрузкам получены из живой [панели мониторинга ClickPy Nairobi OS Dashboard](https://clickpy.clickhouse.com/dashboard/nairobi-os), где вы можете самостоятельно искать и изучать метрики.
 
 ### Совокупное глобальное распределение (6 мая 2026 – 23 мая 2026)
 
@@ -92,12 +90,6 @@ Nairobi OS — это не продукт комфортного корпора�
 Если Nairobi OS оптимизирует ваши конвейеры данных, снижает расходы на облако или управляет вашими локальными архитектурами агентов, подумайте о поддержке наших независимых системных исследований. Каждое пожертвование направляется непосредственно на аппаратную оптимизацию компиляторов и тестирование граничных вычислений в Найроби.
 
 [![Поддержать разработку Nairobi OS](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-PayPal-blue.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=chege.finance@gmail.com&item_name=Support+Nairobi+OS+Development)
-
----
-
-## Языковые параметры / Language Options
-
-[English](README.md) | [简体中文](README.zh-CN.md) | [Español](README.es.md) | [Deutsch](README.de.md) | [日本語](README.ja.md) | [Русский](README.ru.md) | [한국어](README.ko.md)
 
 ---
 

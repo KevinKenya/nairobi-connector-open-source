@@ -1,13 +1,11 @@
+[English](README.md) | [简体中文](README.zh-CN.md) | [Español](README.es.md) | [Deutsch](README.de.md) | [日本語](README.ja.md) | [Русский](README.ru.md) | [한국어](README.ko.md) | [Finnish](README.fi.md) | [Cantonese](README.yue.md)
+
 # Nairobi OS: 고성능, 제로 카피 AI & 데이터 과학 인프라
 
 [![PyPI Version](https://img.shields.io/pypi/v/nairobi-os.svg)](https://pypi.org/project/nairobi-os/)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 ![System](https://img.shields.io/badge/Kernel-Linux_6.17_Native-orange.svg)
 ![Arch](https://img.shields.io/badge/Architecture-x86__64_/_ARM64-red.svg)
-
-## 언어 옵션 / Language Options
-
-[English](README.md) | [简体中文](README.zh-CN.md) | [Español](README.es.md) | [Deutsch](README.de.md) | [日本語](README.ja.md) | [Русский](README.ru.md) | [한국어](README.ko.md)
 
 ---
 
@@ -49,7 +47,7 @@ Tumz를 개발하면서 저는 현대 데이터 과학 스택이 가지고 있�
 
 ## 글로벌 확장 및 텔레메트리
 
-2026년 5월 6일 출시된 Nairobi OS는 전 세계의 시스템 프로그래머, 퀀트 연구원 및 에지 컴퓨팅 아키텍트들 사이에서 빠르게 자리를 잡아가고 있습니다.
+2026년 5월 6일 출시된 Nairobi OS는 전 세계의 시스템 프로그래머, 퀀트 연구원 및 에지 컴퓨팅 아키텍트들 사이에서 빠르게 자리를 잡아가고 있습니다. 이러한 다운로드 통계는 실시간 [ClickPy Nairobi OS 대시보드](https://clickpy.clickhouse.com/dashboard/nairobi-os)에서 제공되며, 여기서 직접 지표를 검색하고 탐색할 수 있습니다.
 
 ### 글로벌 누적 분포 (2026년 5월 6일 – 2026년 5월 23일)
 
@@ -92,12 +90,6 @@ Tumz를 개발하면서 저는 현대 데이터 과학 스택이 가지고 있�
 Nairobi OS가 귀하의 데이터 파이프라인을 최적화하고, 클라우드 비용을 절감하며, 로컬 에이전트 아키텍처를 가속화하고 있다면, 우리의 독립적인 시스템 연구를 지원하는 것을 고려해 보십시오. 모든 기부금은 나이로비 현지 하드웨어 수준의 컴파일러 최적화와 에지 컴퓨팅 테스트 환경 구축에 직접 투입됩니다.
 
 [![Nairobi OS 개발 지원하기](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-PayPal-blue.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=chege.finance@gmail.com&item_name=Support+Nairobi+OS+Development)
-
----
-
-## 언어 옵션 / Language Options
-
-[English](README.md) | [简体中文](README.zh-CN.md) | [Español](README.es.md) | [Deutsch](README.de.md) | [日本語](README.ja.md) | [Русский](README.ru.md) | [한국어](README.ko.md)
 
 ---
 

@@ -1,13 +1,11 @@
+[English](README.md) | [简体中文](README.zh-CN.md) | [Español](README.es.md) | [Deutsch](README.de.md) | [日本語](README.ja.md) | [Русский](README.ru.md) | [한국어](README.ko.md) | [Finnish](README.fi.md) | [Cantonese](README.yue.md)
+
 # Nairobi OS: 高性能、零拷贝 AI 与数据科学基础设施
 
 [![PyPI Version](https://img.shields.io/pypi/v/nairobi-os.svg)](https://pypi.org/project/nairobi-os/)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 ![System](https://img.shields.io/badge/Kernel-Linux_6.17_Native-orange.svg)
 ![Arch](https://img.shields.io/badge/Architecture-x86__64_/_ARM64-red.svg)
-
-## 语言选项
-
-[English](README.md) | [简体中文](README.zh-CN.md) | [Español](README.es.md) | [Deutsch](README.de.md) | [日本語](README.ja.md) | [Русский](README.ru.md) | [한국어](README.ko.md)
 
 ---
 
@@ -49,7 +47,7 @@ Nairobi OS 并非诞生于舒适的企业孵化器或风投支持的研究实验
 
 ## 全球采用与遥测
 
-Nairobi OS 于 2026 年 5 月 6 日发布，迅速获得了全球系统程序员、量化研究员和边缘计算架构师的青睐。
+Nairobi OS 于 2026 年 5 月 6 日发布，迅速获得了全球系统程序员、量化研究员和边缘计算架构师的青睐。这些下载统计数据源自实时 [ClickPy Nairobi OS 仪表板](https://clickpy.clickhouse.com/dashboard/nairobi-os)，您可以亲自搜索和探索这些指标。
 
 ### 全球累计分布 (2026年5月6日 – 2026年5月23日)
 
@@ -92,12 +90,6 @@ Nairobi OS 于 2026 年 5 月 6 日发布，迅速获得了全球系统程序员
 如果 Nairobi OS 优化了您的数据管道、降低了您的云服务账单，或驱动了您的本地智能体架构，请考虑支持我们的独立系统研究。每一笔贡献都将直接用于内罗毕的硬件级编译器优化和边缘计算测试。
 
 [![支持 Nairobi OS 开发](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-PayPal-blue.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=chege.finance@gmail.com&item_name=Support+Nairobi+OS+Development)
-
----
-
-## 语言选项
-
-[English](README.md) | [简体中文](README.zh-CN.md) | [Español](README.es.md) | [Deutsch](README.de.md) | [日本語](README.ja.md) | [Русский](README.ru.md) | [한국어](README.ko.md)
 
 ---
 
