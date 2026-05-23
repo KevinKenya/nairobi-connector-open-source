@@ -1,85 +1,281 @@
-[English](README.md) | [简体中文](README.zh-CN.md) | [Español](README.es.md) | [Deutsch](README.de.md)
+# Nairobi OS: Infraestructura de IA y Ciencia de Datos de Alto Rendimiento y Copia Cero
 
-# Nairobi OS
+[![PyPI Version](https://img.shields.io/pypi/v/nairobi-os.svg)](https://pypi.org/project/nairobi-os/)
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
+![System](https://img.shields.io/badge/Kernel-Linux_6.17_Native-orange.svg)
+![Arch](https://img.shields.io/badge/Architecture-x86__64_/_ARM64-red.svg)
 
-## Descripción General
-Nairobi OS es una infraestructura de ciencia de datos e IA distribuida de alto rendimiento diseñada para una eficiencia extrema de recursos. Permite el procesamiento de conjuntos de datos masivos en entornos restringidos (Edge, IoT, Serverless) mediante el uso de un demonio de refinería especializado basado en Rust, y proporciona **Uso del Ordenador sin píxeles** a través de su puente de accesibilidad compatible con MCP.
+---
 
-Al utilizar características a nivel del núcleo como `io_uring`, `memfd` y Huge Pages, Nairobi OS logra una sobrecarga IPC de sub-milisegundos y canales de datos de copia cero (zero-copy).
+## El Origen: Del Crisol al Metal
 
-## Demostración
+Nairobi OS no es el producto de una cómoda incubadora corporativa o de un laboratorio de investigación respaldado por capital de riesgo. Es el resultado de una necesidad absoluta, nacido de una secuencia de profundas crisis personales y un impulso implacable por ejecutar allí donde las herramientas estándar de la industria fallan.
 
-https://github.com/user-attachments/assets/demo.webm
+Soy Kevin Chege, fundador de Sovereign Systems Lab (Nairobi, Kenia). De 2009 a 2022, mi vida estuvo consumida por un alcoholismo severo. Me costó prestigio profesional, oportunidades y casi mi vida. En el peor momento de mi adicción, trabajé como Analista en la Oficina de Estrategia de The Open University en Milton Keynes, Reino Unido, tras mi paso como Fundador y Presidente de AIESEC en Ruanda (2006–2010). Hoy, estoy en mi cuarto año de sobriedad continua.
 
-<video src="assets/demo.webm" controls width="100%">
-  Tu navegador no soporta el elemento de video.
-</video>
+```
+                     LEGIO XIII GEMINA
+              "La Decimotercera Legión — 13 de junio"
+     Trece años perdidos. Trece años para reclamar.
+```
 
-## Características Principales
-- **Uso del Ordenador Sin Píxeles**: Interactúa directamente con el escritorio Linux a través de AT-SPI2 y el algoritmo de compresión TOON (Token-Oriented Object Notation), omitiendo el procesamiento visual u OCR para agentes de IA.
-- **Ingesta de Copia Cero**: Carga de datos acelerada por hardware mediante `io_uring` y Huge Pages de 1GB.
-- **Visualización Acelerada por Hardware**: Gráficos interactivos de Jupyter a través del motor Lagos Vision (`wgpu` y `egui`).
-- **Canal de Analítica Fusionada**: Ingiere, procesa y correlaciona datos en un solo viaje de ida y vuelta D-Bus.
-- **Rendimiento de Omisión del Núcleo**: Analítica vectorizada aprovechando Polars y Rayon.
-- **Interfaz Soberana**: Una API de Python fluida que oculta la complejidad del IPC y la gestión de memoria.
+Mi camino en la programación está arraigado en la arquitectura de sistemas de bajo nivel y la optimización extrema. En 2015, expuse mi visión para construir capacidades técnicas altamente descentralizadas en el continente africano en [este tratado sobre el Silicon Valley de Kenia](https://www.linkedin.com/pulse/building-kenyas-silicon-valley-making-work-kevin-chege/). Cuando comenzó la fiebre del oro de los LLM en 2023, fui de los primeros. Construí y desplegué wrappers de LLM, pero rápidamente reconocí sus limitaciones, tal como se documenta en esta temprana [demostración de wrapper de LLM de 2023](https://www.linkedin.com/feed/update/urn:li:activity:7102930955807449088/).
 
-## Arquitectura
-Nairobi OS se basa en componentes especializados conectados a través de D-Bus y memoria compartida:
+Me di cuenta de que construir wrappers de alto nivel sobre APIs inestables era un callejón sin salida arquitectónico. La verdadera guerra se libra en la intersección de las limitaciones de hardware local y la asignación de recursos.
 
-1.  **Nairobi Axum Refinery**: El núcleo Rust de alto rendimiento.
-2.  **Nairobi Hub**: El orquestador IPC.
-3.  **Lagos Vision**: El motor de renderizado "headless".
-4.  **Nairobi Connector**: El puente semántico y servidor MCP.
-5.  **Nairobi Python**: El puente de alto nivel. Proporciona una interfaz Python al ecosistema Rust.
+A lo largo de 2025, viví en una Lenovo X13 ThinkPad con un perfil de hardware altamente restringido:
 
-## Instalación
+```
+Procesador: AMD Ryzen 5 PRO 4650U (6 núcleos, 12 hilos)
+Gráficos: AMD Radeon RX Vega 6 iGPU
+Memoria: 32 GB RAM (con una utilización extremadamente alta del sistema)
+Almacenamiento: 256 GB NVMe (99% lleno)
+```
 
-### Desde PyPI
+En esta máquina exacta, pasé el año 2025 construyendo **Tumz** ([Sarafakai](http://www.sarafakai.com)), una IA de soporte de decisiones clínicas en tiempo real, sin latencia y aislada del exterior (air-gapped). Ejecutaba transcripción de audio en vivo y en tiempo real junto con inferencia clínica de forma simultánea en la GPU integrada (iGPU), manteniendo todo el Sistema de Lenguaje Médico Unificado (UMLS) residente en RAM. Actualmente nos estamos asociando con un hospital keniano para pilotar Tumz en un ensayo clínico de un año, porque la salud humana requiere una validación rigurosa y empírica, no las suposiciones de los desarrolladores.
+
+Durante el desarrollo de Tumz, me encontré con las ineficiencias masivas y sistémicas del stack de ciencia de datos moderno:
+1. **El Impuesto de Python**: Copia de memoria de extremo a extremo, cuellos de botella del GIL y un enorme consumo de tiempo de ejecución.
+2. **El Impuesto del Navegador**: Complicaciones de Manifest V3, latencia de renderizado y fallos de comunicación de alta frecuencia en conversaciones de agentes de larga duración.
+3. **El Cuello de Botella del Núcleo del SO**: Programación ineficiente de procesos, inanición de hilos de CPU y sobrecarga del servidor de pantalla (cambio de contexto Wayland vs. X11).
+
+Así, a finales de 2025, me propuse construir un stack de infraestructura que sorteara estos límites por completo: un Sistema Operativo Agéntico (Agentic OS) diseñado para pipelines de datos de copia cero y ejecución nativa en hardware de IA. Este repositorio es el núcleo de código abierto de ese motor.
+
+---
+
+## Tracción Global y Telemetría
+
+Lanzado el 6 de mayo de 2026, Nairobi OS ha ganado tracción rápidamente entre programadores de sistemas, investigadores cuantitativos y arquitectos de edge computing de todo el mundo.
+
+### Distribución Global Acumulada (6 de mayo de 2026 – 23 de mayo de 2026)
+
+| Métrica | Medición | Contexto |
+| :--- | :--- | :--- |
+| **Rango Global** | **#75,293** | De 797,894 paquetes activos en PyPI |
+| **Percentil** | **9.43%** | Clasificación de primer nivel para extensiones de Python a nivel de sistema |
+| **Descargas Totales** | **1,525** | Descargas de desarrolladores orgánicas y de alta intención |
+
+### Volumen de Descargas por Versión
+
+```
+  0.2.0 [████████████████████████████████████████] 342
+  0.2.1 [██████████████████████████] 224
+  0.3.0 [████████████████████████] 212
+  0.3.1 [████████████████████] 176
+  0.1.0 [███████████████████] 169
+  0.4.1 [██████████████] 120
+```
+
+### Top 10 Regiones Soberanas de Adopción
+
+| Rango | Región | Código de País | Volumen de Descargas |
+| :--- | :--- | :--- | :--- |
+| 1 | Estados Unidos | US | 661 |
+| 2 | Hong Kong | HK | 103 |
+| 3 | China | CN | 84 |
+| 4 | Alemania | DE | 74 |
+| 5 | Japón | JP | 65 |
+| 6 | Singapur | SG | 56 |
+| 7 | Reino Unido | GB | 51 |
+| 8 | Francia | FR | 51 |
+| 9 | Rusia | RU | 42 |
+| 10 | Corea del Sur | KR | 30 |
+
+---
+
+## Soporte y Soberanía
+
+Si Nairobi OS está optimizando sus pipelines de datos, reduciendo sus facturas de la nube o impulsando sus arquitecturas agénticas locales, considere apoyar nuestra investigación de sistemas independiente. Cada contribución se destina directamente a optimizaciones de compiladores a nivel de hardware y pruebas de edge computing en Nairobi.
+
+[![Apoyar el Desarrollo de Nairobi OS](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-PayPal-blue.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=chege.finance@gmail.com&item_name=Support+Nairobi+OS+Development)
+
+---
+
+## Opciones de Idioma
+
+[English](README.md) | [简体中文](README.zh-CN.md) | [Español](README.es.md) | [Deutsch](README.de.md) | [日本語](README.ja.md) | [Русский](README.ru.md) | [한국어](README.ko.md)
+
+---
+
+## Características Clave
+
+* **Uso del Ordenador sin Píxeles**: Evita los lentos y costosos pipelines de agentes basados en visión. Interactúa de forma nativa con el escritorio Linux a través de AT-SPI2 y el algoritmo de compresión TOON (Token-Oriented Object Notation), alimentando árboles jerárquicos crudos directamente a los LLM.
+* **Ingesta de Copia Cero**: Carga de datos acelerada por hardware y con omisión del núcleo utilizando `io_uring` y Huge Pages de 1GB.
+* **Visualización Acelerada por Hardware**: Gráficos interactivos de Jupyter de baja latencia utilizando el demonio de renderizado `lagos-lite`, construido sobre `wgpu` y `egui`.
+* **Ejecución Analítica Vectorizada**: Saturación extrema de la CPU mediante la ejecución de consultas de Polars y pipelines de datos multihilo de Rayon.
+* **Interfaz Soberana**: Una API de Python fluida (`SovereignFrame`) que encapsula descriptores de archivos mapeados en memoria e IPC.
+
+---
+
+## Arquitectura de Código Abierto vs. Empresarial
+
+Nairobi OS está bifurcado estructuralmente. El repositorio de código abierto proporciona el procesamiento de datos de alto rendimiento fundamental y las primitivas de visualización en un solo nodo. El ecosistema comercial de código cerrado contiene las implementaciones avanzadas multi-agente, de alta disponibilidad y específicas de la industria.
+
+```
+                                  +---------------------------------------+
+                                  |         Nairobi Python API            |
+                                  +---------------------------------------+
+                                                      |
+                                     [ GVariant sobre D-Bus / memoria comp. ]
+                                                      |
+                                                      v
+                                  +---------------------------------------+
+                                  |           Nairobi Hub                 |
+                                  +---------------------------------------+
+                                                      |
+                    +---------------------------------+---------------------------------+
+                    |                                                                   |
+                    v                                                                   v
+     +------------------------------+                                    +------------------------------+
+     |   Axum Refinery (Datos)      | <===[ Copia Cero IPC / iceoryx2 ]==>|     Lagos Vision (Visual)    |
+     +------------------------------+                                    +------------------------------+
+```
+
+### Espacio de Trabajo de Crates de Código Abierto (`crates/`)
+
+1. **`nairobi-axum-refinery`**: Demonio Rust de alto rendimiento que gestiona la ingesta de datos crudos, estadísticas paralelizadas con Rayon y ejecución de consultas vectorizadas con Polars.
+2. **`nairobi-hub`**: El orquestador central de IPC. Gestiona y ruta descriptores de archivos y señales entre los clientes y el demonio refinery.
+3. **`lagos-lite`**: La corteza visual. Un motor de renderizado sin cabeza guiado por eventos que mapea archivos mapeados en memoria directamente al pipeline de la GPU.
+4. **`nairobi-protocol`**: La capa de protocolo compartida. Define esquemas estándar de serialización de GVariant, tipos de errores y diseños de memoria compartida.
+5. **`nairobi-python`**: El módulo de extensión de Python compilado a través de `PyO3` y empaquetado con `Maturin`.
+
+### Ecosistema Corporativo Privado (`modules/`)
+
+Nuestros componentes de nivel empresarial se encuentran en un repositorio privado (`Sovereign-Systems-Lab`) y tienen licencia para infraestructura industrial, financiera y estatal.
+
+1. **`sovereign-ui`**: El motor empresarial AT-SPI2. Implementa la seguridad del Protocolo Aegis, vinculación de hardware y manipulación de escritorio de nivel de producción.
+2. **`nairobi-connector`**: Servidor avanzado de Protocolo de Contexto de Modelo (MCP) que gestiona señales D-Bus crudas y de baja latencia para LLM empresariales.
+3. **`tactical-rtos-node`**: Programador de sistema operativo en tiempo real de ultra baja latencia para automatización industrial edge crítica para la seguridad.
+4. **`industrial-guardian-rust` / `industrial-guardian-python`**: Capa autónoma de ingeniería de fiabilidad del sitio (SRE) con evitación predictiva de OOM, fugas de memoria y caídas del sistema.
+5. **`fintech-bridge-rust`**: Analizador de transacciones de alta frecuencia en tiempo real y puente de mainframe heredado (análisis de terminales EBCDIC/SBA).
+6. **`aviation-audio-rust`**: Procesamiento de flujo de audio sin bloqueos de sub-milisegundos, análisis de telemetría acústica y DSP de ondas crudas.
+7. **`drawbridge_api`**: Puente levadizo gRPC multi-inquilino, seguro y autenticado, que aísla el núcleo local de las llamadas de agentes en la nube no confiables.
+
+### Matriz de Comparación de Capacidades
+
+| Capacidad / Característica | Código Abierto Core (`crates/`) | Suite Empresarial (`modules/`) |
+| :--- | :---: | :---: |
+| **Motor de Ingesta** | `mmap` / `copy_file_range` | `io_uring` + `SQPOLL` + 1GB Huge Pages |
+| **Análisis Estadístico** | Estadísticas descriptivas básicas | Sesgo/curtosis multi-paso vectorizado, correlación |
+| **Motor de Consultas** | SQL de Polars en proceso | Apache Arrow / DataFusion cluster distribuido |
+| **Mecanismo IPC** | Memoria compartida POSIX / D-Bus | Memoria compartida `iceoryx2` copia cero |
+| **Visualización** | Jupyter `anywidget` local | WebRTC GStreamer / overlays transparentes de Wayland Layer-Shell |
+| **Seguridad y Cumplimiento** | Límites estándar de POSIX | Protocolo Aegis, Libro Mayor Forense Encadenado SHA-256 |
+| **Autenticación** | Ninguna (Usuario local de confianza) | Vinculación de hardware (TPM 2.0 / CPU ID), PKI privada |
+| **Objetivo de Plataforma** | Linux de un solo nodo | Nube distribuida / Nodo edge / Trading de alta frecuencia |
+
+---
+
+## Instalación y Configuración
+
+### Requisitos
+- **SO**: Linux (se recomienda Ubuntu 22.04+) o Windows Subsystem for Linux (WSL2).
+- **GPU**: Controlador compatible con Vulkan, Metal o OpenGL.
+- **Python**: 3.10 o más reciente.
+- **Rust**: Cadena de herramientas estable (si se construye desde la fuente).
+
+### Instalación Rápida (PyPI)
 ```bash
 pip install nairobi-os
 ```
 
-### Compilar desde la Fuente
-```bash
-git clone https://github.com/KevinKenya/nairobi-connector-open-source
-cd nairobi-connector-open-source
-python3 -m venv .venv
-source .venv/bin/activate
-pip install maturin pyo3-build-config zbus anywidget traitlets
-./build_wheel.sh
-```
+### Construir desde la Fuente
+Para compilar todo el espacio de trabajo, incluidos los demonios nativos y la extensión de Python:
 
-## Uso
+1. **Clonar el Repositorio**:
+   ```bash
+   git clone https://github.com/KevinKenya/nairobi-connector-open-source.git
+   cd nairobi-connector-open-source
+   ```
 
-### Analítica de Datos
-```python
-import nairobi_os
+2. **Configurar el Entorno Virtual**:
+   ```bash
+   python3 -m venv .venv
+   source .venv/bin/activate
+   pip install maturin pyo3-build-config zbus anywidget traitlets pandas
+   ```
 
-# Iniciar la refinería
-nairobi_os.connect()
-
-# Ingerir datos
-df = nairobi_os.read_csv("dataset.csv")
-
-print(f"Media: {df.column_name.mean()}")
-df.plot()
-```
-
-### Uso del Ordenador (Servidor MCP)
-Los agentes de IA que usan Nairobi Connector deben seguir este bucle:
-1. Apuntar a una ventana usando `nairobi_find_window`.
-2. Observar el estado actual vía `nairobi_get_ui_map`.
-3. Leer el TOON `[ID: N]` del elemento deseado.
-4. Ejecutar una acción vía `nairobi_interact` o `nairobi_type_text`.
-
-## Soporte
-Si encuentras útil Nairobi OS, considera apoyar el proyecto:
-
-[![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-PayPal-blue.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=chege.finance@gmail.com&item_name=Support+Nairobi+OS+Development)
-
-## Licencia
-Este proyecto está licenciado bajo la **Licencia Apache 2.0**.
-*(Nota: Partes del formato TOON y la implementación se atribuyen a los Autores de TOON).*
+3. **Ejecutar la Construcción del Espacio de Trabajo**:
+   ```bash
+   chmod +x build_wheel.sh
+   ./build_wheel.sh --release
+   ```
+   Esto compila los demonios nativos, los copia al directorio del paquete y construye un wheel bajo `crates/nairobi-python/target/wheels/`.
 
 ---
-© 2026 Kevin Chege. Todos los derechos reservados.
+
+## Guía de Uso
+
+### 1. Análisis de Datos (El Pipeline En Memoria)
+
+Nairobi OS proporciona la API `SovereignFrame`. Maneja el mapeo de memoria cruda bajo el capó, permitiendo una rápida manipulación de datos.
+
+```python
+import nairobi_os as nb
+
+# Encender el demonio refinery de fondo
+nb.connect()
+
+# Ingerir el conjunto de datos usando el pipeline de memoria de copia cero
+frame = nb.read_csv("simulator/fndds_ingredient_nutrient_value.csv")
+
+# Realizar cálculos vectorizados a través de Rust refinery
+profile = frame.crunch("value")
+print(f"Media: {profile['mean']:.4f}")
+print(f"Desviación Estándar: {profile['std_dev']:.4f}")
+
+# Ejecutar consultas SQL arbitrarias directamente en el frame mapeado en memoria
+subset = frame.query("SELECT * FROM dataset WHERE value > 50.0")
+
+# Lanzar el widget de trazado interactivo acelerado por Lagos
+subset.plot(column="value")
+```
+
+### 2. Uso del Ordenador sin Píxeles (MCP)
+
+Para usar la interfaz semántica AT-SPI2, su agente de IA debe interactuar con las herramientas expuestas del servidor MCP en lugar de leer capturas de pantalla:
+
+```
+                    SECUENCIA DE USO DEL ORDENADOR
+                     
+  [ Agente LLM ]                                [ Nairobi OS ]
+        |                                             |
+        |===> nairobi_find_window("Text Editor") ====>| (Localiza el objetivo)
+        |<=== Retorna ID de Ventana y Límites =======|
+        |                                             |
+        |===> nairobi_get_ui_map() ==================>| (Genera TOON)
+        |<=== Retorna árbol Markdown comprimido ======|
+        |     "[ID: 12] Button: 'Save'"               |
+        |                                             |
+        |===> nairobi_interact(12, "click") =========>| (Ejecuta la acción)
+        |<=== Retorna estado de éxito ================|
+```
+
+---
+
+## Ajuste del Sistema (Guía del Colaborador)
+
+Para lograr los perfiles de rendimiento mostrados en nuestros benchmarks, su kernel host debe estar configurado para el mapeo de memoria a nivel de sistema.
+
+### Huge Pages de 1GB
+Nairobi OS utiliza Huge Pages de 1GB para evitar la sobrecarga de traducción de Translation Lookaside Buffer (TLB) de la CPU en conjuntos de datos masivos.
+
+Para asignar una Huge Page en su host Linux:
+```bash
+echo 1 | sudo tee /sys/kernel/mm/hugepages/hugepages-1048576kB/nr_hugepages
+```
+*Nota: Si el sistema no puede asignar una página de 1GB debido a la fragmentación, el motor vuelve automáticamente a Transparent Huge Pages (THP).*
+
+### Configuración de D-Bus Broker
+In entornos de alta frecuencia, asegúrese de que `dbus-broker` esté instalado en lugar del tradicional `dbus-daemon` para manejar una rápida propagación de señales a través del plano de control.
+
+---
+
+## Licencia
+
+Este proyecto está licenciado bajo la **Licencia Apache 2.0**.  
+*(Nota: Partes del formato TOON y de la implementación del puente se atribuyen a los autores de TOON).*
+
+---
+© 2026 Kevin Chege. Todos los derechos reservados.  
+*Sovereign Systems Lab, Nairobi, Kenia.*
