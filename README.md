@@ -91,6 +91,10 @@ If Nairobi OS is optimizing your data pipelines, reducing your cloud bills, or d
 
 [![Support Nairobi OS Development](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-PayPal-blue.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=chege.finance@gmail.com&item_name=Support+Nairobi+OS+Development)
 
+For direct inquiries, contact: aiwithafrica@gmail.com
+
+For direct inquiries, contact: aiwithafrica@gmail.com
+
 ---
 
 ## Key Features
