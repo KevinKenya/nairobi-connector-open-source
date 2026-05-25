@@ -1,4 +1,4 @@
-[English](README.md) | [简体中文](README.zh-CN.md) | [Español](README.es.md) | [Deutsch](README.de.md) | [日本語](README.ja.md) | [Русский](README.ru.md) | [한국어](README.ko.md) | [Finnish](README.fi.md) | [Cantonese](README.yue.md)
+[English](README.md) | [简体中文](README.zh-CN.md) | [Español](README.es.md) | [Deutsch](README.de.md) | [日本語](README.ja.md) | [Русский](README.ru.md) | [한국어](README.ko.md) | [Finnish](README.fi.md) | [Cantonese](README.yue.md) | [Français](README.fr.md)
 
 # Nairobi OS: High-Performance, Zero-Copy AI & Data Science Infrastructure
 
@@ -13,7 +13,7 @@
 
 Nairobi OS is not the product of a comfortable corporate incubator or a venture-backed research lab. It is the result of absolute necessity, born from a sequence of deep personal crises and a relentless drive to execute where standard industry tools fail.
 
-I am Kevin Chege, founder of Sovereign Systems Lab (Nairobi, Kenya). From 2009 to 2022, my life was consumed by severe alcoholism. It cost me professional standing, opportunities, and nearly my life. At the height of my addiction, I worked as an Analyst in the Strategy Office of The Open University in Milton Keynes, UK, following my time as the Founder and President of AIESEC in Rwanda (2006–2010). Today, I am in my fourth year of continuous sobriety.
+I am Kevin Chege, 45 year old founder of Sovereign Systems Lab (Nairobi, Kenya). From 2009 to 2022, my life was consumed by severe alcoholism. It cost me professional standing, opportunities, and nearly my life. At the height of my addiction, I worked as an Analyst in the Strategy Office of The Open University in Milton Keynes, UK, following my time as the Founder and President of AIESEC in Rwanda (2006–2010). Today, I am in my fourth year of continuous sobriety.
 
 ```
                      LEGIO XIII GEMINA
@@ -31,7 +31,7 @@ Throughout 2025, I lived on a Lenovo X13 ThinkPad with a highly constrained hard
 Processor: AMD Ryzen 5 PRO 4650U (6 Cores, 12 Threads)
 Graphics: AMD Radeon RX Vega 6 iGPU
 Memory: 32 GB RAM (with high system utilization)
-Storage: 256 GB NVMe (99% full)
+Storage: 256 GB NVMe
 ```
 
 On this exact machine, I spent 2025 building **Tumz** ([Sarafakai](http://www.sarafakai.com)), an air-gapped, zero-latency clinical decision support AI. It executed live, real-time audio transcription and clinical inference simultaneously on the integrated GPU (iGPU), keeping the entire Unified Medical Language System (UMLS) resident in RAM. We are currently partnering with a Kenyan hospital to pilot Tumz for a year-long clinical trial—because human health requires rigorous, empirical validation, not developers' assumptions.
