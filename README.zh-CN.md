@@ -49,7 +49,7 @@ Nairobi OS 并非诞生于舒适的企业孵化器或风投支持的研究实验
 
 现代开发社区的一些评论家看到新的、高度先进的项目，会将其 dismiss 为 "AI 生成的模板代码"。对于这些 skeptics，我提供 commit 日志的 raw、物理证据。
 
-我 my other github profile (https://github.com/ChegeKenya) 作为 intense、daily 系统工程的 empirical 记录。在 2025 年 alone 就有 7,888 贡献。在 2026 年前五个月 addition 了 1,420 贡献。那是 9,180 贡献在 trailing 365 天——low-latency Rust runtimes、clinical AI 管道和 zero-copy shared memory 系统的近-continuous green commits 序列。这段代码是在战地写的，在 bare metal 上编译，在 byte 字节层面审计。
+我的 my other GitHub 资料 (https://github.com/ChegeKenya) 作为 intense、daily 系统工程的 empirical 记录。在 2025 年 alone 就有 7,888 贡献。在 2026 年前五个月 addition 了 1,420 贡献。那是 9,180 贡献在 trailing 365 天——low-latency Rust runtimes、clinical AI 管道和 zero-copy shared memory 系统的 near-continuous green commits 序列。这段代码是在战地写的，在 bare metal 上编译，在 byte 字节层面审计。
 
 ```
 2025: [██████████████████████████████████████████████████] 7,888 Commits
@@ -58,6 +58,18 @@ Nairobi OS 并非诞生于舒适的企业孵化器或风投支持的研究实验
 ```
 
 ### 硬件原生开发约束
+
+在整个 2025 年和 2026 年，我 lived 和 developed 在 Lenovo X13 ThinkPad 上，配置高度受限：
+
+```
+处理器: AMD Ryzen 5 PRO 4650U (6核, 12线程)
+显卡: AMD Radeon RX Vega 6 iGPU (Shared Memory Architecture)
+内存: 29 GiB RAM (系统使用率高)
+存储: 256 GB NVMe (99% 滿, 资源受限)
+主机内核: Linux 6.17.0-29-generic
+```
+
+就在那台机器上，我在 2025 年构建了 **Tumz** ([Sarafakai](http://www.sarafakai.com))，这是一种 air-gapped、zero-latency 的临床决策支持 AI。它同时在 iGPU 上执行实时的音频转录和临床推理，保持着整个 Unified Medical Language System (UMLS) 字典在 shared RAM 中常驻。Sarafakai 目前正与肯尼亚医院合作进行 Tumz 的一年临床试验——因为人类健康需要严格、empirical 的验证，而不是开发者的假设。
 
 ---
 

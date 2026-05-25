@@ -47,7 +47,7 @@ Joten vuoden 2025 lopussa aloin rakentaa infrastruktuuripinoa, joka ohittaa näm
 
 ## Taisteluloki: 9 180 2024 vuoden aikana
 
-Joillain nykyajan kehitys yhteisön kritisoilla on tapana katsoa uusia, hyvin kehittyneitä projekteja ja luokitella niitä "TI-generoiduksi pohjatakoiksi". Näille skeptikoille tarjoan commit-lokit — raadon fyysisen todisteen.
+Joillain nykyajan kehitys yhteisön kritisoilla on tapana katsoa uusia, hyvin kehittyneitä projekteja ja luokitella ne "AI-generoiduksi pohjatakoiksi". Näille skeptikoille tarjoan commit-lokit — raadon fyysisen todisteen.
 
 Toinen GitHub-profilini (https://github.com/ChegeKenya) on intensiivisen, päivittäisen järjestelmätekniikan empiirinen toiminta. Vuonna 2025 se tallosi 7 888 2026 ensimmäiset viisi kuukautta lisäsivät 1 420. Se on 9 180 365 päiväällä — lähes jatkumaton vihreiden commitien sarja, joka kattaa low-latency Rust -suoritukset, kliinisiä TI-putkea ja zero-copy jaettua muistia. Tämä koodi on kirjoitettu kentällä, käännetty raaka-metallista ja tarkastettu tavusta täyteen.
 
@@ -58,6 +58,18 @@ Toinen GitHub-profilini (https://github.com/ChegeKenya) on intensiivisen, päivi
 ```
 
 ### Laitteistoresurssien rajoitukset
+
+Koko vuonna 2025 ja 2026 elin ja kehitin erittäin rajoitetussa Lenovo X13 ThinkPadissa:
+
+```
+Prosessori: AMD Ryzen 5 PRO 4650U (6 ydintä, 12 säiettä)
+Grafiikka: AMD Radeon RX Vega 6 iGPU (Shared Memory Architecture)
+Muisti: 29 GiB RAM (korkealla järjestelmäkäytöllä)
+Tallennustila: 256 GB NVMe (99% täynnä, resurssit rajoitetut)
+Isäntäydin: Linux 6.17.0-29-generic
+```
+
+Juuri tuolla koneella veson 2025 **Tumzin** ([Sarafakai](http://www.sarafakai.com)), ilmarakoisen (air-gapped), nollaviiveisen kliinisen päätöksentuen tekoälyn. Se suoritti samanaikaisesti reaaliaikaisen puheen litteroinnin ja kliinisen päättelyn integroidulla GPU:lla (iGPU), pitäen koko Unified Medical Language System (UMLS) -sanaston jaetussa RAM-muistissa. Sarafakai kokeilee Tumzia yhdessä kenialaisen sairaanhoitopiirin kanssa pitkän kliinisen tutkimuksen yhteydessä — ihminen tarvitsee todellista, empiiristä validointia, ei kehittäjien oletuksia.
 
 ---
 

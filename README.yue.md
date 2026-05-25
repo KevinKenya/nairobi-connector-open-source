@@ -49,7 +49,7 @@ Nairobi OS 唔係誕生喺舒適嘅企業孵化器或者風投支持嘅研究實
 
 現代開發社區嘅某啲批評家望向啲新、高度先進嘅項目，就會將佢哋 dismiss 做 "AI 生成嘅模板代碼"。俾這啲 skeptics 我展示 commit 日誌嘅 raw、物理證據。
 
-我 my other github profile (https://github.com/ChegeKenya) 做咗一個 intense、daily 系統工程嘅 empirical 記錄。喺 2025 年 alone 就有 7,888 次貢獻。喺 2026 年頭五個月又 addition 咗 1,420 次。總共就有 9,180 次貢獻喺過去 365 天——嗰個 near-continuous 嘅 green commits 序列，橫跨 low-latency Rust runtimes、臨床 AI 管道同 zero-copy shared memory 系統。呢段代碼喺戰地寫㗎、喺 bare metal 上 compile，在 byte 字节層面睇過。
+我 my other GitHub 資料 (https://github.com/ChegeKenya) 做咗一個 intense、daily 系統工程嘅 empirical 記錄。喺 2025 年 alone 就有 7,888 次貢獻。喺 2026 年頭五個月又 addition 咗 1,420 次。總共就有 9,180 次貢獻喺過去 365 天——嗰個 near-continuous 嘅 green commits 序列，橫跨 low-latency Rust runtimes、臨床 AI 管道同 zero-copy shared memory 系統。呢段代碼喺戰地寫㗎、喺 bare metal 上 compile，在 byte 字节層面睇過。
 
 ```
 2025: [██████████████████████████████████████████████████] 7,888 Commits
@@ -58,6 +58,18 @@ Nairobi OS 唔係誕生喺舒適嘅企業孵化器或者風投支持嘅研究實
 ```
 
 ### 硬件原生開發約束
+
+喺成個 2025 年同 2026 年，我 lived 同 developed 喺 Lenovo X13 ThinkPad 上，配置高度受限：
+
+```
+處理器: AMD Ryzen 5 PRO 4650U (6核, 12線程)
+顯卡: AMD Radeon RX Vega 6 集顯 (Shared Memory Architecture)
+內存: 29 GiB RAM (系統使用率高)
+存儲: 256 GB NVMe (99% 滿, 資源受限)
+主機內核: Linux 6.17.0-29-generic
+```
+
+就喺嗰台機上，我喺 2025 年構建咗 **Tumz** ([Sarafakai](http://www.sarafakai.com))，呢係一款 air-gapped、zero-latency 嘅臨床決策支持 AI。佢同時喺 iGPU 上執行實時間嘅音頻轉錄同臨床推論，保持住成個 Unified Medical Language System (UMLS) 字典喺 shared RAM 入面常駐。Sarafakai 而家同肯尼亞醫院合作進行 Tumz 嘅一年臨床試驗——因為人類健康需要嚴格、empirical 嘅驗證，而唔係開發者嘅假設。
 
 ---
 
