@@ -45,6 +45,38 @@ Así, a finales de 2025, me propuse construir un stack de infraestructura que so
 
 ---
 
+## El Registro de Batalla: 9,180 Contribuciones en el Último Año
+
+Algunos críticos en la comunidad de desarrollo moderna miran los proyectos nuevos y altamente avanzados y los rechazan como "boilerplate generado por IA". A esos escépticos, les ofrezco la prueba cruda y física del registro de commits.
+
+Mi otro perfil de GitHub (https://github.com/ChegeKenya) se establece como un registro empírico de intensa ingeniería de sistemas diaria. En 2025 solo, registré 7,888 contribuciones. En los primeros cinco meses de 2026, agregué 1,420 contribuciones. Eso es 9,180 contribuciones en los últimos 365 días — una secuencia casi ininterrumpida de commits verdes que abarcan runtimes Rust de baja latencia, pipelines de IA clínica y sistemas de memoria compartida de copia cero. Este código está escrito en las trincheras, compilado en bare metal y auditado byte por byte.
+
+```
+2025: [██████████████████████████████████████████████████] 7,888 Commits
+  2026: [██████████] 1,420 Commits
+  Total (Último Año): 9,180 Commits de Código de Sistemas Puros
+```
+
+### Restricciones de Desarrollo Nativas de Hardware
+
+Mi trayectoria en programación está arraigada en la arquitectura de sistemas de bajo nivel y la optimización extrema, mecánica. En 2015, compartí mi trayectoria en programación, y expuse mi visión para construir capacidades técnicas altamente descentralizadas en el continente africano en [este tratado sobre el Silicon Valley de Kenia](https://www.linkedin.com/pulse/building-kenyas-silicon-valley-making-work-kevin-chege/). Cuando la transición LLM comenzó en 2023, reconocí temprano las limitaciones estructurales de los wrappers de alto nivel, como se documenta en mi temprana [demostración de wrapper LLM de 2023](https://www.linkedin.com/feed/update/urn:li:activity:7102930955807449088/).
+
+Me di cuenta de que construir wrappers de alto nivel sobre APIs web inestables era un callejón sin salida arquitectónico. La verdadera guerra se libra en la intersección de las limitaciones de hardware local y la asignación directa de recursos.
+
+A lo largo de 2025 y 2026, viví y desarrollé en un Lenovo X13 ThinkPad altamente restringido:
+
+```
+Procesador: AMD Ryzen 5 PRO 4650U (6 núcleos, 12 hilos)
+Gráficos: AMD Radeon RX Vega 6 iGPU (Arquitectura de Memoria Compartida)
+Memoria: 29 GiB RAM (con una utilización del sistema alta)
+Almacenamiento: 256 GB NVMe (99% lleno, altamente restringido)
+Kernel del host: Linux 6.17.0-29-generic
+```
+
+En esta máquina exacta, pasé 2025 construyendo **Tumz** ([Sarafakai](http://www.sarafakai.com)), una IA de soporte de decisiones clínicas air-gapped, de latencia cero. Ejecutaba transcripción de audio en vivo y en tiempo real junto con inferencia clínica simultáneamente en la GPU integrada (iGPU), manteniendo todo el diccionario del Unified Medical Language System (UMLS) residente en RAM compartida. Sarafakai ahora se está asociando con un hospital keniano para pilotar Tumz en un ensayo clínico de un año — porque la salud humana requiere validación rigurosa y empírica, no suposiciones de desarrolladores.
+
+---
+
 ## Tracción Global y Telemetría
 
 Lanzado el 6 de mayo de 2026, Nairobi OS ha ganado tracción rápidamente entre programadores de sistemas, investigadores cuantitativos y arquitectos de edge computing de todo el mundo. Estas estadísticas de descarga se obtienen del [Panel de Control en Vivo de ClickPy Nairobi OS](https://clickpy.clickhouse.com/dashboard/nairobi-os), donde puede buscar y explorar las métricas por sí mismo.

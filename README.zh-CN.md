@@ -45,6 +45,22 @@ Nairobi OS 并非诞生于舒适的企业孵化器或风投支持的研究实验
 
 ---
 
+## 战绩：过去一年的 9,180 次贡献
+
+现代开发社区的一些评论家看到新的、高度先进的项目，会将其 dismiss 为 "AI 生成的模板代码"。对于这些 skeptics，我提供 commit 日志的 raw、物理证据。
+
+我 my other github profile (https://github.com/ChegeKenya) 作为 intense、daily 系统工程的 empirical 记录。在 2025 年 alone 就有 7,888 贡献。在 2026 年前五个月 addition 了 1,420 贡献。那是 9,180 贡献在 trailing 365 天——low-latency Rust runtimes、clinical AI 管道和 zero-copy shared memory 系统的近-continuous green commits 序列。这段代码是在战地写的，在 bare metal 上编译，在 byte 字节层面审计。
+
+```
+2025: [██████████████████████████████████████████████████] 7,888 Commits
+  2026: [██████████] 1,420 Commits
+  Total (Last Year): 9,180 Commits of Pure Systems Code
+```
+
+### 硬件原生开发约束
+
+---
+
 ## 全球采用与遥测
 
 Nairobi OS 于 2026 年 5 月 6 日发布，迅速获得了全球系统程序员、量化研究员和边缘计算架构师的青睐。这些下载统计数据源自实时 [ClickPy Nairobi OS 仪表板](https://clickpy.clickhouse.com/dashboard/nairobi-os)，您可以亲自搜索和探索这些指标。

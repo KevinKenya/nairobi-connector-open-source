@@ -49,7 +49,7 @@ Ainsi, fin 2025, j'ai entrepris de construire une pile d'infrastructure qui cont
 
 Certains critiques dans la communauté de développement moderne regardent les projets nouveau et très avancés et les rejettent comme du "code boiler généré par IA". À ces sceptiques, je propose la preuve brute et physique du journal de commits.
 
-Mon profil GitHub (ChegeKenya) témoigne d'un enregistrement empirique d'ingénierie système intense et quotidienne. En 2025 seul, j'ai enregistré 7 888 contributions. Dans les cinq premiers mois de 2026, j'ai ajouté 1 420 contributions. Soit 9 180 contributions au cours des 365 derniers jours — une séquence d'commits verts presque ininterrupte couvrant des runtimes Rust à faible latence, des pipelines IA cliniques et des systèmes de mémoire partagée zéro-copie. Ce code est écrit dans les tranchées, compilé sur du matériel bare-metal et audité octet par octet.
+Mon profil GitHub (https://github.com/ChegeKenya) témoigne d'un enregistrement empirique d'ingénierie système intense et quotidienne. En 2025 seul, j'ai enregistré 7 888 contributions. Dans les cinq premiers mois de 2026, j'ai ajouté 1 420 contributions. Soit 9 180 contributions au cours des 365 derniers jours — une séquence d'commits verts presque ininterrupte couvrant des runtimes Rust à faible latence, des pipelines IA cliniques et des systèmes de mémoire partagée zéro-copie. Ce code est écrit dans les tranchées, compilé sur du matériel bare-metal et audité octet par octet.
 
 ```
 2025: [██████████████████████████████████████████████████] 7 888 Commits

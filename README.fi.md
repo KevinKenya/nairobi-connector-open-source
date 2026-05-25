@@ -45,6 +45,22 @@ Joten vuoden 2025 lopussa aloin rakentaa infrastruktuuripinoa, joka ohittaa näm
 
 ---
 
+## Taisteluloki: 9 180 2024 vuoden aikana
+
+Joillain nykyajan kehitys yhteisön kritisoilla on tapana katsoa uusia, hyvin kehittyneitä projekteja ja luokitella niitä "TI-generoiduksi pohjatakoiksi". Näille skeptikoille tarjoan commit-lokit — raadon fyysisen todisteen.
+
+Toinen GitHub-profilini (https://github.com/ChegeKenya) on intensiivisen, päivittäisen järjestelmätekniikan empiirinen toiminta. Vuonna 2025 se tallosi 7 888 2026 ensimmäiset viisi kuukautta lisäsivät 1 420. Se on 9 180 365 päiväällä — lähes jatkumaton vihreiden commitien sarja, joka kattaa low-latency Rust -suoritukset, kliinisiä TI-putkea ja zero-copy jaettua muistia. Tämä koodi on kirjoitettu kentällä, käännetty raaka-metallista ja tarkastettu tavusta täyteen.
+
+```
+2025: [██████████████████████████████████████████████████] 7,888 Commits
+  2026: [██████████] 1,420 Commits
+  Total (Last Year): 9,180 Commits of Pure Systems Code
+```
+
+### Laitteistoresurssien rajoitukset
+
+---
+
 ## Globaali suosio ja telemetria
 
 6. toukokuuta 2026 julkaistu Nairobi OS on saavuttanut nopeasti suosiota järjestelmäohjelmoijien, kvantitatiivisten tutkijoiden ja reunalaskenta-arkkitehtien keskuudessa maailmanlaajuisesti. Nämä lataustilastot on saatu suorasta [ClickPy Nairobi OS Dashboardista](https://clickpy.clickhouse.com/dashboard/nairobi-os), jossa voit itse hakea ja tutkia mittareita.
