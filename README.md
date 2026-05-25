@@ -45,6 +45,38 @@ So, at the close of 2025, I set out to build an infrastructure stack that bypass
 
 ---
 
+## The Battle Record: 9,180 Contributions in the Last Year
+
+Some critics in the modern development community look at new, highly advanced projects and dismiss them as "AI-generated boilerplate." To those skeptics, I offer the raw, physical proof of the commit log.
+
+My other GitHub profile (https://github.com/ChegeKenya) stands as an empirical record of intense, daily systems engineering. In 2025 alone, I logged 7,888 contributions. In the first five months of 2026, I added 1,420 contributions. That is 9,180 contributions in the trailing 365 days—a near-unbroken sequence of green commits spanning low-latency Rust runtimes, clinical AI pipelines, and zero-copy shared memory systems. This is code written in the trenches, compiled on bare metal, and audited byte by byte.
+
+```
+2025: [██████████████████████████████████████████████████] 7,888 Commits
+  2026: [██████████] 1,420 Commits
+  Total (Last Year): 9,180 Commits of Pure Systems Code
+```
+
+### Hardware-Native Development Constraints
+
+My programming journey is rooted in low-level systems architecture and extreme, mechanical optimization. In 2015, I shared my journey into programming, and I laid out my vision for building decentralized, highly technical capabilities on the African continent in [this treatise on Kenya's Silicon Valley](https://www.linkedin.com/pulse/building-kenyas-silicon-valley-making-work-kevin-chege/). When the LLM transition began in 2023, I recognized the structural limitations of high-level wrappers early, as documented in my early [2023 LLM wrapper demonstration](https://www.linkedin.com/feed/update/urn:li:activity:7102930955807449088/).
+
+I realized that building high-level wrappers on top of unstable web APIs was an architectural dead-end. The real war is fought at the intersection of local hardware constraints and direct resource allocation.
+
+Throughout 2025 and 2026, I lived and developed on a highly constrained Lenovo X13 ThinkPad:
+
+```
+Processor: AMD Ryzen 5 PRO 4650U (6 Cores, 12 Threads)
+Graphics: AMD Radeon RX Vega 6 iGPU (Shared Memory Architecture)
+Memory: 29 GiB RAM (with high system utilization)
+Storage: 256 GB NVMe (99% full, heavily resource-constrained)
+Host Kernel: Linux 6.17.0-29-generic
+```
+
+On this exact machine, I spent 2025 building **Tumz** ([Sarafakai](http://www.sarafakai.com)), an air-gapped, zero-latency clinical decision support AI. It executed live, real-time audio transcription and clinical inference simultaneously on the integrated GPU (iGPU), keeping the entire Unified Medical Language System (UMLS) dictionary resident in shared RAM. Sarafakai is now partnering with a Kenyan hospital to pilot Tumz for a year-long clinical trial—because human health requires rigorous, empirical validation, not developer assumptions.
+
+---
+
 ## Global Traction & Telemetry
 
 Launched on May 6, 2026, Nairobi OS has rapidly gained traction among systems programmers, quantitative researchers, and edge computing architects worldwide. These download statistics are sourced from the live [ClickPy Nairobi OS Dashboard](https://clickpy.clickhouse.com/dashboard/nairobi-os), where you can search and explore the metrics for yourself.
@@ -93,7 +125,6 @@ If Nairobi OS is optimizing your data pipelines, reducing your cloud bills, or d
 
 For direct inquiries, contact: aiwithafrica@gmail.com
 
-For direct inquiries, contact: aiwithafrica@gmail.com
 
 ---
 

@@ -45,6 +45,38 @@ Daarom ben ik eind 2025 begonnen met het bouwen van een infrastructuurstack die 
 
 ---
 
+## Het Dobbelschrift: 9.180 Bijdragen in het Afgelopen Jaar
+
+Sommige kritici in de moderne ontwikkelaarsgemeenschap kijken naar nieuwe, zeer geavanceerde projecten en schrijden ze af als "AI-gegenereerde sjablooncode". Aan deze skeptici stuur ik de ruwe, fysieke bewijs van de commitlog.
+
+Mijn GitHub-profiel (ChegeKenya) staat als empirisch dossier van intens, dagelijks systeemengineering. In 2025 alleen logeerde ik 7.888 bijdragen. In de eerste vijf maanden van 2026 voegde ik 1.420 bijdragen toe. Dat is 9.180 bijdragen in de afgelopen 365 dagen — een bijna ononderbroken reeks groene commits die low-latency Rust-runtimes, klinische AI-pijplijnen en zero-copy gedeelde geheugensystemen bestrijken. Deze code is geschreven in de weiden, gecompileerd op bare-metal en byte voor byte gecontroleerd.
+
+```
+2025: [██████████████████████████████████████████████████] 7.888 Commits
+  2026: [██████████] 1.420 Commits
+  Totaal (Vorig Jaar): 9.180 Commits van Puur Systeemcode
+```
+
+### Hardware-Natieve Ontwikkelingsbeperkingen
+
+Mijn programmeerreis is geworteld in low-level systeemarchitectuur en extreme, mechanische optimalisatie. In 2015 legde ik mijn visie uit voor het bouwen van gedecentraliseerde, hoogtechnologische capaciteiten op het Afrikaanse continent in [dit traktaat over Kenia's Silicon Valley](https://www.linkedin.com/pulse/building-kenyas-silicon-valley-making-work-kevin-chege/). Toen de LLM-transitie begon in 2023, herkende ik vroeg de structurele beperkingen van high-level wrappers, zoals gedocumenteerd in mijn vroege [LLM-wrapper demonstratie van 2023](https://www.linkedin.com/feed/update/urn:li:activity:7102930955807449088/).
+
+Ik besefte dat het bouwen van high-level wrappers op onstabiele web-APIs een architecturale doodlopende weg was. De echte oorlog wordt uitgevochten op het snijvlak van lokale hardwarebeperkingen en directe resource-toewijzing.
+
+Gedurende 2025 en 2026 woonde en ontwikkelde ik op een sterk beperkt Lenovo X13 ThinkPad:
+
+```
+Processor: AMD Ryzen 5 PRO 4650U (6 Cores, 12 Threads)
+Grafisch: AMD Radeon RX Vega 6 iGPU (Shared Memory Architecture)
+Geheugen: 29 GiB RAM (met hoog systeemgebruik)
+Opslag: 256 GB NVMe (99% vol, zwaar verouderd)
+Host Kernel: Linux 6.17.0-29-generic
+```
+
+Op precies deze machine besteedde ik 2025 aan het bouwen van **Tumz** ([Sarafakai](http://www.sarafakai.com)), een air-gapped, zero-latency klinische beslissingsondersteunende AI. Het voerde gelijktijdig live audio-transcriptie en klinische inferentie uit op de geïntegreerde GPU (iGPU), waarbij het volledige Unified Medical Language System (UMLS) woordenboek resident bleef in gedeelde RAM. Sarafakai partnerde momenteel met een Keniaans ziekenhuis om Tumz te testen in een jaar-long klinisch experiment — omdat menselijke gezondheid rigoureuse, empirische validatie vereist, niet aannames van ontwikkelaars.
+
+---
+
 ## Wereldwijde Tractie & Télémétrie
 
 Gelanceerd op 6 mei 2026, heeft Nairobi OS snel terrein gewonnen onder systeemprogrammeurs, kwantitatieve onderzoekers en edge computing-architecten wereldwijd. Deze downloadstatistieken zijn afkomstig van het live ClickPy Nairobi OS Dashboard.
