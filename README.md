@@ -21,7 +21,7 @@ I am Kevin Chege, 45 year old founder of Sovereign Systems Lab (Nairobi, Kenya).
      Thirteen years lost. Thirteen years to reclaim.
 ```
 
-My programming journey is rooted in low-level systems architecture and extreme optimization. In 2015, I laid out my vision for building decentralized, highly technical capabilities on the African continent in [this treatise on Kenya's Silicon Valley](https://www.linkedin.com/pulse/building-kenyas-silicon-valley-making-work-kevin-chege/). When the LLM gold rush began in 2023, I was early. I built and deployed LLM wrappers, but quickly recognized their limitations, as documented in this early [2023 LLM wrapper demonstration](https://www.linkedin.com/feed/update/urn:li:activity:7102930955807449088/). 
+My programming journey is rooted in low-level systems architecture and extreme optimization. In 2015, I shared my coding background as I made suggestions on building decentralized, highly technical capabilities on the African continent in [this treatise on Kenya's Silicon Valley](https://www.linkedin.com/pulse/building-kenyas-silicon-valley-making-work-kevin-chege/). When the LLM gold rush began in 2023, I was early. I built and deployed LLM wrappers, but quickly recognized their limitations, as documented in this early [2023 LLM wrapper demonstration](https://www.linkedin.com/feed/update/urn:li:activity:7102930955807449088/). 
 
 I realized that building high-level wrappers on top of unstable APIs was a architectural dead-end. The real war is fought at the intersection of local hardware constraints and resource allocation.
 
@@ -56,24 +56,6 @@ My other GitHub profile (https://github.com/ChegeKenya) stands as an empirical r
   2026: [██████████] 1,420 Commits
   Total (Last Year): 9,180 Commits of Pure Systems Code
 ```
-
-### Hardware-Native Development Constraints
-
-My programming journey is rooted in low-level systems architecture and extreme, mechanical optimization. In 2015, I shared my journey into programming, and I laid out my vision for building decentralized, highly technical capabilities on the African continent in [this treatise on Kenya's Silicon Valley](https://www.linkedin.com/pulse/building-kenyas-silicon-valley-making-work-kevin-chege/). When the LLM transition began in 2023, I recognized the structural limitations of high-level wrappers early, as documented in my early [2023 LLM wrapper demonstration](https://www.linkedin.com/feed/update/urn:li:activity:7102930955807449088/).
-
-I realized that building high-level wrappers on top of unstable web APIs was an architectural dead-end. The real war is fought at the intersection of local hardware constraints and direct resource allocation.
-
-Throughout 2025 and 2026, I lived and developed on a highly constrained Lenovo X13 ThinkPad:
-
-```
-Processor: AMD Ryzen 5 PRO 4650U (6 Cores, 12 Threads)
-Graphics: AMD Radeon RX Vega 6 iGPU (Shared Memory Architecture)
-Memory: 29 GiB RAM (with high system utilization)
-Storage: 256 GB NVMe (99% full, heavily resource-constrained)
-Host Kernel: Linux 6.17.0-29-generic
-```
-
-On this exact machine, I spent 2025 building **Tumz** ([Sarafakai](http://www.sarafakai.com)), an air-gapped, zero-latency clinical decision support AI. It executed live, real-time audio transcription and clinical inference simultaneously on the integrated GPU (iGPU), keeping the entire Unified Medical Language System (UMLS) dictionary resident in shared RAM. Sarafakai is now partnering with a Kenyan hospital to pilot Tumz for a year-long clinical trial—because human health requires rigorous, empirical validation, not developer assumptions.
 
 ---
 
@@ -130,17 +112,17 @@ For direct inquiries, contact: aiwithafrica@gmail.com
 
 ## Key Features
 
-* **Computer Use Without Pixels**: Bypasses slow, expensive vision-based agent pipelines. Interacts natively with the Linux desktop through AT-SPI2 and the TOON (Token-Oriented Object Notation) compression algorithm, feeding raw hierarchical trees directly to LLMs.
-* **Zero-Copy Ingestion**: Hardware-accelerated, kernel-bypass data loading utilizing `io_uring` and 1GB Huge Pages.
-* **Hardware-Accelerated Visualization**: Low-latency, interactive Jupyter plotting using the `lagos-lite` rendering daemon, built on `wgpu` and `egui`.
-* **Vectorized Analytical Execution**: Extreme CPU saturation utilizing Polars query execution and Rayon multi-threaded data pipelines.
-* **Sovereign Interface**: A fluent Python API (`SovereignFrame`) that encapsulates memory-mapped file descriptors and IPC.
+- **Computer Use Without Pixels**: AT-SPI2 semantic interface with TOON compression for native desktop interaction
+- **Zero-Copy Ingestion**: `io_uring` and 1GB Huge Pages for kernel-bypass data loading
+- **Hardware-Accelerated Visualization**: Low-latency Jupyter plotting via `lagos-lite` (wgpu/egui)
+- **Vectorized Execution**: Polars query engine + Rayon multi-threaded pipelines
+- **Sovereign Interface**: Python API (`SovereignFrame`) with memory-mapped IPC
 
 ---
 
-## Open Source vs. Enterprise Architecture
+## Architecture
 
-Nairobi OS is structurally bifurcated. The open-source repository provides the fundamental high-performance data processing and single-node visualization primitives. The closed-source commercial ecosystem contains the advanced multi-agent, high-availability, and industry-specific implementations.
+Nairobi OS is structurally bifurcated: the open-source repository provides fundamental high-performance data processing primitives, while the closed-source commercial ecosystem contains advanced multi-agent, high-availability, and industry-specific implementations.
 
 ```
                                   +---------------------------------------+
