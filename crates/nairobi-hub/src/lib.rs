@@ -22,10 +22,14 @@
 //! D-Bus client proxy to Axum Refinery with Semantic Decoder.
 
 pub mod client;
+pub mod dag_parser;
 pub mod decoder;
+pub mod executor;
 pub mod shm_subscriber;
 
 pub use client::RefineryClient;
+pub use dag_parser::{NodeType, ParsedNode};
 pub use decoder::generate_correlation_report;
 pub use decoder::generate_report;
+pub use executor::DagExecutor;
 pub use shm_subscriber::ShmSubscriber;
