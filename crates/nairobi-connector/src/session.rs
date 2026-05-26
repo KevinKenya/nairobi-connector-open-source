@@ -22,6 +22,7 @@ use crate::engine::DFSEngine;
 use crate::error::{NeuralError, Result};
 use crate::safety::WindowLock;
 use crate::toon;
+use atspi::Accessible;
 use std::collections::HashMap;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::time::{Duration, Instant};
@@ -107,11 +108,11 @@ impl NeuralSession {
                     Err(_) => continue,
                 };
 
-                let apps = DFSEngine::get_children(&proxy).await;
+                let apps: Vec<Accessible> = DFSEngine::get_children(&proxy).await;
 
                 for app in apps {
-                    let app_dest = app.name_as_str().unwrap_or_default().to_string();
-                    let app_path = app.path_as_str().to_string();
+                    let app_dest: String = app.name.clone();
+                    let app_path: String = app.path.to_string();
 
                     // 1. Destination Matching (Case-insensitive)
                     let dest_match = app_dest.to_lowercase().contains(&lower_title);
@@ -135,7 +136,7 @@ impl NeuralSession {
                         // Found a candidate application.
 
                         // 3. Handle Empty Trees: sleep 100ms and re-query once.
-                        let mut children = DFSEngine::get_children(&app_proxy).await;
+                        let mut children: Vec<Accessible> = DFSEngine::get_children(&app_proxy).await;
                         if children.is_empty() {
                             sleep(Duration::from_millis(100)).await;
                             children = DFSEngine::get_children(&app_proxy).await;
@@ -152,8 +153,8 @@ impl NeuralSession {
 
                             // Search children (Level 2)
                             for child in children {
-                                let c_dest = child.name_as_str().unwrap_or_default().to_string();
-                                let c_path = child.path_as_str().to_string();
+                                let c_dest: String = child.name.clone();
+                                let c_path: String = child.path.to_string();
                                 let c_proxy = match DFSEngine::timeout_proxy_build(
                                     &self.connection,
                                     &c_dest,
@@ -173,8 +174,8 @@ impl NeuralSession {
                                 // Search grandchildren (Level 3)
                                 let grandchildren = DFSEngine::get_children(&c_proxy).await;
                                 for gc in grandchildren {
-                                    let gc_dest = gc.name_as_str().unwrap_or_default().to_string();
-                                    let gc_path = gc.path_as_str().to_string();
+                                    let gc_dest: String = gc.name.clone();
+                                    let gc_path: String = gc.path.to_string();
                                     let gc_proxy = match DFSEngine::timeout_proxy_build(
                                         &self.connection,
                                         &gc_dest,
@@ -256,7 +257,7 @@ impl NeuralSession {
     }
 
     /// Generate a TOON string for the currently cached window.
-    /// Also caches the ID → (destination, object_path) mapping for action dispatch.
+    /// Also caches the ID → (destination, object path) mapping for action dispatch.
     pub async fn get_ui_map(&self, max_depth: u32) -> Result<(String, u32, u128)> {
         let (dest, path) = self.get_cached_window().await?;
         let proxy =

@@ -15,13 +15,12 @@
 // crates/nairobi-connector/src/engine.rs
 // Author: Kevin Chege, Location: Nairobi, Date: 21st May 2026
 
-//! DFS Tree Traversal Engine — AT-SPI2 accessibility tree DFS with zbus 5.x / atspi 0.30.
+//! DFS Tree Traversal Engine — AT-SPI2 accessibility tree DFS with zbus 3.x / atspi 0.19.
 
 use crate::error::{NeuralError, Result};
 use atspi::{
-    object_ref::ObjectRefOwned,
     proxy::{accessible::AccessibleProxy, action::ActionProxy, text::TextProxy},
-    Role, State,
+    Role, State, Accessible,
 };
 use std::sync::Arc;
 use std::time::Duration;
@@ -87,7 +86,7 @@ impl DFSEngine {
             .await.unwrap_or_else(|_| Ok(Role::Unknown)).unwrap_or(Role::Unknown)
     }
 
-    pub async fn get_children(proxy: &AccessibleProxy<'_>) -> Vec<ObjectRefOwned> {
+    pub async fn get_children(proxy: &AccessibleProxy<'_>) -> Vec<Accessible> {
         timeout(DFS_TIMEOUT, proxy.get_children())
             .await.unwrap_or_else(|_| Ok(Vec::new())).unwrap_or_default()
     }
@@ -104,7 +103,7 @@ impl DFSEngine {
 
     pub fn is_semantic_role(role: Role) -> bool {
         matches!(role,
-            Role::Button | Role::ToggleButton | Role::Link | Role::Entry
+            Role::PushButton | Role::ToggleButton | Role::Link | Role::Entry
             | Role::Text | Role::DocumentText | Role::Terminal
             | Role::Heading | Role::MenuItem | Role::Alert | Role::Dialog
             | Role::Frame | Role::PageTab | Role::Label
@@ -116,7 +115,7 @@ impl DFSEngine {
 
     pub fn is_interactive_role(role: Role) -> bool {
         matches!(role,
-            Role::Button | Role::ToggleButton | Role::MenuItem
+            Role::PushButton | Role::ToggleButton | Role::MenuItem
             | Role::CheckMenuItem | Role::RadioMenuItem | Role::Entry
             | Role::PasswordText | Role::SpinButton | Role::Slider
             | Role::ComboBox | Role::ListItem | Role::PageTab
@@ -193,7 +192,7 @@ impl DFSEngine {
         };
         if let Ok(Ok(actions)) = timeout(DFS_TIMEOUT, ap.get_actions()).await {
             return actions.into_iter().filter_map(|a| {
-                let c = Self::clean_label(&a.name);
+                let c = Self::clean_label(&a.0);
                 if !c.is_empty() && c.chars().any(|ch| ch.is_alphabetic()) { Some(c) } else { None }
             }).collect();
         }
@@ -236,7 +235,7 @@ impl DFSEngine {
             let actions = if is_semantic { Self::get_actions(&conn, &dest_str, &pth_str).await } else { vec![] };
             let state_set = Self::get_state_set(&proxy).await;
             let states = state_set.iter().collect::<Vec<_>>();
-            let children_raw = if depth < MAX_DEPTH { Self::get_children(&proxy).await } else { vec![] };
+            let children_raw: Vec<Accessible> = if depth < MAX_DEPTH { Self::get_children(&proxy).await } else { vec![] };
             (role, name, actions, states, children_raw)
         };
         if children_raw.is_empty() {
@@ -244,8 +243,8 @@ impl DFSEngine {
         }
         let mut futures = vec![];
         for child in children_raw {
-            let nd = child.name_as_str().unwrap_or_default().to_string();
-            let np = child.path_as_str().to_string();
+            let nd: String = child.name.clone();
+            let np: String = child.path.to_string();
             let s = semaphore.clone();
             let c = conn.clone();
             futures.push(tokio::spawn(async move {
