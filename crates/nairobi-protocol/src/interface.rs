@@ -44,3 +44,11 @@ pub const SERVICE_NAME: &str = "org.nairobi.NairobiAxumRefinery1";
 /// The object path at which the Refinery interface is mounted.
 pub const OBJECT_PATH: &str = "/org/nairobi/NairobiAxumRefinery1";
 
+/// The D-Bus interface name for the Nairobi Hub's ExecuteDag endpoint.
+///
+/// Methods on this interface:
+/// - `ExecuteDag(ay dag_bytes) → s` - Executes a compiled DAG, returns status/result
+pub const HUB_INTERFACE_NAME: &str = "org.nairobi.NairobiHub1";
+pub const HUB_SERVICE_NAME: &str = "org.nairobi.NairobiHub1";
+pub const HUB_OBJECT_PATH: &str = "/org/nairobi/NairobiHub1";
+
