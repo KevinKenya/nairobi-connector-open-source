@@ -19,6 +19,7 @@
 // nairobi-open-source-release/crates/nairobi-python/src/lib.rs
 use pyo3::prelude::*;
 
+mod canvas_bridge;
 mod data_bridge;
 mod types;
 
@@ -28,6 +29,11 @@ fn _core(py: Python, m: &PyModule) -> PyResult<()> {
     let data_module = PyModule::new(py, "data")?;
     data_bridge::init_module(data_module)?;
     m.add_submodule(data_module)?;
+
+    // Create canvas submodule
+    let canvas_module = PyModule::new(py, "canvas")?;
+    canvas_bridge::init_module(canvas_module)?;
+    m.add_submodule(canvas_module)?;
 
     Ok(())
 }
