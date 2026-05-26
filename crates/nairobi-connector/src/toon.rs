@@ -27,11 +27,11 @@ use std::collections::HashMap;
 use std::time::Instant;
 
 /// Interactive roles that are actionable by AI (kept in TOON output).
-/// Uses atspi 0.30 Role variants (Button, CheckMenuItem, RadioMenuItem, etc.)
+/// Uses atspi 0.19 Role variants (PushButton, CheckMenuItem, RadioMenuItem, etc.)
 fn is_interactive(role: Role) -> bool {
     matches!(
         role,
-        Role::Button
+        Role::PushButton
             | Role::ToggleButton
             | Role::MenuItem
             | Role::CheckMenuItem
@@ -135,9 +135,9 @@ fn serialize_toon(
             output.push_str(&format!("[ID: {}] ", id));
         }
 
-        // Human-readable role name (using atspi 0.30 variant names)
+        // Human-readable role name (using atspi 0.19 variant names)
         let role_name = match node.role {
-            Role::Button => "Button",
+            Role::PushButton => "Button",
             Role::ToggleButton => "ToggleButton",
             Role::MenuItem => "MenuItem",
             Role::CheckMenuItem => "CheckMenu",
