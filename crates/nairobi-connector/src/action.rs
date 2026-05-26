@@ -63,7 +63,8 @@ pub async fn do_action_by_name(
         .map_err(|e| NeuralError::ActionFailed(format!("GetActions failed: {}", e)))?;
     let lower_name = name.to_lowercase();
     for (i, action) in actions.iter().enumerate() {
-        if action.name.to_lowercase() == lower_name {
+        // Actions are tuples (name, description, key_binding) in atspi 0.19
+        if action.0.to_lowercase() == lower_name {
             return do_action(conn, dest, path, i as i32).await;
         }
     }
@@ -83,7 +84,7 @@ pub async fn get_available_actions(
     match timeout(ACTION_TIMEOUT, proxy.get_actions()).await {
         Ok(Ok(actions)) => actions
             .into_iter()
-            .map(|a| (a.name.clone(), a.description.clone()))
+            .map(|a| (a.0, a.1))  // (name, description)
             .collect(),
         _ => Vec::new(),
     }
@@ -246,8 +247,7 @@ async fn execute_select_index(
 }
 
 // ─── Proxy Builders ────────────────────────────────────────────
-// zbus 5.x API: builder(conn) → Builder, .destination(dest) → Result<Builder>,
-// .path(path) → Result<Builder>, .build() → async Result<Proxy>
+// zbus 3.x / atspi 0.19 proxy builder pattern
 
 async fn build_action_proxy<'a>(
     conn: &'a Connection, dest: &'a str, path: &'a str,
