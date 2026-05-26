@@ -10,9 +10,11 @@ members = [
     "crates/nairobi-hub",
     "crates/nairobi-python",
     "crates/lagos-lite", "crates/nairobi-connector",
+    "crates/nairobi-canvas",
 ]
 
 [workspace.dependencies]
+byteorder = "1"
 iceoryx2 = "0.3.0"
 zbus = { version = "3.15", features = ["gvariant"] }
 tokio = { version = "1.36", features = ["full"] }
@@ -26,12 +28,12 @@ tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 pyo3 = { version = "0.20", features = ["extension-module"] }
 # AT-SPI2 / Action Engine dependencies (nairobi-connector)
-atspi = "0.30"
+atspi = { version = "0.19", default-features = false, features = ["tokio", "connection-tokio", "proxies-tokio"] }
 async-recursion = "1"
 futures-util = "0.3"
 thiserror = "2"
 anyhow = "1"
 rmcp = { version = "1.5", features = ["server", "transport-io", "macros"] }
 schemars = "1"
-zbus_names = "4"
-zvariant = "5"
+zbus_names = "2"
+zvariant = { version = "3.15", features = ["gvariant"] }

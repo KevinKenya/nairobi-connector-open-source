@@ -1,5 +1,19 @@
+# Copyright 2026 Kevin Chege
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 # File: /home/KevinKenya/nairobi-connector-open-source/crates/nairobi-hub/Cargo.toml
-# Author: Kevin Chege
+# Author: Kevin Chege. Location: Nairobi
 # Date: 2026-05-21
 
 # nairobi-open-source-release/crates/nairobi-hub/Cargo.toml
@@ -16,18 +30,27 @@ description = "The Orchestrator — D-Bus client proxy to Axum Refinery with Sem
 name = "nairobi_hub"
 path = "src/lib.rs"
 
+[[bin]]
+name = "nairobi-hub"
+path = "src/main.rs"
+
 [dependencies]
 # The Constitution
 nairobi-protocol = { path = "../nairobi-protocol" }
+nairobi-canvas = { path = "../nairobi-canvas" }
 
 # D-Bus / GVariant
 zbus = { workspace = true }
+zvariant = { workspace = true }
+byteorder = { workspace = true }
 
-# Async runtime (rt only — the Hub is a library, not a daemon)
-tokio = { workspace = true, features = ["rt"] }
+# Async runtime (full features for daemon)
+tokio = { workspace = true, features = ["rt", "macros", "signal"] }
 
 # JSON deserialization (iceoryx2 arena payloads)
 serde_json = { workspace = true }
+serde = { workspace = true }
+thiserror = { workspace = true }
 libc = { workspace = true }
 
 # Zero-copy shared memory IPC (Data Plane)
@@ -35,6 +58,7 @@ iceoryx2 = { workspace = true }
 
 # Logging
 tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
 
 # Cryptographic hashing (DORA Compliance)
 sha2 = { workspace = true }

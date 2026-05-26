@@ -85,6 +85,14 @@ crunch_and_correlate = _core.data.crunch_and_correlate
 free = _core.data.free
 get_fd = _core.data.get_fd
 
+# Canvas namespace for nairobi_os.canvas.* pattern
+class CanvasNamespace:
+    def __init__(self):
+        self.open = _core.canvas.open
+        self.execute = _core.canvas.execute
+
+canvas = CanvasNamespace()
+
 # Import framework, lagos, and ui modules
 from . import framework
 from . import lagos
@@ -106,6 +114,7 @@ logger = logging.getLogger(__name__)
 
 # Global reference to the refinery process
 _refinery_process = None
+_hub_process = None
 
 def start_refinery(binary_path=None, timeout=15):
     """
@@ -193,5 +202,74 @@ def stop_refinery():
             _refinery_process.kill()
         _refinery_process = None
         logger.info("🛑 Refinery stopped.")
+
+def _check_hub_service():
+    """Check if Hub service is registered on D-Bus."""
+    try:
+        result = subprocess.run(
+            ["busctl", "--user", "status", "org.nairobi.NairobiHub1"],
+            capture_output=True,
+            text=True
+        )
+        return result.returncode == 0
+    except Exception:
+        return False
+
+def ignite(binary_path=None, timeout=15):
+    """
+    Start both Nairobi Axum Refinery and Nairobi Hub daemons.
+    """
+    global _refinery_process, _hub_process
+    
+    start_refinery(binary_path, timeout)
+    
+    if _hub_process is not None:
+        if _hub_process.poll() is None:
+            return True
+        else:
+            _hub_process = None
+    
+    bin_dir = Path(__file__).parent / "bin"
+    hub_binary = bin_dir / "nairobi-hub"
+    
+    if not hub_binary.exists():
+        raise RuntimeError(f"Hub binary not found at {hub_binary}")
+    
+    try:
+        log_path = Path.home() / ".nairobi_hub.log"
+        log_file = open(log_path, "a")
+        
+        _hub_process = subprocess.Popen(
+            [str(hub_binary)],
+            start_new_session=True,
+            stdout=log_file,
+            stderr=log_file
+        )
+        
+        logger.info(f"🚀 Igniting Nairobi Hub (PID: {_hub_process.pid})")
+        logger.info(f"📝 Logs: {log_path}")
+        
+        start_time = time.time()
+        while time.time() - start_time < timeout:
+            if _check_hub_service():
+                logger.info("✅ Nairobi Hub is live on D-Bus")
+                return True
+            
+            if _hub_process.poll() is not None:
+                break
+                
+            time.sleep(0.5)
+        
+        if _hub_process.poll() is not None:
+            error_msg = "Hub process exited immediately. Check ~/.nairobi_hub.log"
+        else:
+            error_msg = f"Systemic Seizure: Hub failed to register on D-Bus within {timeout}s"
+            _hub_process.terminate()
+            _hub_process = None
+            
+        raise RuntimeError(error_msg)
+        
+    except Exception as e:
+        raise RuntimeError(f"Failed to ignite hub: {e}")
 
 #

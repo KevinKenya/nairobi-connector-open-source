@@ -13,12 +13,12 @@ name = "nairobi-connector"
 path = "src/main.rs"
 
 [dependencies]
-# AT-SPI2 accessibility (latest stable — uses zbus 5.x internally)
-atspi = "0.30"
-# D-Bus communication — must match atspi 0.30's zbus 5.x requirement
-zbus = "5"
-zbus_names = "4"
-zvariant = "5"
+# AT-SPI2 accessibility (uses zbus 3.x for GVariant compatibility)
+atspi = { version = "0.19", default-features = false, features = ["tokio", "connection-tokio", "proxies-tokio"] }
+# D-Bus communication — must match atspi 0.19's zbus 3.x requirement
+zbus = { workspace = true }
+zbus_names = { workspace = true }
+zvariant = { workspace = true }
 # Async runtime
 tokio = { version = "1", features = ["full"] }
 # Serialization
