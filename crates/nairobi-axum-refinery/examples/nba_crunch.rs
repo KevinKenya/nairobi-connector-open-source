@@ -12,11 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// File: /home/KevinKenya/nairobi-connector-open-source/crates/nairobi-axum-refinery/examples/nba_crunch.rs
+// crates/nairobi-axum-refinery/examples/nba_crunch.rs
 // Author: Kevin Chege. Location: Nairobi
 // Date: 2026-05-21
 
-// nairobi-open-source-release/crates/nairobi-axum-refinery/examples/nba_crunch.rs
 use nairobi_axum_refinery::analyze::{get_peak_rss, AnalyzeEngine};
 use nairobi_protocol::MemoryPipe;
 use std::fs::File;
@@ -29,10 +28,12 @@ use zbus::zvariant::OwnedFd;
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let start_total = Instant::now();
 
-    let home = std::env::var("HOME")?;
-    let csv_path =
-        PathBuf::from("simulator/PlayerStatisticsExtended.csv");
-    let log_path = PathBuf::from("axum_nba_strike.log");
+    let workspace_root = std::env::var("CARGO_MANIFEST_DIR")
+        .map(|p| PathBuf::from(p).parent().map(|p| p.parent().map(|p| p.to_path_buf()).unwrap_or_default()).unwrap_or_default())
+        .unwrap_or_else(|_| std::env::current_dir().unwrap_or_default());
+
+    let csv_path = workspace_root.join("simulator/PlayerStatisticsExtended.csv");
+    let log_path = workspace_root.join("axum_nba_strike.log");
 
     println!("Starting Axum Isolation Strike: NBA Dataset (Kernel-Space Ingestion)...");
 
@@ -161,8 +162,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     for (i, anomaly) in analytics.anomalies.iter().enumerate() {
         report.push_str(&format!("Anomaly #{}: {}\n", i + 1, anomaly));
     }
+    report.push_str("\n");
 
-    report.push_str("\n[PANDAS/NUMPY BENCHMARK COMPARISON (Reference)]\n");
+    report.push_str("[PANDAS/NUMPY BENCHMARK COMPARISON (Reference)]\n");
     report.push_str("Implementation         | Peak Memory | Ingestion Time | Analysis Time | Total Strike Time\n");
     report.push_str(
         "---------------------------------------------------------------------------------------\n",
