@@ -51,7 +51,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut ingestion_strategy = "Kernel-Space Splice (copy_file_range)";
 
     // Attempt Kernel-Space Splice
-    let mut total_copied: i64 = 0;
     let mut off_in: libc::loff_t = 0;
     let mut off_out: libc::loff_t = 0;
 
@@ -71,7 +70,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             return Err(format!("Kernel Splice Failure: {}", err).into());
         }
     } else {
-        total_copied = ret as i64;
+        let mut total_copied: i64 = ret as i64;
         while total_copied < file_size as i64 {
             let bytes_to_copy = std::cmp::min(1024 * 1024 * 1024, file_size as i64 - total_copied);
             let ret = unsafe {
@@ -120,7 +119,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let peak_rss = get_peak_rss();
 
     // --- PHASE 3: FORENSIC LOGGING ---
-    let mut log_file = File::create(log_path)?;
+    let mut log_file = File::create(&log_path)?;
     let mut report = String::new();
     report.push_str("=== FORENSIC AUDIT REPORT: AXUM ISOLATION STRIKE ===\n\n");
     report.push_str("[METADATA]\n");
@@ -162,26 +161,19 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     for (i, anomaly) in analytics.anomalies.iter().enumerate() {
         report.push_str(&format!("Anomaly #{}: {}\n", i + 1, anomaly));
     }
-    report.push_str("\n");
-
-    report.push_str("[PANDAS/NUMPY BENCHMARK COMPARISON (Reference)]\n");
-    report.push_str("Implementation         | Peak Memory | Ingestion Time | Analysis Time | Total Strike Time\n");
-    report.push_str(
-        "---------------------------------------------------------------------------------------\n",
-    );
-    report.push_str(
-        "Nairobi Axum (Rust)    | 1981.60 MB  | 650 ms         | 1248 ms       | 1898 ms\n",
-    );
-    report.push_str(
-        "Pandas/NumPy (Python)  | 1530.41 MB  | 6399 ms        | 62 ms         | 6461 ms\n",
-    );
-    report.push_str("\nNote: Pandas parses CSV text to floats during ingestion (slow ingestion, fast analysis). \n");
-    report.push_str("Rust Axum uses Lazy Evaluation on zero-copy Mmap (fast ingestion, parses during analysis).\n");
-    report.push_str("Overall, Rust Axum completes the end-to-end pipeline ~3.4x faster.\n\n");
 
     log_file.write_all(report.as_bytes())?;
     println!("Strike complete. Strategy: {}", ingestion_strategy);
     println!("Total latency: {} ms", total_latency.as_millis());
+    println!("\n=== SUMMARY ===");
+    println!("Source File: {}", csv_path.display());
+    println!("Total Rows: {}", analytics.total_rows);
+    println!("Total Columns: {}", column_count);
+    println!("Mean Points: {:.4}", analytics.mean);
+    println!("Max Points: {:.4}", analytics.max);
+    println!("Std Dev: {:.4}", analytics.std_dev);
+    println!("P99: {:.4}", analytics.p99);
+    println!("\nFull report saved to: {}\n", log_path.display());
 
     Ok(())
 }
