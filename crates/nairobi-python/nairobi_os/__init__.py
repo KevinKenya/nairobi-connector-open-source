@@ -33,10 +33,15 @@ Example Usage:
     >>> import nairobi_os
     >>> import pandas as pd
     >>> 
-    >>> # Start the refinery daemon
-    >>> nairobi_os.start_refinery()
+    >>> # Initialize the infrastructure (starts both Refinery and Hub daemons)
+    >>> nairobi_os.ignite()
     >>> 
-    >>> # Ingest and analyze data in a single call
+    >>> # Open the canvas to compile a DAG
+    >>> dag_bytes = nairobi_os.canvas.open()
+    >>> if dag_bytes:
+    >>>     nairobi_os.canvas.execute(dag_bytes)
+    >>> 
+    >>> # Or use data pipeline directly
     >>> result = nairobi_os.data.pipeline(
     ...     "large_dataset.csv",
     ...     "value_column",
@@ -45,10 +50,6 @@ Example Usage:
     >>> 
     >>> # Convert results to pandas for further analysis
     >>> df_result = pd.json_normalize([result])
-    >>> 
-    >>> # Create interactive visualization
-    >>> widget = nairobi_os.lagos.plot_inline(handle_id="abc-123")
-    >>> widget  # Display in Jupyter
     >>> 
     >>> # Cleanup
     >>> nairobi_os.stop_refinery()
@@ -193,7 +194,8 @@ def _check_dbus_service():
         return False
 
 def stop_refinery():
-    global _refinery_process
+    """Stop the Refinery daemon and its spawned Hub daemon."""
+    global _refinery_process, _hub_process
     if _refinery_process:
         try:
             _refinery_process.terminate()
@@ -202,27 +204,26 @@ def stop_refinery():
             _refinery_process.kill()
         _refinery_process = None
         logger.info("🛑 Refinery stopped.")
-
-def _check_hub_service():
-    """Check if Hub service is registered on D-Bus."""
-    try:
-        result = subprocess.run(
-            ["busctl", "--user", "status", "org.nairobi.NairobiHub1"],
-            capture_output=True,
-            text=True
-        )
-        return result.returncode == 0
-    except Exception:
-        return False
+    if _hub_process:
+        try:
+            _hub_process.terminate()
+            _hub_process.wait(timeout=2)
+        except Exception:
+            _hub_process.kill()
+        _hub_process = None
+        logger.info("🛑 Hub stopped.")
 
 def ignite(binary_path=None, timeout=15):
     """
     Start both Nairobi Axum Refinery and Nairobi Hub daemons.
+    This is the primary entry point for initializing the Nairobi OS infrastructure.
     """
     global _refinery_process, _hub_process
     
+    # Start Refinery first (Hub depends on it)
     start_refinery(binary_path, timeout)
     
+    # Start Hub daemon
     if _hub_process is not None:
         if _hub_process.poll() is None:
             return True
@@ -264,7 +265,8 @@ def ignite(binary_path=None, timeout=15):
             error_msg = "Hub process exited immediately. Check ~/.nairobi_hub.log"
         else:
             error_msg = f"Systemic Seizure: Hub failed to register on D-Bus within {timeout}s"
-            _hub_process.terminate()
+            if _hub_process is not None:
+                _hub_process.terminate()
             _hub_process = None
             
         raise RuntimeError(error_msg)
@@ -272,4 +274,14 @@ def ignite(binary_path=None, timeout=15):
     except Exception as e:
         raise RuntimeError(f"Failed to ignite hub: {e}")
 
-#
+def _check_hub_service():
+    """Check if Hub service is registered on D-Bus."""
+    try:
+        result = subprocess.run(
+            ["busctl", "--user", "status", "org.nairobi.NairobiHub1"],
+            capture_output=True,
+            text=True
+        )
+        return result.returncode == 0
+    except Exception:
+        return False
