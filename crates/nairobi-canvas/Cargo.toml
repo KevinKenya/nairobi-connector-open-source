@@ -1,0 +1,24 @@
+[package]
+name = "nairobi-canvas"
+version = "0.4.2"
+edition = "2021"
+authors = ["Kevin Chege <aiwithafrica@gmail.com>"]
+license = "Apache-2.0"
+description = "Nairobi Canvas: Immediate-Mode Node Graph Visual Compiler"
+
+[lib]
+name = "nairobi_canvas"
+path = "src/lib.rs"
+
+[dependencies]
+egui = "0.26"
+egui-snarl = "0.3.0"
+zvariant = { workspace = true, features = ["gvariant"] }
+byteorder = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+nairobi-protocol = { path = "../nairobi-protocol" }
+
+[dev-dependencies]
+eframe = "0.26"
