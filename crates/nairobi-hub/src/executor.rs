@@ -14,7 +14,7 @@
 
 use crate::dag_parser::NodeType;
 use nairobi_protocol::ImperialError;
-use tracing::{info, warn};
+use tracing::info;
 use zbus::zvariant::OwnedFd;
 use std::os::unix::io::{AsRawFd, FromRawFd};
 
@@ -114,7 +114,37 @@ impl DagExecutor {
                     info!("Node {}: AxiomCrunch completed", node.node_id);
                 }
                 NodeType::LagosPlot => {
-                    warn!("Node {}: LagosPlot is a placeholder", node.node_id);
+                    let input_fd = if let Some(&input_id) = node.input_edges.first() {
+                        match result_store.get(&input_id) {
+                            Some(NodeResult::Handle(fd)) => fd.as_raw_fd(),
+                            _ => return Err(ImperialError::SystemicSeizure(format!("Node {}: Missing input handle for LagosPlot", node.node_id))),
+                        }
+                    } else {
+                        return Err(ImperialError::SystemicSeizure(format!(
+                            "Node {}: LagosPlot requires input",
+                            node.node_id
+                        )));
+                    };
+
+                    let format = node
+                        .params
+                        .get("format")
+                        .and_then(|p| p.as_str())
+                        .unwrap_or("sparkline");
+
+                    info!("Node {}: LagosPlot rendering (format: {}, input_fd: {})", node.node_id, format, input_fd);
+
+                    let output = std::process::Command::new("lagos-vision-daemon")
+                        .arg("--fd")
+                        .arg(input_fd.to_string())
+                        .output()
+                        .map_err(|e| ImperialError::SystemicSeizure(format!("Failed to spawn lagos-vision-daemon: {}", e)))?;
+
+                    if !output.status.success() {
+                        let stderr = String::from_utf8_lossy(&output.stderr);
+                        return Err(ImperialError::SystemicSeizure(format!("LagosPlot failed: {}", stderr)));
+                    }
+                }
                 }
             }
         }
