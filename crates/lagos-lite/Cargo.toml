@@ -30,6 +30,7 @@ serde = { workspace = true }
 serde_json = { workspace = true }
 crossbeam-channel = "0.5"
 futures-util = "0.3"
+image = "0.24"
 
 # CLI & Zero-Copy (for the daemon)
 clap = { version = "4", features = ["derive"] }
@@ -38,3 +39,7 @@ libc = { workspace = true }
 
 [dev-dependencies]
 image = "0.24"
+
+[[example]]
+name = "basic_plot"
+path = "examples/basic_plot.rs"
