@@ -39,6 +39,7 @@ nairobi-canvas = { path = "../nairobi-canvas" }
 egui = "0.26"
 egui-snarl = "0.3.0"
 eframe = "0.26"
+tracing = { workspace = true }
 
 [build-dependencies]
 pyo3-build-config = "0.20"
