@@ -33,3 +33,4 @@ pub use error::{NeuralError, Result};
 pub use safety::WindowLock;
 pub use session::NeuralSession;
 pub use server::NairobiServer;
+pub use engine::UISnapshot;
