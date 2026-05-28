@@ -21,30 +21,22 @@
 // Tests MemoryPipe, GVariant serialization, and D-Bus interface constants.
 
 use nairobi_protocol::{CleanDataStrategy, DistilledAnalytics, MemoryPipe, SchemaInspection};
-use std::os::fd::FromRawFd;
-use std::path::Path;
 
 /// Helper function to read a file and check if it contains a pattern
 /// Uses workspace root as base if path is relative
 fn file_contains(path: &str, pattern: &str) -> bool {
-    // Try relative to current dir, then try workspace root
-    let workspace_root = std::env::var("CARGO_WORKSPACE_DIR")
-        .unwrap_or_else(|_| "./".to_string());
+    // Use workspace root (cargo test runs from workspace root)
+    let workspace_root = workspace_root();
 
-    let paths_to_try = vec![
-        Path::new(&workspace_root).join(path),
-        Path::new(path).to_path_buf(),
-        Path::new("/app").join(path),
-    ];
+    std::fs::read_to_string(workspace_root.join(path))
+        .map(|text| text.contains(pattern))
+        .unwrap_or(false)
+}
 
-    for p in paths_to_try {
-        if let Ok(text) = std::fs::read_to_string(&p) {
-            if text.contains(pattern) {
-                return true;
-            }
-        }
-    }
-    false
+fn workspace_root() -> std::path::PathBuf {
+    std::env::var("CARGO_MANIFEST_DIR")
+        .map(|manifest_dir| std::path::PathBuf::from(manifest_dir).parent().unwrap().parent().unwrap().to_path_buf())
+        .unwrap_or_else(|_| std::path::PathBuf::from("/home/chege/nairobi-connector-open-source"))
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
