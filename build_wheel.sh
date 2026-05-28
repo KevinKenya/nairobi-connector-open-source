@@ -26,16 +26,22 @@ echo "Nairobi OS v0.4.0: Heavy Iron Build Orchestrator"
 echo "=========================================="
 
 # 1. Build the Microservice Binaries in parallel
-echo "Step 1: Compiling Microservices (Refinery, Lagos & Connector)..."
-cargo build --release -p nairobi-axum-refinery -p lagos-lite -p nairobi-connector
+echo "Step 1: Compiling Microservices (Refinery, Hub, Lagos & Connector)..."
+cargo build --release -p nairobi-axum-refinery -p nairobi-hub -p lagos-lite -p nairobi-connector
 
 # 2. Locate and Prepare Binaries
 REFINERY_BIN="$PROJECT_ROOT/target/release/nairobi-axum-refinery"
+HUB_BIN="$PROJECT_ROOT/target/release/nairobi-hub"
 LAGOS_BIN="$PROJECT_ROOT/target/release/lagos-vision-daemon"
 CONNECTOR_BIN="$PROJECT_ROOT/target/release/nairobi-connector"
 
 if [ ! -f "$REFINERY_BIN" ]; then
     echo "ERROR: Refinery binary not found at $REFINERY_BIN"
+    exit 1
+fi
+
+if [ ! -f "$HUB_BIN" ]; then
+    echo "ERROR: Hub binary not found at $HUB_BIN"
     exit 1
 fi
 
@@ -53,15 +59,18 @@ echo "Step 2: Preparing binaries for distribution..."
 mkdir -p "$BIN_DEST_DIR"
 
 cp "$REFINERY_BIN" "$BIN_DEST_DIR/"
+cp "$HUB_BIN" "$BIN_DEST_DIR/"
 cp "$LAGOS_BIN" "$BIN_DEST_DIR/"
 cp "$CONNECTOR_BIN" "$BIN_DEST_DIR/"
 
 # Remove debug symbols to save space
 strip "$BIN_DEST_DIR/nairobi-axum-refinery"
+strip "$BIN_DEST_DIR/nairobi-hub"
 strip "$BIN_DEST_DIR/lagos-vision-daemon"
 strip "$BIN_DEST_DIR/nairobi-connector"
 
 chmod +x "$BIN_DEST_DIR/nairobi-axum-refinery"
+chmod +x "$BIN_DEST_DIR/nairobi-hub"
 chmod +x "$BIN_DEST_DIR/lagos-vision-daemon"
 chmod +x "$BIN_DEST_DIR/nairobi-connector"
 
