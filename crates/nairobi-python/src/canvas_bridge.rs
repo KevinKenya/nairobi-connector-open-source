@@ -21,7 +21,7 @@ use egui_snarl::Snarl;
 use nairobi_canvas::{compile_graph, NairobiNode, NairobiViewer};
 use pyo3::prelude::*;
 use std::sync::{Arc, Mutex};
-use zbus::Connection;
+use tracing::info;
 
 struct PythonCanvasApp {
     snarl: Snarl<NairobiNode>,
@@ -44,7 +44,7 @@ impl eframe::App for PythonCanvasApp {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         egui::TopBottomPanel::top("top_panel").show(ctx, |ui| {
             ui.horizontal(|ui| {
-                ui.heading("Nairobi Visual Compiler");
+                ui.heading("Nairobi Canvas");
                 ui.separator();
 
                 if ui.button("Compile & Close").clicked() {
@@ -102,32 +102,40 @@ pub fn init_module(m: &PyModule) -> PyResult<()> {
     Ok(())
 }
 
-#[zbus::dbus_proxy(
-    interface = "org.nairobi.NairobiHub1",
-    default_service = "org.nairobi.NairobiHub1",
-    default_path = "/org/nairobi/NairobiHub1"
-)]
-pub trait Hub {
-    async fn execute_dag(&self, dag_bytes: Vec<u8>) -> zbus::Result<String>;
-}
-
 #[pyfunction]
-pub fn execute(_py: Python, dag_bytes: Vec<u8>) -> PyResult<Option<String>> {
-    _py.allow_threads(move || {
-        let rt = tokio::runtime::Runtime::new().map_err(|e| {
-            pyo3::exceptions::PyRuntimeError::new_err(format!("Failed to create runtime: {}", e))
-        })?;
-        let result = rt.block_on(async {
-            let connection = Connection::session().await.map_err(|e| {
+pub fn execute(py: Python, dag_bytes: Vec<u8>) -> PyResult<()> {
+    let rt = tokio::runtime::Runtime::new().map_err(|e| {
+        pyo3::exceptions::PyRuntimeError::new_err(format!("Failed to create runtime: {}", e))
+    })?;
+
+    py.allow_threads(|| {
+        rt.block_on(async {
+            let connection = zbus::Connection::session().await.map_err(|e| {
                 pyo3::exceptions::PyRuntimeError::new_err(format!("D-Bus connection failed: {}", e))
             })?;
-            let proxy = HubProxy::new(&connection).await.map_err(|e| {
+
+            let proxy = zbus::Proxy::new(
+                &connection,
+                "org.nairobi.NairobiHub1",
+                "/org/nairobi/NairobiHub1",
+                "org.nairobi.NairobiHub1",
+            ).await.map_err(|e| {
                 pyo3::exceptions::PyRuntimeError::new_err(format!("Failed to create Hub proxy: {}", e))
             })?;
-            proxy.execute_dag(dag_bytes).await.map_err(|e| {
-                pyo3::exceptions::PyRuntimeError::new_err(format!("ExecuteDag failed: {}", e))
-            })
-        });
-        result.map(Some)
+
+            let response: String = proxy
+                .call_method("execute_dag", &(dag_bytes,))
+                .await
+                .map_err(|e| {
+                    pyo3::exceptions::PyRuntimeError::new_err(format!("execute_dag failed: {}", e))
+                })?
+                .body()
+                .map_err(|e| {
+                    pyo3::exceptions::PyRuntimeError::new_err(format!("Failed to read response: {}", e))
+                })?;
+
+            info!("DAG execution result: {}", response);
+            Ok::<(), PyErr>(())
+        })
     })
 }
