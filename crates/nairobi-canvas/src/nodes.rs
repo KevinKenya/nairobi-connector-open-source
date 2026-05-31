@@ -18,11 +18,31 @@ use egui_snarl::{
     InPin, NodeId, OutPin, Snarl,
 };
 use serde::{Deserialize, Serialize};
+use std::sync::{Arc, Mutex, OnceLock};
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+static FILE_PICKER: OnceLock<Arc<Mutex<Option<NodeId>>>> = OnceLock::new();
+
+pub fn get_file_picker() -> Arc<Mutex<Option<NodeId>>> {
+    FILE_PICKER.get_or_init(|| Arc::new(Mutex::new(None))).clone()
+}
+
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
 pub enum PlotFormat {
+    #[default]
     Sparkline,
     Scatter,
+    Png,
+    Jpg,
+}
+
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub enum QueryPreset {
+    #[default]
+    AllColumns,
+    SingleColumn,
+    WhereClause,
+    MultiColumn,
+    Custom,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -32,6 +52,8 @@ pub enum NairobiNode {
     },
     SqlQuery {
         query: String,
+        #[serde(default)]
+        preset: QueryPreset,
     },
     AxiomCrunch {
         column: String,
@@ -41,6 +63,8 @@ pub enum NairobiNode {
     },
     LagosPlot {
         format: PlotFormat,
+        width: u32,
+        height: u32,
     },
 }
 
@@ -89,10 +113,37 @@ impl SnarlViewer<NairobiNode> for NairobiViewer {
     ) {
         match &mut snarl[node] {
             NairobiNode::Ingest { dataset_path } => {
-                ui.label("Dataset Path:");
-                ui.text_edit_singleline(dataset_path);
+                ui.horizontal(|ui| {
+                    ui.label("Dataset Path:");
+                    ui.text_edit_singleline(dataset_path);
+                    if ui.button("📂").clicked() {
+                        if let Ok(mut browse) = get_file_picker().lock() {
+                            *browse = Some(node);
+                        }
+                    }
+                });
             }
-            NairobiNode::SqlQuery { query } => {
+            NairobiNode::SqlQuery { query, preset } => {
+                ui.label("Query Preset:");
+                ui.menu_button("Select Preset", |ui| {
+                    let presets: Vec<(QueryPreset, &str)> = vec![
+                        (QueryPreset::AllColumns, "SELECT * FROM dataset"),
+                        (QueryPreset::SingleColumn, "SELECT column FROM dataset"),
+                        (QueryPreset::WhereClause, "SELECT * FROM dataset WHERE column > value"),
+                        (QueryPreset::MultiColumn, "SELECT column1, column2 FROM dataset"),
+                        (QueryPreset::Custom, "Custom"),
+                    ];
+                    for (opt, label) in presets {
+                        if ui.selectable_label(*preset == opt, label).clicked() {
+                            *preset = opt;
+                            if *preset != QueryPreset::Custom {
+                                *query = label.to_string();
+                            }
+                            ui.close_menu();
+                        }
+                    }
+                });
+                
                 ui.label("Polars SQL Query:");
                 ui.text_edit_multiline(query);
             }
@@ -109,10 +160,16 @@ impl SnarlViewer<NairobiNode> for NairobiViewer {
                 ui.checkbox(std_dev, "Std Dev");
                 ui.checkbox(kurtosis, "Kurtosis");
             }
-            NairobiNode::LagosPlot { format } => {
+            NairobiNode::LagosPlot { format, width, height } => {
                 ui.label("Visual Format:");
                 ui.radio_value(format, PlotFormat::Sparkline, "Sparkline");
                 ui.radio_value(format, PlotFormat::Scatter, "Scatter");
+                ui.horizontal(|ui| {
+                    ui.label("Width:");
+                    ui.add(egui::DragValue::new(width).speed(1.0));
+                    ui.label("Height:");
+                    ui.add(egui::DragValue::new(height).speed(1.0));
+                });
             }
         }
     }
@@ -175,7 +232,7 @@ impl SnarlViewer<NairobiNode> for NairobiViewer {
             ui.close_menu();
         }
         if ui.button("SQL Query Node").clicked() {
-            snarl.insert_node(pos, NairobiNode::SqlQuery { query: "".to_owned() });
+            snarl.insert_node(pos, NairobiNode::SqlQuery { query: "".to_owned(), preset: QueryPreset::AllColumns });
             ui.close_menu();
         }
         if ui.button("Axiom Crunch Node").clicked() {
@@ -195,6 +252,8 @@ impl SnarlViewer<NairobiNode> for NairobiViewer {
                 pos,
                 NairobiNode::LagosPlot {
                     format: PlotFormat::Sparkline,
+                    width: 1000,
+                    height: 400,
                 },
             );
             ui.close_menu();
@@ -243,14 +302,16 @@ mod tests {
     fn test_plot_format_variants() {
         assert!(PlotFormat::Sparkline == PlotFormat::Sparkline);
         assert!(PlotFormat::Scatter == PlotFormat::Scatter);
+        assert!(PlotFormat::Png == PlotFormat::Png);
+        assert!(PlotFormat::Jpg == PlotFormat::Jpg);
     }
 
     #[test]
     fn test_nairobi_node_variants() {
         let _ingest = NairobiNode::Ingest { dataset_path: "test".to_string() };
-        let _sql_query = NairobiNode::SqlQuery { query: "SELECT *".to_string() };
+        let _sql_query = NairobiNode::SqlQuery { query: "SELECT *".to_string(), preset: QueryPreset::AllColumns };
         let _axiom = NairobiNode::AxiomCrunch { column: "test".to_string(), mean: true, std_dev: false, kurtosis: false };
-        let _plot = NairobiNode::LagosPlot { format: PlotFormat::Sparkline };
+        let _plot = NairobiNode::LagosPlot { format: PlotFormat::Sparkline, width: 1000, height: 400 };
     }
 
     #[test]
@@ -260,10 +321,11 @@ mod tests {
         assert!(json.contains("\"Ingest\""));
         assert!(json.contains("\"dataset_path\":\"/path/to/data.csv\""));
 
-        let sql = NairobiNode::SqlQuery { query: "SELECT * FROM t".to_string() };
+        let sql = NairobiNode::SqlQuery { query: "SELECT * FROM t".to_string(), preset: QueryPreset::AllColumns };
         let json = serde_json::to_string(&sql).unwrap();
         assert!(json.contains("\"SqlQuery\""));
         assert!(json.contains("\"query\":\"SELECT * FROM t\""));
+        assert!(json.contains("\"AllColumns\""));
 
         let axiom = NairobiNode::AxiomCrunch { column: "test".to_string(), mean: true, std_dev: true, kurtosis: false };
         let json = serde_json::to_string(&axiom).unwrap();
@@ -273,10 +335,10 @@ mod tests {
         assert!(json.contains("\"std_dev\":true"));
         assert!(json.contains("\"kurtosis\":false"));
 
-        let plot = NairobiNode::LagosPlot { format: PlotFormat::Scatter };
+        let plot = NairobiNode::LagosPlot { format: PlotFormat::Png, width: 1000, height: 400 };
         let json = serde_json::to_string(&plot).unwrap();
         assert!(json.contains("\"LagosPlot\""));
-        assert!(json.contains("\"Sparkline\"") || json.contains("\"Scatter\""));
+        assert!(json.contains("\"Png\"") || json.contains("\"png\""));
     }
 
     #[test]
@@ -286,10 +348,22 @@ mod tests {
         ).unwrap();
         assert!(matches!(ingest, NairobiNode::Ingest { .. }));
 
+        // Test deserialization with preset field explicitly provided
         let sql: NairobiNode = serde_json::from_str(
-            r#"{"SqlQuery":{"query":"SELECT 1"}}"#
+            r#"{"SqlQuery":{"query":"SELECT 1", "preset": "AllColumns"}}"#
         ).unwrap();
         assert!(matches!(sql, NairobiNode::SqlQuery { .. }));
+
+        // Test deserialization without preset field (backward compatibility) - should use default
+        let sql_default: NairobiNode = serde_json::from_str(
+            r#"{"SqlQuery":{"query":"SELECT 1"}}"#
+        ).unwrap();
+        if let NairobiNode::SqlQuery { query, preset } = sql_default {
+            assert_eq!(query, "SELECT 1");
+            assert_eq!(preset, QueryPreset::AllColumns); // Should default to AllColumns
+        } else {
+            panic!("Expected SqlQuery node");
+        }
 
         let axiom: NairobiNode = serde_json::from_str(
             r#"{"AxiomCrunch":{"column":"price","mean":true,"std_dev":false,"kurtosis":true}}"#
@@ -297,7 +371,7 @@ mod tests {
         assert!(matches!(axiom, NairobiNode::AxiomCrunch { .. }));
 
         let plot: NairobiNode = serde_json::from_str(
-            r#"{"LagosPlot":{"format":"Sparkline"}}"#
+            r#"{"LagosPlot":{"format":"Png","width":640,"height":480}}"#
         ).unwrap();
         assert!(matches!(plot, NairobiNode::LagosPlot { .. }));
     }
@@ -308,7 +382,7 @@ mod tests {
         assert_eq!(inputs(&ingest), 0);
         assert_eq!(outputs(&ingest), 1);
 
-        let sql = NairobiNode::SqlQuery { query: "".to_string() };
+        let sql = NairobiNode::SqlQuery { query: "".to_string(), preset: QueryPreset::AllColumns };
         assert_eq!(inputs(&sql), 1);
         assert_eq!(outputs(&sql), 1);
 
@@ -316,7 +390,7 @@ mod tests {
         assert_eq!(inputs(&axiom), 1);
         assert_eq!(outputs(&axiom), 1);
 
-        let plot = NairobiNode::LagosPlot { format: PlotFormat::Sparkline };
+        let plot = NairobiNode::LagosPlot { format: PlotFormat::Sparkline, width: 1000, height: 400 };
         assert_eq!(inputs(&plot), 1);
         assert_eq!(outputs(&plot), 0);
     }
