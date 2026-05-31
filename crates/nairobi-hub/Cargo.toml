@@ -60,6 +60,9 @@ iceoryx2 = { workspace = true }
 tracing = { workspace = true }
 tracing-subscriber = { workspace = true }
 
+# Memory-mapped IO (LagosPlot temp file materialization)
+memmap2 = { workspace = true }
+
 # Cryptographic hashing (DORA Compliance)
 sha2 = { workspace = true }
 

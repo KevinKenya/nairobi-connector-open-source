@@ -22,3 +22,5 @@ nairobi-protocol = { path = "../nairobi-protocol" }
 
 [dev-dependencies]
 eframe = "0.26"
+rfd = "0.12"
+tokio = { workspace = true }

@@ -39,6 +39,7 @@ nairobi-canvas = { path = "../nairobi-canvas" }
 egui = "0.26"
 egui-snarl = "0.3.0"
 eframe = "0.26"
+rfd = "0.12"
 tracing = { workspace = true }
 
 [build-dependencies]
