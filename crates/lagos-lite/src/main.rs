@@ -31,17 +31,9 @@ struct Args {
     #[arg(short, long)]
     fd: Option<i32>,
 
-    /// Path to CSV file for one-shot rendering (mutually exclusive with --fd)
-    #[arg(short, long)]
-    file: Option<String>,
-
     /// Render format: sparkline, scatter, or points
     #[arg(short, long, default_value_t = String::from("sparkline"))]
     format: String,
-
-    /// Output path for rendered image (one-shot mode requires this)
-    #[arg(short, long)]
-    output: Option<String>,
 
     /// Width of the render target
     #[arg(short, long, default_value_t = 1000)]
@@ -52,8 +44,6 @@ struct Args {
     height: u32,
 }
 
-/// Parse CSV text from the memfd into f64 values.
-/// The memfd contains CSV output from Polars SQL (e.g., "points\n12.5\n8.3\n...")
 fn parse_csv_to_points(data: &[u8]) -> Vec<LttbPoint> {
     let text = match std::str::from_utf8(data) {
         Ok(s) => s,
@@ -64,7 +54,7 @@ fn parse_csv_to_points(data: &[u8]) -> Vec<LttbPoint> {
     };
 
     text.lines()
-        .skip(1) // Skip the CSV header row
+        .skip(1)
         .enumerate()
         .filter_map(|(i, line)| {
             let trimmed = line.trim();
@@ -87,39 +77,17 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     env_logger::init();
     let args = Args::parse();
 
-    // Validate mutually exclusive args
-    if args.fd.is_some() && args.file.is_some() {
-        eprintln!("[LAGOS_DAEMON] ERROR: --fd and --file are mutually exclusive");
-        std::process::exit(1);
-    }
-
-    // 1. Get CSV data - either from FD or from file
-    let points = match (args.fd, &args.file) {
-        (Some(fd), None) => {
-            // Memory map the FD directly (Zero-Copy Doctrine)
-            let file = unsafe { File::from_raw_fd(fd) };
-            let mmap = unsafe { MmapOptions::new().map(&file) }?;
-            parse_csv_to_points(&mmap)
-        }
-        (None, Some(file_path)) => {
-            // Read CSV from file
-            let file = File::open(file_path).map_err(|e| {
-                eprintln!("[LAGOS_DAEMON] ERROR: Failed to open file: {}", e);
-                std::io::Error::new(std::io::ErrorKind::Other, e)
-            })?;
-            let mmap = unsafe { MmapOptions::new().map(&file) }.map_err(|e| {
-                eprintln!("[LAGOS_DAEMON] ERROR: Failed to mmap file: {}", e);
-                std::io::Error::new(std::io::ErrorKind::Other, e)
-            })?;
-            parse_csv_to_points(&mmap)
-        }
-        _ => {
-            eprintln!("[LAGOS_DAEMON] ERROR: Either --fd or --file is required");
+    let fd = match args.fd {
+        Some(f) => f,
+        None => {
+            eprintln!("[LAGOS_DAEMON] ERROR: --fd is required");
             std::process::exit(1);
         }
     };
 
-    let points = Arc::new(points);
+    let file = unsafe { File::from_raw_fd(fd) };
+    let mmap = unsafe { MmapOptions::new().map(&file) }?;
+    let points: Vec<LttbPoint> = parse_csv_to_points(&mmap);
 
     eprintln!("[LAGOS_DAEMON] Parsed {} data points.", points.len());
 
@@ -128,75 +96,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         std::process::exit(1);
     }
 
-    // 2. Initialize Lagos Sovereign Stream
-    let stream = lagos_lite::SovereignStream::new().await;
-
-    // 3. One-shot mode: render once and save to file
-    if let Some(output_path) = &args.output {
-        let rgba_data = stream.render_once(
-            args.width,
-            args.height,
-            2000,
-            move || points.to_vec(),
-            |ctx, decimated| {
-                egui::CentralPanel::default().show(ctx, |ui| {
-                    let plot_points: PlotPoints = decimated
-                        .iter()
-                        .map(|p| [p.x as f64, p.y as f64])
-                        .collect();
-                    let line = Line::new(plot_points);
-
-                    Plot::new("lagos_plot")
-                        .show(ui, |plot_ui| {
-                            plot_ui.line(line);
-                        });
-                });
-            },
-        ).await;
-
-        if rgba_data.is_empty() {
-            eprintln!("[LAGOS_DAEMON] ERROR: Render produced no data");
-            std::process::exit(1);
-        }
-
-        // Encode and save to file based on format
-        let output_bytes = match args.format.as_str() {
-            "png" | "PNG" => {
-                lagos_lite::compress_rgba_to_png(args.width, args.height, &rgba_data)
-                    .map_err(|e| {
-                        eprintln!("[LAGOS_DAEMON] ERROR: Failed to encode PNG: {}", e);
-                        std::io::Error::new(std::io::ErrorKind::Other, e)
-                    })?
-            }
-            _ => {
-                lagos_lite::compress_rgba_to_jpeg(args.width, args.height, &rgba_data, 80)
-                    .map_err(|e| {
-                        eprintln!("[LAGOS_DAEMON] ERROR: Failed to encode JPEG: {}", e);
-                        std::io::Error::new(std::io::ErrorKind::Other, e)
-                    })?
-            }
-        };
-
-        std::fs::write(output_path, &output_bytes).map_err(|e| {
-            eprintln!("[LAGOS_DAEMON] ERROR: Failed to write output file: {}", e);
-            e
-        })?;
-
-        eprintln!("[LAGOS_DAEMON] Render saved to {}", output_path);
-        return Ok(());
-    }
-
-    // 4. Interactive mode (original behavior): Start infinite render loop with WebSocket server
-    let notifier = stream.get_notifier();
-    let points_clone = points.clone();
-    stream.start(
+    let frame = lagos_lite::SovereignFrame::new().await;
+    let rgba_data = frame.render_once(
         args.width,
         args.height,
         2000,
-        move || {
-            points_clone.to_vec()
-        },
-        move |ctx, decimated| {
+        &points,
+        |ctx, decimated| {
             egui::CentralPanel::default().show(ctx, |ui| {
                 let plot_points: PlotPoints = decimated
                     .iter()
@@ -210,14 +116,35 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     });
             });
         },
-    );
+    ).await;
 
-    // 5. Trigger the initial render after a brief setup delay
-    tokio::time::sleep(std::time::Duration::from_millis(200)).await;
-    notifier.notify_one();
+    if rgba_data.is_empty() {
+        eprintln!("[LAGOS_DAEMON] ERROR: Render produced no data");
+        std::process::exit(1);
+    }
 
-    // Keep the main thread alive while background threads run
-    std::future::pending::<()>().await;
+    let output_bytes = match args.format.as_str() {
+        "png" | "PNG" => {
+            image::codecs::png::PngEncoder::new(Vec::new())
+                .write_image(&rgba_data, args.width, args.height, image::ColorType::Rgba8)
+                .map_err(|e| {
+                    eprintln!("[LAGOS_DAEMON] ERROR: Failed to encode PNG: {}", e);
+                    std::io::Error::new(std::io::ErrorKind::Other, e)
+                })?
+        }
+        _ => {
+            let mut output = Vec::new();
+            jpeg_encoder::Encoder::new(&mut output, 80)
+                .encode(&rgba_data, args.width as u16, args.height as u16, jpeg_encoder::ColorType::Rgba)
+                .map_err(|e| {
+                    eprintln!("[LAGOS_DAEMON] ERROR: Failed to encode JPEG: {}", e);
+                    std::io::Error::new(std::io::ErrorKind::Other, e)
+                })?;
+            output
+        }
+    };
+
+    println!("{}", base64::engine::general_purpose::STANDARD.encode(&output_bytes));
 
     Ok(())
 }
