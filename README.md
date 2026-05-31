@@ -117,6 +117,7 @@ For direct inquiries, contact: aiwithafrica@gmail.com
 - **Hardware-Accelerated Visualization**: Low-latency Jupyter plotting via `lagos-lite` (wgpu/egui)
 - **Vectorized Execution**: Polars query engine + Rayon multi-threaded pipelines
 - **Sovereign Interface**: Python API (`SovereignFrame`) with memory-mapped IPC
+- **Canvas Pipelines**: Visual node graph compiler with native file picker and SQL query presets
 
 ---
 
@@ -151,6 +152,7 @@ Nairobi OS is structurally bifurcated: the open-source repository provides funda
 3. **`lagos-lite`**: The visual cortex. A headless, event-driven rendering engine that maps memory-mapped files directly into the GPU pipeline.
 4. **`nairobi-protocol`**: The shared protocol layer. Defines standard GVariant serialization schemes, error types, and shared memory layouts.
 5. **`nairobi-python`**: The Python extension module compiled via `PyO3` and packaged with `Maturin`.
+6. **`nairobi-canvas`**: Immediate-mode node graph compiler with hardware-accelerated UI (wgpu/egui). Features native file picker for data ingestion and SQL query presets for rapid pipeline construction.
 
 ### Private Corporate Ecosystem (`modules/`)
 
@@ -244,13 +246,32 @@ subset = frame.query("SELECT * FROM dataset WHERE value > 50.0")
 subset.plot(column="value")
 ```
 
-### 2. Computer Use Without Pixels (MCP)
+### 2. Canvas Visual Pipelines
+
+Nairobi OS provides an immediate-mode node graph canvas for visual pipeline construction. The UI supports native file dialogs and SQL query presets.
+
+```python
+import nairobi_os as nb
+
+# Open the visual canvas for DAG compilation
+dag_bytes = nb.canvas.open()
+
+# Execute the compiled pipeline
+if dag_bytes:
+    nb.canvas.execute(dag_bytes)
+```
+
+The canvas UI features:
+- **Ingest Node**: Click the 📂 button to open a native file picker dialog for selecting CSV datasets
+- **SQL Query Node**: Select from query presets (All Columns, Single Column, Where Clause, Multi-Column) for rapid query building
+
+### 3. Computer Use Without Pixels (MCP)
 
 To use the AT-SPI2 semantic interface, your AI agent should interact with the exposed MCP server tools rather than reading screenshots:
 
 ```
-                     COMPUTER USE SEQUENCE
-                     
+                      COMPUTER USE SEQUENCE
+                      
   [ LLM Agent ]                                 [ Nairobi OS ]
         |                                             |
         |===> nairobi_find_window("Text Editor") ====>| (Locates Target)
