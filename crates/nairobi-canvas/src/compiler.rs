@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::nodes::NairobiNode;
+use crate::nodes::{NairobiNode, PlotFormat};
 use egui_snarl::Snarl;
 use serde::{Deserialize, Serialize};
 use std::collections::{HashMap, HashSet, VecDeque};
@@ -170,7 +170,7 @@ pub fn compile_graph(snarl: &Snarl<NairobiNode>) -> Result<Vec<u8>, SovereignErr
                         "dataset_path": dataset_path
                     })
                 }
-                NairobiNode::SqlQuery { query } => {
+                NairobiNode::SqlQuery { query, .. } => {
                     serde_json::json!({
                         "type": "SqlQuery",
                         "query": query
@@ -190,10 +190,18 @@ pub fn compile_graph(snarl: &Snarl<NairobiNode>) -> Result<Vec<u8>, SovereignErr
                         "kurtosis": kurtosis
                     })
                 }
-                NairobiNode::LagosPlot { format } => {
+                NairobiNode::LagosPlot { format, width, height } => {
+                    let format_str = match format {
+                        PlotFormat::Sparkline => "sparkline",
+                        PlotFormat::Scatter => "scatter",
+                        PlotFormat::Png => "png",
+                        PlotFormat::Jpg => "jpg",
+                    };
                     serde_json::json!({
                         "type": "LagosPlot",
-                        "format": format
+                        "format": format_str,
+                        "width": width,
+                        "height": height
                     })
                 }
             };
@@ -308,7 +316,7 @@ pub fn build_dag_from_config(config: DagConfig) -> Result<Vec<u8>, SovereignErro
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::nodes::PlotFormat;
+    use crate::nodes::{PlotFormat, QueryPreset};
     use egui_snarl::Snarl;
 
     fn make_test_snarl() -> Snarl<NairobiNode> {
@@ -344,7 +352,7 @@ mod tests {
         );
         let node2 = snarl.insert_node(
             egui::Pos2::new(200.0, 0.0),
-            NairobiNode::SqlQuery { query: "SELECT *".to_string() },
+            NairobiNode::SqlQuery { query: "SELECT *".to_string(), preset: QueryPreset::AllColumns },
         );
 
         let out_pin_id = egui_snarl::OutPinId { node: node1, output: 0 };
@@ -362,7 +370,7 @@ mod tests {
         let mut snarl: Snarl<NairobiNode> = make_test_snarl();
         let node1 = snarl.insert_node(
             egui::Pos2::ZERO,
-            NairobiNode::SqlQuery { query: "SELECT 1".to_string() },
+            NairobiNode::SqlQuery { query: "SELECT 1".to_string(), preset: QueryPreset::Custom },
         );
         let node2 = snarl.insert_node(
             egui::Pos2::new(200.0, 0.0),
@@ -426,7 +434,7 @@ mod tests {
 
         let sql = snarl.insert_node(
             egui::Pos2::new(100.0, 0.0),
-            NairobiNode::SqlQuery { query: "SELECT".to_string() },
+            NairobiNode::SqlQuery { query: "SELECT".to_string(), preset: QueryPreset::Custom },
         );
         assert!(snarl.get_node(sql).is_some());
 
@@ -438,7 +446,7 @@ mod tests {
 
         let plot = snarl.insert_node(
             egui::Pos2::new(300.0, 0.0),
-            NairobiNode::LagosPlot { format: PlotFormat::Sparkline },
+            NairobiNode::LagosPlot { format: PlotFormat::Sparkline, width: 1000, height: 400 },
         );
         assert!(snarl.get_node(plot).is_some());
 
