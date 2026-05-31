@@ -21,12 +21,16 @@ dist/
 *.egg-info/
 
 # Nairobi OS Artifacts
-*.log
+.log
 .nairobi_refinery.log
-# Only ignore the compiled binaries, not the source directory
-**/bin/nairobi-axum-refinery
-**/bin/lagos-vision-daemon
+.nairobi_hub.log
+# Ignore all compiled binaries in bin directories
+**/bin/*
+**/bin/**
 **/target/wheels/
+# Implementation reports and build artifacts
+IMPLEMENTATION_REPORT*
+HANDOVER*
 zig_dist/
 *.tar.xz
 Cross.toml
@@ -42,6 +46,7 @@ simulator/*.parquet
 .vscode/
 .DS_Store
 .gemini/
+.kilo/
 scripts/scratch/
 brain/
 IMPLEMENTATION_REPORT_PHASE_5.md

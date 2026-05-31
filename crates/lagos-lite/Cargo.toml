@@ -4,7 +4,7 @@ version = "0.4.2"
 edition = "2021"
 authors = ["Kevin Chege <aiwithafrica@gmail.com>"]
 license = "Apache-2.0"
-description = "The Visual Cortex — egui/wgpu hardware rendering with Zero-Copy mmap data access"
+description = "The Visual Cortex — egui/wgpu hardware rendering with Zero-Copy mmap data access (local display required)"
 
 [[bin]]
 name = "lagos-vision-daemon"
@@ -24,13 +24,10 @@ pollster = { version = "0.3", features = ["macro"] }
 log = "0.4"
 env_logger = "0.11"
 tokio = { workspace = true }
-tokio-tungstenite = "0.21"
-jpeg-encoder = "0.6"
-serde = { workspace = true }
 serde_json = { workspace = true }
-crossbeam-channel = "0.5"
-futures-util = "0.3"
 image = "0.24"
+jpeg-encoder = "0.6"
+base64 = "0.21"
 
 # CLI & Zero-Copy (for the daemon)
 clap = { version = "4", features = ["derive"] }
