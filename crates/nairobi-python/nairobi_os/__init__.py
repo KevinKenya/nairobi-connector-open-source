@@ -91,6 +91,7 @@ class CanvasNamespace:
     def __init__(self):
         self.open = _core.canvas.open
         self.execute = _core.canvas.execute
+        self.build_dag = _core.canvas.build_dag
 
 canvas = CanvasNamespace()
 
@@ -149,6 +150,7 @@ def start_refinery(binary_path=None, timeout=15):
             stdout=log_file,
             stderr=log_file
         )
+        log_file.close()  # Child inherited the fd; parent must close its copy
         
         logger.info(f"🚀 Igniting Axum Refinery (PID: {_refinery_process.pid})")
         logger.info(f"📝 Logs: {log_path}")
@@ -240,12 +242,19 @@ def ignite(binary_path=None, timeout=15):
         log_path = Path.home() / ".nairobi_hub.log"
         log_file = open(log_path, "a")
         
+        # Prepare environment with LAGOS_VISION_DAEMON_BIN
+        env = os.environ.copy()
+        if "LAGOS_VISION_DAEMON_BIN" not in env:
+            env["LAGOS_VISION_DAEMON_BIN"] = str(bin_dir / "lagos-vision-daemon")
+        
         _hub_process = subprocess.Popen(
             [str(hub_binary)],
             start_new_session=True,
             stdout=log_file,
-            stderr=log_file
+            stderr=log_file,
+            env=env
         )
+        log_file.close()  # Child inherited the fd; parent must close its copy
         
         logger.info(f"🚀 Igniting Nairobi Hub (PID: {_hub_process.pid})")
         logger.info(f"📝 Logs: {log_path}")
