@@ -149,7 +149,7 @@ Nairobi OS is structurally bifurcated: the open-source repository provides funda
 
 1. **`nairobi-axum-refinery`**: High-performance Rust daemon managing raw data ingestion, Rayon-parallelized statistics, and Polars-vectorized query execution.
 2. **`nairobi-hub`**: The central IPC orchestrator. Manages and routes file descriptors and signals between clients and the refinery daemon.
-3. **`lagos-lite`**: The visual cortex. A headless, event-driven rendering engine that maps memory-mapped files directly into the GPU pipeline.
+3. **`lagos-lite`**: The visual cortex. A local-only rendering engine that uses egui/wgpu hardware acceleration with Zero-Copy mmap data access. Requires a physical display.
 4. **`nairobi-protocol`**: The shared protocol layer. Defines standard GVariant serialization schemes, error types, and shared memory layouts.
 5. **`nairobi-python`**: The Python extension module compiled via `PyO3` and packaged with `Maturin`.
 6. **`nairobi-canvas`**: Immediate-mode node graph compiler with hardware-accelerated UI (wgpu/egui). Features native file picker for data ingestion and SQL query presets for rapid pipeline construction.
@@ -174,7 +174,7 @@ Our enterprise-tier components are held in a private repository (`Sovereign-Syst
 | **Statistical Analysis** | Basic descriptive stats | Vectorized, multi-pass skew/kurtosis, correlation |
 | **Query Engine** | In-process Polars SQL | Distributed Apache Arrow / DataFusion cluster |
 | **IPC Mechanism** | POSIX shared memory / D-Bus | Zero-Copy `iceoryx2` shared memory arenas |
-| **Visualization** | Local Jupyter `anywidget` | WebRTC GStreamer / transparent Wayland Layer-Shell overlays |
+| **Visualization** | Local Jupyter `anywidget` (display required) | Headless WebSocket streaming + WebRTC + Wayland overlays |
 | **Security & Compliance** | Standard POSIX boundaries | Aegis Protocol, SHA-256 Chained Forensic Ledger |
 | **Authentication** | None (Local trusted user) | Hardware Binding (TPM 2.0 / CPU ID), private PKI |
 | **Platform Target** | Single-node Linux | Distributed Cloud / Edge Node / High-Frequency Trading |
