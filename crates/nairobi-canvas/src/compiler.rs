@@ -20,6 +20,18 @@ use thiserror::Error;
 use zvariant::{EncodingContext as Context, to_bytes, Type};
 use byteorder::LE;
 
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct NodeConfig {
+    pub node_type: String,
+    pub params: serde_json::Value,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct DagConfig {
+    pub nodes: Vec<(u32, NodeConfig)>,
+    pub edges: Vec<(u32, u32)>,
+}
+
 #[derive(Debug, Error, Clone)]
 pub enum SovereignError {
     #[error("Cyclic dependency detected in node graph")]
@@ -197,6 +209,94 @@ pub fn compile_graph(snarl: &Snarl<NairobiNode>) -> Result<Vec<u8>, SovereignErr
     }
 
     // 5. Serialize to GVariant
+    let dag = GVariantDag { nodes, edges };
+    let ctxt = Context::<LE>::new_gvariant(0);
+    let bytes = to_bytes(ctxt, &dag)
+        .map_err(|e| SovereignError::Serialization(format!("GVariant serialization error: {}", e)))?;
+
+    Ok(bytes.to_vec())
+}
+
+pub fn build_dag_from_config(config: DagConfig) -> Result<Vec<u8>, SovereignError> {
+    let mut nodes = Vec::new();
+    let mut edges = Vec::new();
+    let mut seen_edges = HashSet::new();
+
+    for (node_id, node_config) in config.nodes {
+        let payload = match node_config.node_type.as_str() {
+            "Ingest" => {
+                let dataset_path = node_config.params.get("dataset_path")
+                    .and_then(|p| p.as_str())
+                    .unwrap_or("")
+                    .to_string();
+                serde_json::json!({
+                    "type": "Ingest",
+                    "dataset_path": dataset_path
+                })
+            }
+            "SqlQuery" => {
+                let query = node_config.params.get("query")
+                    .and_then(|p| p.as_str())
+                    .unwrap_or("")
+                    .to_string();
+                serde_json::json!({
+                    "type": "SqlQuery",
+                    "query": query
+                })
+            }
+            "AxiomCrunch" => {
+                let column = node_config.params.get("column")
+                    .and_then(|p| p.as_str())
+                    .unwrap_or("")
+                    .to_string();
+                let mean = node_config.params.get("mean").and_then(|p| p.as_bool()).unwrap_or(false);
+                let std_dev = node_config.params.get("std_dev").and_then(|p| p.as_bool()).unwrap_or(false);
+                let kurtosis = node_config.params.get("kurtosis").and_then(|p| p.as_bool()).unwrap_or(false);
+                serde_json::json!({
+                    "type": "AxiomCrunch",
+                    "column": column,
+                    "mean": mean,
+                    "std_dev": std_dev,
+                    "kurtosis": kurtosis
+                })
+            }
+            "LagosPlot" => {
+                let format = node_config.params.get("format")
+                    .and_then(|p| p.as_str())
+                    .unwrap_or("sparkline");
+                let width = node_config.params.get("width").and_then(|p| p.as_u64()).unwrap_or(1000) as u32;
+                let height = node_config.params.get("height").and_then(|p| p.as_u64()).unwrap_or(400) as u32;
+                serde_json::json!({
+                    "type": "LagosPlot",
+                    "format": format,
+                    "width": width,
+                    "height": height
+                })
+            }
+            _ => {
+                return Err(SovereignError::Serialization(format!("Unknown node type: {}", node_config.node_type)));
+            }
+        };
+
+        let json_str = serde_json::to_string(&payload)
+            .map_err(|e| SovereignError::Serialization(format!("JSON serialization failed: {}", e)))?;
+
+        nodes.push(GVariantNode {
+            node_id,
+            node_type_and_parameters: json_str,
+        });
+    }
+
+    for (from_id, to_id) in config.edges {
+        let edge = (from_id, to_id);
+        if seen_edges.insert(edge) {
+            edges.push(GVariantEdge {
+                from_node_id: from_id,
+                to_node_id: to_id,
+            });
+        }
+    }
+
     let dag = GVariantDag { nodes, edges };
     let ctxt = Context::<LE>::new_gvariant(0);
     let bytes = to_bytes(ctxt, &dag)
