@@ -14,7 +14,7 @@
 
 use nairobi_protocol::ImperialError;
 use tracing::info;
-use zbus::{Connection, dbus_interface, fdo::Error};
+use zbus::{ConnectionBuilder, dbus_interface, fdo::Error};
 use tokio::sync::Mutex;
 
 struct HubService {
@@ -36,10 +36,6 @@ impl HubService {
 async fn main() -> Result<(), ImperialError> {
     tracing_subscriber::fmt::init();
 
-    let connection = Connection::session().await.map_err(|e| {
-        ImperialError::SystemicSeizure(format!("Failed to connect to D-Bus: {}", e))
-    })?;
-
     let executor = nairobi_hub::DagExecutor::new()
         .await
         .map_err(|e| ImperialError::SystemicSeizure(format!("Failed to initialize executor: {}", e)))?;
@@ -48,11 +44,15 @@ async fn main() -> Result<(), ImperialError> {
         executor: Mutex::new(executor),
     };
 
-    let _ = connection
-        .object_server()
-        .at("/org/nairobi/NairobiHub1", service)
+    let _connection = ConnectionBuilder::session()
+        .map_err(|e| ImperialError::SystemicSeizure(format!("Failed to connect to D-Bus: {}", e)))?
+        .name("org.nairobi.NairobiHub1")
+        .map_err(|e| ImperialError::SystemicSeizure(format!("Failed to request D-Bus name: {}", e)))?
+        .serve_at("/org/nairobi/NairobiHub1", service)
+        .map_err(|e| ImperialError::SystemicSeizure(format!("Failed to register service: {}", e)))?
+        .build()
         .await
-        .map_err(|e| ImperialError::SystemicSeizure(format!("Failed to register service: {}", e)))?;
+        .map_err(|e| ImperialError::SystemicSeizure(format!("Failed to build D-Bus connection: {}", e)))?;
 
     info!("Nairobi Hub is live on D-Bus at org.nairobi.NairobiHub1");
 
