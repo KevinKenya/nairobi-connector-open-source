@@ -19,7 +19,7 @@
 
 use eframe::egui;
 use egui_snarl::Snarl;
-use nairobi_canvas::{compile_graph, NairobiNode, NairobiViewer, PlotFormat};
+use nairobi_canvas::{compile_graph, NairobiNode, NairobiViewer, PlotFormat, QueryPreset};
 use std::path::PathBuf;
 
 const OUTPUT_FILE: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/canvas_compiled_output.bin");
@@ -125,6 +125,7 @@ impl eframe::App for CanvasCompileOutputApp {
                         egui::Pos2::new(250.0, 50.0),
                         NairobiNode::SqlQuery {
                             query: "SELECT * FROM data WHERE value > 100".to_string(),
+                            preset: QueryPreset::Custom,
                         },
                     );
 
@@ -142,6 +143,8 @@ impl eframe::App for CanvasCompileOutputApp {
                         egui::Pos2::new(650.0, 50.0),
                         NairobiNode::LagosPlot {
                             format: PlotFormat::Sparkline,
+                            width: 1000,
+                            height: 400,
                         },
                     );
 

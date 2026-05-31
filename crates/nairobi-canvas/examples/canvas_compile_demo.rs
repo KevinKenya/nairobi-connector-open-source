@@ -17,6 +17,12 @@ use egui_snarl::Snarl;
 use nairobi_canvas::{compile_graph, NairobiNode, NairobiViewer};
 
 fn main() -> eframe::Result<()> {
+    let rt = tokio::runtime::Builder::new_multi_thread()
+        .enable_all()
+        .build()
+        .unwrap();
+    let _guard = rt.enter();
+
     let native_options = eframe::NativeOptions::default();
     eframe::run_native(
         "Nairobi Canvas & compiler Demo",
