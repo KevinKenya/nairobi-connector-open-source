@@ -21,11 +21,12 @@ pub mod encoder;
 pub mod input;
 pub mod server;
 
+pub use crate::encoder::compress_rgba_to_jpeg;
+pub use crate::encoder::compress_rgba_to_png;
 use std::sync::Arc;
 use tokio::sync::{mpsc, Notify};
 use crate::device::HeadlessContext;
 use crate::pipeline::{LagosPipeline, LttbPoint};
-use crate::encoder::compress_rgba_to_jpeg;
 
 pub struct SovereignStream {
     ctx: Arc<HeadlessContext>,
@@ -49,6 +50,35 @@ impl SovereignStream {
     /// Use this to trigger the initial render after start() consumes self.
     pub fn get_notifier(&self) -> Arc<Notify> {
         self.data_notify.clone()
+    }
+
+    /// Render a single frame without WebSocket server loop.
+    /// Used for one-shot headless rendering.
+    pub async fn render_once<F>(
+        &self,
+        width: u32,
+        height: u32,
+        output_count: u32,
+        get_data: impl Fn() -> Vec<LttbPoint>,
+        render_ui: F,
+    ) -> Vec<u8>
+    where
+        F: FnOnce(&egui::Context, &[LttbPoint]),
+    {
+        let mut pipeline = LagosPipeline::new(self.ctx.clone());
+        let input_points = get_data();
+
+        let raw_input = egui::RawInput {
+            screen_rect: Some(egui::Rect::from_min_size(
+                egui::Pos2::ZERO,
+                egui::vec2(width as f32, height as f32),
+            )),
+            ..Default::default()
+        };
+
+        pipeline
+            .process_and_render(&input_points, output_count, width, height, raw_input, render_ui)
+            .await
     }
 
     pub fn start<F>(
@@ -128,7 +158,7 @@ impl SovereignStream {
                         move |ctx, points| render_ui_clone(ctx, points),
                     ).await;
 
-                    if let Ok(jpeg_data) = compress_rgba_to_jpeg(width, height, &rgba_data, 80) {
+                    if let Ok(jpeg_data) = crate::encoder::compress_rgba_to_jpeg(width, height, &rgba_data, 80) {
                         let _ = tx_frames.send(jpeg_data).await;
                     }
                 }
