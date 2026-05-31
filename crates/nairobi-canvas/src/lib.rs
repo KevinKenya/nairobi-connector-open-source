@@ -15,5 +15,6 @@
 pub mod compiler;
 pub mod nodes;
 
-pub use compiler::{compile_graph, GVariantDag, GVariantEdge, GVariantNode, SovereignError};
+pub use compiler::{build_dag_from_config, compile_graph, GVariantDag, GVariantEdge, GVariantNode, SovereignError};
+pub use compiler::{NodeConfig, DagConfig};
 pub use nodes::{NairobiNode, NairobiViewer, PlotFormat};
