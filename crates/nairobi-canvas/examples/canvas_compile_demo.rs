@@ -14,7 +14,7 @@
 
 use eframe::egui;
 use egui_snarl::Snarl;
-use nairobi_canvas::{compile_graph, NairobiNode, NairobiViewer};
+use nairobi_canvas::{compile_graph, get_file_picker, NairobiNode, NairobiViewer};
 
 fn main() -> eframe::Result<()> {
     let rt = tokio::runtime::Builder::new_multi_thread()
@@ -100,14 +100,32 @@ impl eframe::App for CanvasDemoApp {
             ui.label("Tip: Right-click the canvas grid area to add new nodes, or right-click a node header to remove it.");
         });
 
-        egui::CentralPanel::default().show(ctx, |ui| {
-            let style = egui_snarl::ui::SnarlStyle::default();
-            self.snarl.show(
-                &mut self.viewer,
-                &style,
-                egui::Id::new("snarl_canvas"),
-                ui,
-            );
-        });
-    }
-}
+egui::CentralPanel::default().show(ctx, |ui| {
+             let style = egui_snarl::ui::SnarlStyle::default();
+             self.snarl.show(
+                 &mut self.viewer,
+                 &style,
+                 egui::Id::new("snarl_canvas"),
+                 ui,
+             );
+         });
+
+         // Handle file picker request from Ingest node
+         if let Ok(mut browse_node) = get_file_picker().lock() {
+             if let Some(node_id) = *browse_node {
+                 *browse_node = None;
+                 if let Some(path) = rfd::FileDialog::new()
+                     .add_filter("CSV Files", &["csv"])
+                     .add_filter("All Files", &["*"])
+                     .pick_file()
+                 {
+                     if let Some(NairobiNode::Ingest { dataset_path }) = self.snarl.get_node_mut(node_id) {
+                         if let Some(p) = path.to_str() {
+                             *dataset_path = p.to_string();
+                         }
+                     }
+                 }
+             }
+         }
+     }
+ }

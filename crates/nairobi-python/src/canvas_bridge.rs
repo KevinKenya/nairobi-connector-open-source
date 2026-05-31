@@ -18,24 +18,26 @@
 
 use eframe::egui;
 use egui_snarl::Snarl;
-use nairobi_canvas::{compile_graph, build_dag_from_config, NairobiNode, NairobiViewer, NodeConfig};
+use nairobi_canvas::{compile_graph, build_dag_from_config, get_file_picker, NairobiNode, NairobiViewer, NodeConfig, PlotFormat, QueryPreset};
 use pyo3::prelude::*;
 use std::sync::{Arc, Mutex};
 use tracing::info;
 
-struct PythonCanvasApp {
+pub struct PythonCanvasApp {
     snarl: Snarl<NairobiNode>,
     viewer: NairobiViewer,
     result: Arc<Mutex<Option<Vec<u8>>>>,
+    auto_execute: bool,
 }
 
 impl PythonCanvasApp {
-    fn new(cc: &eframe::CreationContext<'_>, result: Arc<Mutex<Option<Vec<u8>>>>) -> Self {
+    fn new(cc: &eframe::CreationContext<'_>, result: Arc<Mutex<Option<Vec<u8>>>>, auto_execute: bool) -> Self {
         cc.egui_ctx.set_visuals(egui::Visuals::dark());
         Self {
             snarl: Snarl::new(),
             viewer: NairobiViewer,
             result,
+            auto_execute,
         }
     }
 }
@@ -50,7 +52,12 @@ impl eframe::App for PythonCanvasApp {
                 if ui.button("Compile & Close").clicked() {
                     match compile_graph(&self.snarl) {
                         Ok(bytes) => {
-                            *self.result.lock().unwrap() = Some(bytes);
+                            *self.result.lock().unwrap() = Some(bytes.clone());
+                            if self.auto_execute {
+                                if let Err(e) = execute_dag_internal(bytes) {
+                                    eprintln!("Auto-execution error: {}", e);
+                                }
+                            }
                         }
                         Err(e) => {
                             eprintln!("Compilation error: {}", e);
@@ -74,12 +81,33 @@ impl eframe::App for PythonCanvasApp {
                 ui,
             );
         });
+
+        // Handle file picker request from node UI
+        if let Ok(mut browse_node) = get_file_picker().lock() {
+            if let Some(node_id) = *browse_node {
+                *browse_node = None;
+                if let Some(path) = rfd::FileDialog::new()
+                    .add_filter("CSV Files", &["csv"])
+                    .add_filter("All Files", &["*"])
+                    .pick_file()
+                {
+                    if let Some(node) = self.snarl.get_node_mut(node_id) {
+                        if let NairobiNode::Ingest { dataset_path } = node {
+                            if let Some(p) = path.to_str() {
+                                *dataset_path = p.to_string();
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
-#[pyfunction]
-pub fn open(_py: Python) -> PyResult<Option<Vec<u8>>> {
+#[pyfunction(signature = (preset = None, auto_execute = false))]
+pub fn open(_py: Python, preset: Option<String>, auto_execute: Option<bool>) -> PyResult<Option<Vec<u8>>> {
     let result = Arc::new(Mutex::new(None::<Vec<u8>>));
+    let should_auto_execute = auto_execute.unwrap_or(false);
 
     let native_options = eframe::NativeOptions::default();
 
@@ -88,12 +116,92 @@ pub fn open(_py: Python) -> PyResult<Option<Vec<u8>>> {
         "Nairobi Canvas",
         native_options,
         Box::new(move |cc| {
-            Box::new(PythonCanvasApp::new(cc, result_for_closure.clone()))
+            let mut app = Box::new(PythonCanvasApp::new(cc, result_for_closure.clone(), should_auto_execute));
+
+            if let Some(p) = &preset {
+                populate_preset(&mut app.snarl, p);
+            }
+
+            app
         }),
     );
 
     let output = result.lock().unwrap().take();
     Ok(output)
+}
+
+fn populate_preset(snarl: &mut Snarl<NairobiNode>, preset_name: &str) {
+    match preset_name {
+        "playerstats_vis" => {
+            use egui::Pos2;
+            
+            let node0 = snarl.insert_node(
+                Pos2::new(50.0, 50.0),
+                NairobiNode::Ingest {
+                    dataset_path: "/home/chege/nairobi-connector-open-source/simulator/PlayerStatisticsExtended.csv".to_string(),
+                },
+            );
+            let node1 = snarl.insert_node(
+                Pos2::new(300.0, 50.0),
+                NairobiNode::SqlQuery {
+                    query: "SELECT points FROM dataset".to_string(),
+                    preset: QueryPreset::SingleColumn,
+                },
+            );
+            let node2 = snarl.insert_node(
+                Pos2::new(550.0, 50.0),
+                NairobiNode::LagosPlot {
+                    format: PlotFormat::Png,
+                    width: 1200,
+                    height: 400,
+                },
+            );
+
+            let out_pin_id = egui_snarl::OutPinId { node: node0, output: 0 };
+            let in_pin_id = egui_snarl::InPinId { node: node1, input: 0 };
+            snarl.connect(out_pin_id, in_pin_id);
+
+            let out_pin_id = egui_snarl::OutPinId { node: node1, output: 0 };
+            let in_pin_id = egui_snarl::InPinId { node: node2, input: 0 };
+            snarl.connect(out_pin_id, in_pin_id);
+        }
+        _ => {
+            eprintln!("Unknown preset: {}", preset_name);
+        }
+    }
+}
+
+fn execute_dag_internal(dag_bytes: Vec<u8>) -> PyResult<()> {
+    let rt = shared_runtime();
+
+    rt.block_on(async {
+        let connection = zbus::Connection::session().await.map_err(|e| {
+            pyo3::exceptions::PyRuntimeError::new_err(format!("D-Bus connection failed: {}", e))
+        })?;
+
+        let proxy = zbus::Proxy::new(
+            &connection,
+            "org.nairobi.NairobiHub1",
+            "/org/nairobi/NairobiHub1",
+            "org.nairobi.NairobiHub1",
+        ).await.map_err(|e| {
+            pyo3::exceptions::PyRuntimeError::new_err(format!("Failed to create Hub proxy: {}", e))
+        })?;
+
+        let response: String = proxy
+            .call_method("ExecuteDag", &(dag_bytes,))
+            .await
+            .map_err(|e| {
+                pyo3::exceptions::PyRuntimeError::new_err(format!("ExecuteDag failed: {}", e))
+            })?
+            .body()
+            .map_err(|e| {
+                pyo3::exceptions::PyRuntimeError::new_err(format!("Failed to read response: {}", e))
+            })?;
+
+        info!("DAG execution result: {}", response);
+        Ok(())
+    })
 }
 
 pub fn init_module(m: &PyModule) -> PyResult<()> {
