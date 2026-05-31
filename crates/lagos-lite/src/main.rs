@@ -17,10 +17,11 @@
 // Date: 2026-05-21
 
 use clap::Parser;
+use image::ImageEncoder;
 use memmap2::MmapOptions;
 use std::fs::File;
 use std::os::unix::io::FromRawFd;
-use std::sync::Arc;
+use base64::Engine;
 use lagos_lite::pipeline::LttbPoint;
 use egui_plot::{Line, Plot, PlotPoints};
 
@@ -125,12 +126,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let output_bytes = match args.format.as_str() {
         "png" | "PNG" => {
-            image::codecs::png::PngEncoder::new(Vec::new())
+            let mut output = Vec::new();
+            image::codecs::png::PngEncoder::new(&mut output)
                 .write_image(&rgba_data, args.width, args.height, image::ColorType::Rgba8)
                 .map_err(|e| {
                     eprintln!("[LAGOS_DAEMON] ERROR: Failed to encode PNG: {}", e);
                     std::io::Error::new(std::io::ErrorKind::Other, e)
-                })?
+                })?;
+            output
         }
         _ => {
             let mut output = Vec::new();

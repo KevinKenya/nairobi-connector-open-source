@@ -195,6 +195,8 @@ class SovereignFrame:
     def plot(self, width=1000, height=400):
         """
         Spawns the Lagos Vision widget for the current frame.
+        Note: lagos-lite requires a physical display. For headless visualization,
+        use the enterprise nairobi-lagos-vision package.
         """
         return lagos.plot_inline(self.handle_id, width=width, height=height)
 
