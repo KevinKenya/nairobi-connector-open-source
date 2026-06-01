@@ -29,3 +29,5 @@ python-source = "."
 module-name = "nairobi_os._core"
 # Ensure the bundled refinery binary is included
 include = ["nairobi_os/bin/*"]
+# Use manylinux2014 for PyPI compatibility
+compatibility = "manylinux2014"
