@@ -9,8 +9,8 @@ build-backend = "maturin"
 
 [project]
 name = "nairobi-os"
-version = "0.4.2"
-description = "Nairobi OS: Heavy Iron Data Science Infrastructure with Lagos Vision (Hardware-Accelerated Zero-Copy Rendering)"
+version = "0.5.0"
+description = "Nairobi OS: Heavy Iron Data Science Infrastructure with Canvas Node Graph Compiler (Hardware-Accelerated Zero-Copy Rendering)"
 authors = [{name = "Kevin Chege", email = "aiwithafrica@gmail.com"}]
 license = "Apache-2.0"
 readme = "README.md"

@@ -56,7 +56,7 @@ Example Usage:
     """
 
 __author__ = "Kevin Chege"
-__version__ = "0.4.2"
+__version__ = "0.5.0"
 __license__ = "Apache License 2.0"
 
 # Import the _core module first to access its data functions

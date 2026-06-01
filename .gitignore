@@ -47,6 +47,7 @@ simulator/*.parquet
 .DS_Store
 .gemini/
 .kilo/
+AGENTS.md
 scripts/scratch/
 brain/
 IMPLEMENTATION_REPORT_PHASE_5.md

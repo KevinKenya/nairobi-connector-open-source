@@ -5,7 +5,7 @@
 # nairobi-open-source-release/crates/nairobi-axum-refinery/Cargo.toml
 [package]
 name = "nairobi-axum-refinery"
-version = "0.4.2"
+version = "0.5.0"
 edition = "2021"
 authors = ["Kevin Chege <aiwithafrica@gmail.com>"]
 license = "Apache-2.0"
