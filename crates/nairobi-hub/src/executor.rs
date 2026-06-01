@@ -275,3 +275,7 @@ NodeType::AxiomCrunch => {
                 }
             }
         }
+
+        Ok("Execution completed successfully".to_string())
+    }
+}
