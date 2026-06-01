@@ -1,3 +1,5 @@
+[English](README.md) | [简体中文](README.zh-CN.md) | [Español](README.es.md) | [Deutsch](README.de.md) | [日本語](README.ja.md) | [Русский](README.ru.md) | [한국어](README.ko.md)
+
 # Nairobi Canvas: Immediate-Mode Node Graph Visual Compiler
 
 Nairobi Canvas is a hardware-accelerated visual compiler for building data processing pipelines. It provides an immediate-mode node graph UI built on `egui`/`egui-snarl` that compiles visual workflows into GVariant DAG (Directed Acyclic Graph) format for execution by the Nairobi Hub.
@@ -93,3 +95,13 @@ The compiled DAG is transmitted via IPC to the Hub, which routes nodes to:
 - The canvas currently outputs to console - mention this for developers building from source
 - Note that file picker uses `rfd` crate in dev-dependencies, not main dependencies
 - Keep the README focused on usage; link to main repository README for architecture context
+
+## Support
+If you find Nairobi OS useful, consider supporting the project:
+
+[![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-PayPal-blue.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=chege.finance@gmail.com&item_name=Support+Nairobi+OS+Development)
+
+## License
+This project is licensed under the **Apache License 2.0**.
+
+© 2026 Kevin Chege. All Rights Reserved.
