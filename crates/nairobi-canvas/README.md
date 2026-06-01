@@ -1,4 +1,4 @@
-[English](README.md) | [简体中文](README.zh-CN.md) | [Español](README.es.md) | [Deutsch](README.de.md) | [日本語](README.ja.md) | [Русский](README.ru.md) | [한국어](README.ko.md)
+[English](README.md) | [简体中文](README.zh-CN.md) | [廣東話](README.yue.md) | [Français](README.fr.md) | [Español](README.es.md) | [Deutsch](README.de.md) | [Suomi](README.fi.md) | [Nederlands](README.nl.md) | [日本語](README.ja.md) | [Русский](README.ru.md) | [한국어](README.ko.md)
 
 # Nairobi Canvas: Immediate-Mode Node Graph Visual Compiler
 
@@ -88,13 +88,7 @@ The compiled DAG is transmitted via IPC to the Hub, which routes nodes to:
 - **Axum Refinery**: Data ingestion and statistical processing
 - **Lagos Vision**: Hardware-accelerated visualization rendering
 
-## Implementation Notes
-
-- Follow existing code documentation style (Apache 2.0 header, brief module description)
-- Reference the exact node input/output counts in the table (critical for understanding the DAG structure)
-- The canvas currently outputs to console - mention this for developers building from source
-- Note that file picker uses `rfd` crate in dev-dependencies, not main dependencies
-- Keep the README focused on usage; link to main repository README for architecture context
+For architecture details and the full system overview, see the [main repository README](../README.md).
 
 ## Support
 If you find Nairobi OS useful, consider supporting the project:
