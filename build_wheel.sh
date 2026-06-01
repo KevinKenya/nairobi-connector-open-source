@@ -22,7 +22,7 @@ PYTHON_CRATE_DIR="$PROJECT_ROOT/crates/nairobi-python"
 BIN_DEST_DIR="$PYTHON_CRATE_DIR/nairobi_os/bin"
 
 echo "=========================================="
-echo "Nairobi OS v0.4.0: Heavy Iron Build Orchestrator"
+echo "Nairobi OS v0.5.0: Heavy Iron Build Orchestrator"
 echo "=========================================="
 
 # 1. Build the Microservice Binaries in parallel
@@ -79,11 +79,10 @@ echo "Step 3: Forging the Python Wheel..."
 cd "$PYTHON_CRATE_DIR"
 
 # Use maturin from virtual environment if it exists
-export PATH="$PROJECT_ROOT/zig_dist:$PATH"
 if [ -f "$PROJECT_ROOT/.venv/bin/maturin" ]; then
-    "$PROJECT_ROOT/.venv/bin/maturin" build --release --compatibility manylinux2014 --zig
+    "$PROJECT_ROOT/.venv/bin/maturin" build --release --skip-auditwheel
 elif command -v maturin &> /dev/null; then
-    maturin build --release --compatibility manylinux2014 --zig
+    maturin build --release --skip-auditwheel
 else
     echo "ERROR: maturin not found. Please install it in the virtual environment."
     exit 1

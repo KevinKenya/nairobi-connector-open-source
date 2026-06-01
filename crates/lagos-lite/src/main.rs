@@ -32,6 +32,10 @@ struct Args {
     #[arg(short, long)]
     fd: Option<i32>,
 
+    /// Path to file containing CSV data
+    #[arg(short, long)]
+    file: Option<String>,
+
     /// Render format: sparkline, scatter, or points
     #[arg(short, long, default_value_t = String::from("sparkline"))]
     format: String,
@@ -43,6 +47,10 @@ struct Args {
     /// Height of the render target
     #[arg(long, default_value_t = 400)]
     height: u32,
+
+    /// Output file path (optional, defaults to stdout base64)
+    #[arg(short, long)]
+    output: Option<String>,
 }
 
 fn parse_csv_to_points(data: &[u8]) -> Vec<LttbPoint> {
@@ -78,16 +86,17 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     env_logger::init();
     let args = Args::parse();
 
-    let fd = match args.fd {
-        Some(f) => f,
-        None => {
-            eprintln!("[LAGOS_DAEMON] ERROR: --fd is required");
-            std::process::exit(1);
-        }
+    let (mmap, _file_handle) = if let Some(fd) = args.fd {
+        let file = unsafe { File::from_raw_fd(fd) };
+        (unsafe { MmapOptions::new().map(&file)? }, Some(file))
+    } else if let Some(path) = &args.file {
+        let file = File::open(path)?;
+        (unsafe { MmapOptions::new().map(&file)? }, None)
+    } else {
+        eprintln!("[LAGOS_DAEMON] ERROR: Either --fd or --file is required");
+        std::process::exit(1);
     };
 
-    let file = unsafe { File::from_raw_fd(fd) };
-    let mmap = unsafe { MmapOptions::new().map(&file) }?;
     let points: Vec<LttbPoint> = parse_csv_to_points(&mmap);
 
     eprintln!("[LAGOS_DAEMON] Parsed {} data points.", points.len());
@@ -147,7 +156,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
     };
 
-    println!("{}", base64::engine::general_purpose::STANDARD.encode(&output_bytes));
+    if let Some(output_path) = args.output {
+        std::fs::write(&output_path, &output_bytes)
+            .map_err(|e| {
+                eprintln!("[LAGOS_DAEMON] ERROR: Failed to write output file: {}", e);
+                std::io::Error::new(std::io::ErrorKind::Other, e)
+            })?;
+    } else {
+        println!("{}", base64::engine::general_purpose::STANDARD.encode(&output_bytes));
+    }
 
     Ok(())
 }

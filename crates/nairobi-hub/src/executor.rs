@@ -117,7 +117,7 @@ impl DagExecutor {
                     result_store.insert(node.node_id, NodeResult::Handle(result_fd));
                     info!("Node {}: SqlQuery completed", node.node_id);
                 }
-                NodeType::AxiomCrunch => {
+NodeType::AxiomCrunch => {
                     let input_fd = resolve_input_fd(
                         node.node_id, "AxiomCrunch", &node.input_edges, &result_store
                     )?;
@@ -163,7 +163,7 @@ impl DagExecutor {
                     result_store.insert(node.node_id, NodeResult::Handle(owned_fd));
                     info!("Node {}: AxiomCrunch completed ({} bytes)", node.node_id, bytes.len());
                 }
-NodeType::LagosPlot => {
+                NodeType::LagosPlot => {
                     let input_raw_fd = if let Some(&input_id) = node.input_edges.first() {
                         match result_store.get(&input_id) {
                             Some(NodeResult::Handle(fd)) => fd.as_raw_fd(),
@@ -223,8 +223,14 @@ NodeType::LagosPlot => {
                         })?;
                     }
 
+                    let exe_path = std::env::current_exe()
+                        .map_err(|e| ImperialError::SystemicSeizure(format!("Failed to get exe path: {}", e)))?;
+                    let bin_dir = exe_path.parent()
+                        .map(|p| p.to_string_lossy().to_string())
+                        .unwrap_or("/usr/bin".to_string());
+
                     let lagos_bin = std::env::var("LAGOS_VISION_DAEMON_BIN")
-                        .unwrap_or_else(|_| "/home/chege/nairobi-connector-open-source/.venv/lib/python3.12/site-packages/nairobi_os/bin/lagos-vision-daemon".to_string());
+                        .unwrap_or_else(|_| format!("{}/lagos-vision-daemon", bin_dir));
 
                     let output = std::process::Command::new(lagos_bin)
                         .arg("--file")
@@ -256,10 +262,16 @@ NodeType::LagosPlot => {
                     }
 
                     info!("Node {}: LagosPlot completed, output: {}", node.node_id, output_path);
+
+                    let mut cmd = std::process::Command::new("xdg-open");
+                    cmd.arg(&output_path);
+                    if let Ok(disp) = std::env::var("DISPLAY") {
+                        cmd.env("DISPLAY", disp);
+                    }
+                    match cmd.spawn() {
+                        Ok(_) => info!("Node {}: Launched xdg-open for visualization", node.node_id),
+                        Err(e) => info!("Node {}: Failed to launch xdg-open: {}", node.node_id, e),
+                    }
                 }
             }
         }
-
-        Ok("Execution completed successfully".to_string())
-    }
-}
