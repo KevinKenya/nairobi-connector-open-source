@@ -17,6 +17,13 @@
 # nairobi-connector-open-source/build_wheel.sh
 set -e
 
+# Stop stale daemons before building to avoid "name already taken on the bus" errors
+pkill -f "nairobi-axum-refinery" 2>/dev/null || true
+pkill -f "nairobi-hub" 2>/dev/null || true
+pkill -f "lagos-vision-daemon" 2>/dev/null || true
+pkill -f "nairobi-connector" 2>/dev/null || true
+sleep 1
+
 PROJECT_ROOT=$(pwd)
 PYTHON_CRATE_DIR="$PROJECT_ROOT/crates/nairobi-python"
 BIN_DEST_DIR="$PYTHON_CRATE_DIR/nairobi_os/bin"
