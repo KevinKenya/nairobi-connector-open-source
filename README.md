@@ -13,13 +13,7 @@
 
 Nairobi OS is not the product of a comfortable corporate incubator or a venture-backed research lab. It is the result of absolute necessity, born from a sequence of deep personal crises and a relentless drive to execute where standard industry tools fail.
 
-I am Kevin Chege, 45 year old founder of Sovereign Systems Lab (Nairobi, Kenya). From 2009 to 2022, my life was consumed by severe alcoholism. It cost me professional standing, opportunities, and nearly my life. At the height of my addiction, I worked as an Analyst in the Strategy Office of The Open University in Milton Keynes, UK, following my time as the Founder and President of AIESEC in Rwanda (2006–2010). Today, I am in my fourth year of continuous sobriety.
 
-```
-                     LEGIO XIII GEMINA
-              "The 13th Legion — June 13th"
-     Thirteen years lost. Thirteen years to reclaim.
-```
 
 My programming journey is rooted in low-level systems architecture and extreme optimization. In 2015, I shared my coding background as I made suggestions on building decentralized, highly technical capabilities on the African continent in [this treatise on Kenya's Silicon Valley](https://www.linkedin.com/pulse/building-kenyas-silicon-valley-making-work-kevin-chege/). When the LLM gold rush began in 2023, I was early. I built and deployed LLM wrappers, but quickly recognized their limitations, as documented in this early [2023 LLM wrapper demonstration](https://www.linkedin.com/feed/update/urn:li:activity:7102930955807449088/). 
 
