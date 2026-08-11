@@ -2,309 +2,261 @@
 
 # Nairobi OS: High-Performance, Zero-Copy AI & Data Science Infrastructure
 
-[![PyPI Version](https://img.shields.io/pypi/v/nairobi-os.svg)](https://pypi.org/project/nairobi-os/)
-[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
-![System](https://img.shields.io/badge/Kernel-Linux_6.17_Native-orange.svg)
-![Arch](https://img.shields.io/badge/Architecture-x86__64_/_ARM64-red.svg)
+[![PyPI Version](https://img.shields.io/pypi/v/nairobi-os.svg)](https://pypi.org/project/nairobi-os/) [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://github.com/KevinKenya/nairobi-connector-open-source/blob/main/LICENSE) [![System](https://img.shields.io/badge/Kernel-Linux_6.17_Native-orange.svg)]() [![Arch](https://img.shields.io/badge/Architecture-x86__64_/_ARM64-red.svg)]()
 
 ---
 
-## The Origin: From the Crucible to the Metal
+## Why This Exists
 
-Nairobi OS is not the product of a comfortable corporate incubator or a venture-backed research lab. It is the result of absolute necessity, born from a sequence of deep personal crises and a relentless drive to execute where standard industry tools fail.
+Nairobi OS is infrastructure for running AI and data-science pipelines on local hardware
+without paying the overhead that Python's default tooling introduces at each layer:
 
+1. **The Python Tax** — end-to-end memory copying, GIL contention, and interpreter overhead
+   on data-heavy workloads.
+2. **The Browser Tax** — rendering latency and communication overhead when agent tooling is
+   built on top of browser-based interfaces for long-running, high-frequency interactions.
+3. **The OS Kernel Bottleneck** — process scheduling and display-server overhead (Wayland vs.
+   X11 context switching) that adds latency to desktop-automation workloads.
 
+Nairobi OS is a Rust-based infrastructure stack — zero-copy data pipelines, hardware-native
+execution, and a semantic (non-pixel) interface for desktop automation — built to remove these
+overheads directly. This repository is the open-source core of that stack.
 
-My programming journey is rooted in low-level systems architecture and extreme optimization. In 2015, I shared my coding background as I made suggestions on building decentralized, highly technical capabilities on the African continent in [this treatise on Kenya's Silicon Valley](https://www.linkedin.com/pulse/building-kenyas-silicon-valley-making-work-kevin-chege/). When the LLM gold rush began in 2023, I was early. I built and deployed LLM wrappers, but quickly recognized their limitations, as documented in this early [2023 LLM wrapper demonstration](https://www.linkedin.com/feed/update/urn:li:activity:7102930955807449088/). 
+The engine originated from work building **Tumz** ([Sarafakai](http://www.sarafakai.com)), an
+air-gapped clinical decision-support system running real-time audio transcription and clinical
+inference on integrated GPU hardware, keeping the full UMLS resident in RAM. That project
+surfaced the systemic Python/browser/kernel overheads above, which Nairobi OS was built to
+address more generally.
 
-I realized that building high-level wrappers on top of unstable APIs was a architectural dead-end. The real war is fought at the intersection of local hardware constraints and resource allocation.
-
-Throughout 2025, I lived on a Lenovo X13 ThinkPad with a highly constrained hardware profile:
-
+Reference hardware used in development and benchmarking:
 ```
 Processor: AMD Ryzen 5 PRO 4650U (6 Cores, 12 Threads)
-Graphics: AMD Radeon RX Vega 6 iGPU
-Memory: 32 GB RAM (with high system utilization)
-Storage: 256 GB NVMe
-```
-
-On this exact machine, I spent 2025 building **Tumz** ([Sarafakai](http://www.sarafakai.com)), an air-gapped, zero-latency clinical decision support AI. It executed live, real-time audio transcription and clinical inference simultaneously on the integrated GPU (iGPU), keeping the entire Unified Medical Language System (UMLS) resident in RAM. We are currently partnering with a Kenyan hospital to pilot Tumz for a year-long clinical trial—because human health requires rigorous, empirical validation, not developers' assumptions.
-
-During the development of Tumz, I encountered the massive, systemic inefficiencies of the modern data science stack:
-1. **The Python Tax**: End-to-end memory copying, GIL bottlenecks, and massive runtime overhead.
-2. **The Browser Tax**: Manifest V3 complications, rendering latency, and high-frequency communication failures in long-running agentic conversations.
-3. **The OS Kernel Bottleneck**: Inefficient process scheduling, CPU thread starvation, and display server overhead (Wayland vs. X11 context switching).
-
-So, at the close of 2025, I set out to build an infrastructure stack that bypasses these limits entirely—an Agentic Operating System designed for zero-copy data pipelines and hardware-native AI execution. This repository is the open-source core of that engine.
-
----
-
-## The Battle Record: 9,180 Contributions in the Last Year
-
-Some critics in the modern development community look at new, highly advanced projects and dismiss them as "AI-generated boilerplate." To those skeptics, I offer the raw, physical proof of the commit log.
-
-My other GitHub profile (https://github.com/ChegeKenya) stands as an empirical record of intense, daily systems engineering. In 2025 alone, I logged 7,888 contributions. In the first five months of 2026, I added 1,420 contributions. That is 9,180 contributions in the trailing 365 days—a near-unbroken sequence of green commits spanning low-latency Rust runtimes, clinical AI pipelines, and zero-copy shared memory systems. This is code written in the trenches, compiled on bare metal, and audited byte by byte.
-
-```
-2025: [██████████████████████████████████████████████████] 7,888 Commits
-  2026: [██████████] 1,420 Commits
-  Total (Last Year): 9,180 Commits of Pure Systems Code
+Graphics:  AMD Radeon RX Vega 6 iGPU
+Memory:    32 GB RAM
+Storage:   256 GB NVMe
 ```
 
 ---
 
-## Global Traction & Telemetry
+## Adoption
 
-Launched on May 6, 2026, Nairobi OS has rapidly gained traction among systems programmers, quantitative researchers, and edge computing architects worldwide. These download statistics are sourced from the live [ClickPy Nairobi OS Dashboard](https://clickpy.clickhouse.com/dashboard/nairobi-os), where you can search and explore the metrics for yourself.
+Launched May 6, 2026. Current PyPI download statistics (sourced from the live
+[ClickPy dashboard](https://clickpy.clickhouse.com/dashboard/nairobi-os), verifiable directly):
 
-### Cumulative Global Distribution (May 6, 2026 – May 23, 2026)
-
-| Metric | Measurement | Context |
-| :--- | :--- | :--- |
-| **Global Rank** | **#75,293** | Out of 797,894 active packages on PyPI |
-| **Percentile** | **9.43%** | Top-tier ranking for system-level Python extensions |
-| **Total Downloads** | **1,525** | Clean, organic, high-intent developer downloads |
-
-### Download Volume by Version
-
-```
-   0.2.0 [████████████████████████████████████████] 342
-   0.2.1 [██████████████████████████] 224
-   0.3.0 [████████████████████████] 212
-   0.3.1 [████████████████████] 176
-   0.1.0 [███████████████████] 169
-   0.4.1 [██████████████] 120
-   0.5.0 [███] 0
-```
-
-### Top 10 Sovereign Regions of Adoption
-
-| Rank | Region | Country Code | Download Volume |
-| :--- | :--- | :--- | :--- |
-| 1 | United States | US | 661 |
-| 2 | Hong Kong | HK | 103 |
-| 3 | China | CN | 84 |
-| 4 | Germany | DE | 74 |
-| 5 | Japan | JP | 65 |
-| 6 | Singapore | SG | 56 |
-| 7 | United Kingdom | GB | 51 |
-| 8 | France | FR | 51 |
-| 9 | Russia | RU | 42 |
-| 10 | South Korea | KR | 30 |
-
----
-
-## Support & Sovereignty
-
-If Nairobi OS is optimizing your data pipelines, reducing your cloud bills, or driving your local agentic architectures, consider supporting our independent systems research. Every contribution is directly deployed into hardware-level compiler optimizations and edge-compute testing in Nairobi.
-
-[![Support Nairobi OS Development](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-PayPal-blue.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=chege.finance@gmail.com&item_name=Support+Nairobi+OS+Development)
-
-For direct inquiries, contact: aiwithafrica@gmail.com
-
+| Metric | Value |
+|---|---|
+| Total downloads (since launch) | 1,525 |
+| Top adopting countries | US, HK, CN, DE, JP |
 
 ---
 
 ## Key Features
 
-- **Computer Use Without Pixels**: AT-SPI2 semantic interface with TOON compression for native desktop interaction
-- **Zero-Copy Ingestion**: `io_uring` and 1GB Huge Pages for kernel-bypass data loading
-- **Hardware-Accelerated Visualization**: Low-latency Jupyter plotting via `lagos-lite` (wgpu/egui)
-- **Vectorized Execution**: Polars query engine + Rayon multi-threaded pipelines
-- **Sovereign Interface**: Python API (`SovereignFrame`) with memory-mapped IPC
-- **Canvas Pipelines**: Visual node graph compiler with native file picker and SQL query presets
+- **Computer Use Without Pixels**: AT-SPI2 semantic interface with TOON compression for
+  native desktop interaction — agents read a structured UI tree, not screenshots.
+- **Zero-Copy Ingestion**: `io_uring` and 1GB Huge Pages for kernel-bypass data loading.
+- **Hardware-Accelerated Visualization**: Low-latency Jupyter plotting via `lagos-lite`
+  (wgpu/egui).
+- **Vectorized Execution**: Polars query engine + Rayon multi-threaded pipelines.
+- **Python API**: `SovereignFrame` — a Python-facing frame API backed by memory-mapped IPC,
+  so data manipulation from Python doesn't pay a serialization cost to reach the Rust layer.
+- **Canvas Pipelines**: Visual node-graph compiler with a native file picker and SQL query
+  presets for building pipelines without writing glue code.
 
 ---
 
 ## Architecture
 
-Nairobi OS is structurally bifurcated: the open-source repository provides fundamental high-performance data processing primitives, while the closed-source commercial ecosystem contains advanced multi-agent, high-availability, and industry-specific implementations.
+The repository is structurally split: the open-source core provides the fundamental
+high-performance data-processing primitives; a separate closed-source repository
+(`Sovereign-Systems-Lab`) contains multi-agent, high-availability, and industry-specific
+extensions built on top of this core.
 
 ```
-                                  +---------------------------------------+
-                                  |         Nairobi Python API            |
-                                  +---------------------------------------+
-                                                      |
-                                     [ GVariant over D-Bus / shared memory ]
-                                                      |
-                                                      v
-                                  +---------------------------------------+
-                                  |           Nairobi Hub                 |
-                                  +---------------------------------------+
-                                                      |
-                    +---------------------------------+---------------------------------+
-                    |                                                                   |
-                    v                                                                   v
-     +------------------------------+                                    +------------------------------+
-     |     Axum Refinery (Data)     | <===[ Zero-Copy IPC / iceoryx2 ]==> |     Lagos Vision (Visual)    |
-     +------------------------------+                                    +------------------------------+
+                             +---------------------------------------+
+                             |         Nairobi Python API            |
+                             +---------------------------------------+
+                                                 |
+                                [ GVariant over D-Bus / shared memory ]
+                                                 |
+                                                 v
+                             +---------------------------------------+
+                             |           Nairobi Hub                 |
+                             +---------------------------------------+
+                                                 |
+               +---------------------------------+---------------------------------+
+               |                                                                   |
+               v                                                                   v
++------------------------------+                                    +------------------------------+
+|     Axum Refinery (Data)     | <===[ Zero-Copy IPC / iceoryx2 ]==> |     Lagos Vision (Visual)    |
++------------------------------+                                    +------------------------------+
 ```
 
 ### Open Source Crate Workspace (`crates/`)
 
-1. **`nairobi-axum-refinery`**: High-performance Rust daemon managing raw data ingestion, Rayon-parallelized statistics, and Polars-vectorized query execution.
-2. **`nairobi-hub`**: The central IPC orchestrator. Manages and routes file descriptors and signals between clients and the refinery daemon.
-3. **`lagos-lite`**: The visual cortex. A local-only rendering engine that uses egui/wgpu hardware acceleration with Zero-Copy mmap data access. Requires a physical display.
-4. **`nairobi-protocol`**: The shared protocol layer. Defines standard GVariant serialization schemes, error types, and shared memory layouts.
-5. **`nairobi-python`**: The Python extension module compiled via `PyO3` and packaged with `Maturin`.
-6. **`nairobi-canvas`**: Immediate-mode node graph compiler with hardware-accelerated UI (wgpu/egui). Features native file picker for data ingestion and SQL query presets for rapid pipeline construction.
+1. **`nairobi-axum-refinery`** — Rust daemon managing raw data ingestion, Rayon-parallelized
+   statistics, and Polars-vectorized query execution.
+2. **`nairobi-hub`** — Central IPC orchestrator; routes file descriptors and signals between
+   clients and the refinery daemon.
+3. **`lagos-lite`** — Local-only rendering engine using egui/wgpu hardware acceleration with
+   zero-copy mmap data access. Requires a physical display.
+4. **`nairobi-protocol`** — Shared protocol layer: GVariant serialization schemes, error
+   types, and shared-memory layouts.
+5. **`nairobi-python`** — The Python extension module, compiled via PyO3 and packaged with
+   Maturin.
+6. **`nairobi-canvas`** — Immediate-mode node-graph compiler with hardware-accelerated UI
+   (wgpu/egui), including a native file picker and SQL query presets.
 
-### Private Corporate Ecosystem (`modules/`)
+### Private Extensions (`Sovereign-Systems-Lab`, closed-source)
 
-Our enterprise-tier components are held in a private repository (`Sovereign-Systems-Lab`) and licensed for industrial, financial, and state-level infrastructure.
+Enterprise-tier components — advanced MCP integration, hardware-bound security, and
+industry-specific modules — are maintained in a private repository and licensed separately.
+Details available on request.
 
-1. **`sovereign-ui`**: The enterprise AT-SPI2 engine. Implements Aegis Protocol security, hardware binding, and production-grade desktop manipulation.
-2. **`nairobi-connector`**: Advanced Model Context Protocol (MCP) server managing raw, low-latency D-Bus signals for enterprise LLMs.
-3. **`tactical-rtos-node`**: Ultra-low-latency, real-time operating system scheduler for safety-critical edge industrial automation.
-4. **`industrial-guardian-rust` / `industrial-guardian-python`**: Autonomous site reliability engineering (SRE) layer with predictive OOM, memory leak, and system crash avoidance.
-5. **`fintech-bridge-rust`**: Real-time high-frequency transaction parser and legacy mainframe bridge (EBCDIC/SBA terminal parsing).
-6. **`aviation-audio-rust`**: Sub-millisecond, lock-free audio stream processing, acoustic telemetry analysis, and raw wave DSP.
-7. **`drawbridge_api`**: Secure, authenticated, multi-tenant gRPC drawbridge isolating the local kernel from untrusted cloud agent calls.
+### Capability Comparison
 
-### Capability Comparison Matrix
-
-| Capability / Feature | Open Source Core (`crates/`) | Enterprise Suite (`modules/`) |
-| :--- | :---: | :---: |
-| **Ingestion Engine** | `mmap` / `copy_file_range` | `io_uring` + `SQPOLL` + 1GB Huge Pages |
-| **Statistical Analysis** | Basic descriptive stats | Vectorized, multi-pass skew/kurtosis, correlation |
-| **Query Engine** | In-process Polars SQL | Distributed Apache Arrow / DataFusion cluster |
-| **IPC Mechanism** | POSIX shared memory / D-Bus | Zero-Copy `iceoryx2` shared memory arenas |
-| **Visualization** | Local Jupyter `anywidget` (display required) | Headless WebSocket streaming + WebRTC + Wayland overlays |
-| **Security & Compliance** | Standard POSIX boundaries | Aegis Protocol, SHA-256 Chained Forensic Ledger |
-| **Authentication** | None (Local trusted user) | Hardware Binding (TPM 2.0 / CPU ID), private PKI |
-| **Platform Target** | Single-node Linux | Distributed Cloud / Edge Node / High-Frequency Trading |
+| Capability | Open Source Core (`crates/`) | Enterprise Suite (private) |
+|---|---|---|
+| Ingestion Engine | `mmap` / `copy_file_range` | `io_uring` + `SQPOLL` + 1GB Huge Pages |
+| Statistical Analysis | Basic descriptive stats | Vectorized multi-pass skew/kurtosis, correlation |
+| Query Engine | In-process Polars SQL | Distributed Apache Arrow / DataFusion cluster |
+| IPC Mechanism | POSIX shared memory / D-Bus | Zero-copy `iceoryx2` shared-memory arenas |
+| Visualization | Local Jupyter `anywidget` (display required) | Headless WebSocket / WebRTC / Wayland overlays |
+| Security | Standard POSIX boundaries | Hardware-bound identity, chained forensic ledger |
+| Authentication | None (local trusted user) | Hardware binding (TPM 2.0 / CPU ID), private PKI |
+| Target Deployment | Single-node Linux | Distributed cloud / edge node |
 
 ---
 
 ## Installation & Setup
 
 ### Requirements
-- **OS**: Linux (Ubuntu 22.04+ recommended) or Windows Subsystem for Linux (WSL2).
-- **GPU**: Vulkan, Metal, or OpenGL compatible driver.
+
+- **OS**: Linux (Ubuntu 22.04+ recommended) or WSL2.
+- **GPU**: Vulkan, Metal, or OpenGL-compatible driver.
 - **Python**: 3.10 or newer.
 - **Rust**: Stable toolchain (if building from source).
 
 ### Quick Install (PyPI)
+
 ```bash
 pip install nairobi-os
 ```
 
 ### Build from Source
-To compile the entire workspace, including the native daemons and Python extension:
 
-1. **Clone the Repository**:
-   ```bash
-   git clone https://github.com/KevinKenya/nairobi-connector-open-source.git
-   cd nairobi-connector-open-source
-   ```
+```bash
+git clone https://github.com/KevinKenya/nairobi-connector-open-source.git
+cd nairobi-connector-open-source
 
-2. **Configure Virtual Environment**:
-   ```bash
-   python3 -m venv .venv
-   source .venv/bin/activate
-   pip install maturin pyo3-build-config zbus anywidget traitlets pandas
-   ```
+python3 -m venv .venv
+source .venv/bin/activate
+pip install maturin pyo3-build-config zbus anywidget traitlets pandas
 
-3. **Execute Workspace Build**:
-   ```bash
-   chmod +x build_wheel.sh
-   ./build_wheel.sh --release
-   ```
-   This compiles the native daemons, copies them to the package directory, and builds a wheel under `crates/nairobi-python/target/wheels/`.
+chmod +x build_wheel.sh
+./build_wheel.sh --release
+```
+
+This compiles the native daemons, copies them into the package directory, and builds a wheel
+under `crates/nairobi-python/target/wheels/`.
 
 ---
 
-## Usage Guide
+## Usage
 
-### 1. Data Analytics (The In-Memory Pipeline)
-
-Nairobi OS provides the `SovereignFrame` API. It handles raw memory mapping under the hood, enabling rapid data manipulation.
+### 1. Data Analytics (In-Memory Pipeline)
 
 ```python
 import nairobi_os as nb
 
-# Ignite the background refinery daemon
+# Start the background refinery daemon
 nb.connect()
 
-# Ingest dataset using zero-copy memory pipe
+# Ingest a dataset via zero-copy memory pipe
 frame = nb.read_csv("simulator/fndds_ingredient_nutrient_value.csv")
 
-# Perform vectorized calculations via Rust refinery
+# Vectorized computation via the Rust refinery
 profile = frame.crunch("value")
 print(f"Mean: {profile['mean']:.4f}")
 print(f"Std Dev: {profile['std_dev']:.4f}")
 
-# Execute arbitrary SQL queries directly on the memory-mapped frame
+# Arbitrary SQL directly against the memory-mapped frame
 subset = frame.query("SELECT * FROM dataset WHERE value > 50.0")
 
-# Spawn the Lagos-accelerated interactive plotting widget
+# Lagos-accelerated interactive plotting widget
 subset.plot(column="value")
 ```
 
 ### 2. Canvas Visual Pipelines
 
-Nairobi OS provides an immediate-mode node graph canvas for visual pipeline construction. The UI supports native file dialogs and SQL query presets.
-
 ```python
 import nairobi_os as nb
 
-# Open the visual canvas for DAG compilation
 dag_bytes = nb.canvas.open()
 
-# Execute the compiled pipeline
 if dag_bytes:
     nb.canvas.execute(dag_bytes)
 ```
 
-The canvas UI features:
-- **Ingest Node**: Click the 📂 button to open a native file picker dialog for selecting CSV datasets
-- **SQL Query Node**: Select from query presets (All Columns, Single Column, Where Clause, Multi-Column) for rapid query building
+The canvas UI supports a native file-picker ingest node and SQL query presets (All Columns,
+Single Column, Where Clause, Multi-Column) for rapid pipeline construction.
 
 ### 3. Computer Use Without Pixels (MCP)
 
-To use the AT-SPI2 semantic interface, your AI agent should interact with the exposed MCP server tools rather than reading screenshots:
+Agents interact with the exposed MCP server tools rather than reading screenshots:
 
 ```
-                      COMPUTER USE SEQUENCE
-                      
-  [ LLM Agent ]                                 [ Nairobi OS ]
-        |                                             |
-        |===> nairobi_find_window("Text Editor") ====>| (Locates Target)
-        |<=== Returns Window ID & Bounds =============|
-        |                                             |
-        |===> nairobi_get_ui_map() ==================>| (Generates TOON)
-        |<=== Returns compressed Markdown Tree =======|
-        |     "[ID: 12] Button: 'Save'"               |
-        |                                             |
-        |===> nairobi_interact(12, "click") =========>| (Executes Action)
-        |<=== Returns Success Status =================|
+                    COMPUTER USE SEQUENCE
+
+[ LLM Agent ]                                 [ Nairobi OS ]
+      |                                             |
+      |===> nairobi_find_window("Text Editor") ====>| (Locates target)
+      |<=== Returns window ID & bounds =============|
+      |                                             |
+      |===> nairobi_get_ui_map() ==================>| (Generates TOON)
+      |<=== Returns compressed markdown tree =======|
+      |     "[ID: 12] Button: 'Save'"               |
+      |                                             |
+      |===> nairobi_interact(12, "click") =========>| (Executes action)
+      |<=== Returns success status =================|
 ```
 
 ---
 
 ## System Tuning (Contributor Guide)
 
-To achieve the performance profiles shown in our benchmarks, your host kernel must be configured for system-level memory mapping.
-
 ### 1GB Huge Pages
-Nairobi OS uses 1GB Huge Pages to bypass the CPU’s Translation Lookaside Buffer (TLB) translation overhead on massive datasets. 
 
-To allocate a Huge Page on your Linux host:
+Nairobi OS uses 1GB Huge Pages to reduce TLB translation overhead on large datasets:
+
 ```bash
 echo 1 | sudo tee /sys/kernel/mm/hugepages/hugepages-1048576kB/nr_hugepages
 ```
-*Note: If the system cannot allocate a 1GB page due to fragmentation, the engine automatically falls back to Transparent Huge Pages (THP).*
+
+If the system can't allocate a 1GB page due to fragmentation, the engine falls back to
+Transparent Huge Pages (THP) automatically.
 
 ### D-Bus Broker Configuration
-In high-frequency environments, ensure `dbus-broker` is installed instead of legacy `dbus-daemon` to handle rapid signal propagation across the control plane.
+
+For high-frequency signal environments, use `dbus-broker` rather than legacy `dbus-daemon`.
+
+---
+
+## Support
+
+If Nairobi OS is useful in your data pipeline or agentic architecture, consider supporting
+continued development:
+
+[![Support Nairobi OS Development](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-PayPal-blue.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=chege.finance@gmail.com&item_name=Support+Nairobi+OS+Development)
+
+Direct inquiries: aiwithafrica@gmail.com
 
 ---
 
 ## License
 
-This project is licensed under the **Apache License 2.0**.  
-*(Note: Portions of the TOON format and bridge implementation are credited to The TOON Authors.)*
+Apache License 2.0. Portions of the TOON format and bridge implementation are credited to
+The TOON Authors.
 
 ---
-© 2026 Kevin Chege. All Rights Reserved.  
-*Sovereign Systems Lab, Nairobi, Kenya.*
+© 2026 Kevin Chege. Sovereign Systems Lab, Nairobi, Kenya.
