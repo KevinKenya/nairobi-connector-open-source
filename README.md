@@ -22,11 +22,6 @@ Nairobi OS is a Rust-based infrastructure stack — zero-copy data pipelines, ha
 execution, and a semantic (non-pixel) interface for desktop automation — built to remove these
 overheads directly. This repository is the open-source core of that stack.
 
-The engine originated from work building **Tumz** ([Sarafakai](http://www.sarafakai.com)), an
-air-gapped clinical decision-support system running real-time audio transcription and clinical
-inference on integrated GPU hardware, keeping the full UMLS resident in RAM. That project
-surfaced the systemic Python/browser/kernel overheads above, which Nairobi OS was built to
-address more generally.
 
 Reference hardware used in development and benchmarking:
 ```
