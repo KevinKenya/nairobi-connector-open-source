@@ -11,15 +11,7 @@
 
 ## Alkuperä: Upokkaasta metalliin
 
-Nairobi OS ei ole mukavan yrityshautomon tai pääomasijoittajien rahoittaman tutkimuslaboratorion tuote. Se on ehdottoman välttämättömyyden tulos, joka on syntynyt syvien henkilökohtaisten kriisien sarjasta ja säälimättömästä halusta toimia siellä, missä alan vakiotyökalut epäonnistuvat.
 
-Olen Kevin Chege, Sovereign Systems Labin (Nairobi, Kenia) perustaja. Vuosina 2009–2022 elämäni kului vakavan alkoholismin parissa. Se maksoi minulle ammatillisen asemani, mahdollisuuteni ja melkein elämäni. Riippuvuuteni huipulla työskentelin analyytikkona Open Universityn strategiatoimistossa Milton Keynesissä, Isossa-Britanniassa, toimittuani sitä ennen AIESECin perustajana ja puheenjohtajana Ruandassa (2006–2010). Tänään olen neljättä vuotta jatkuvasti raittiina.
-
-```
-                     LEGIO XIII GEMINA
-              "13. legioona — 13. kesäkuuta"
-     Kolmetoista kadotettua vuotta. Kolmetoista vuotta takaisin vaadittavaksi.
-```
 
 Ohjelmointimatkani juuret ovat matalan tason järjestelmäarkkitehtuurissa ja äärimmäisessä optimoinnissa. Vuonna 2015 esitin vision hajautetun, erittäin teknisen kapasiteetin rakentamisesta Afrikan mantereelle [tässä tutkielmassa Kenian Piilaaksosta](https://www.linkedin.com/pulse/building-kenyas-silicon-valley-making-work-kevin-chege/). Kun LLM-kultaryntäys alkoi vuonna 2023, olin varhaisessa vaiheessa mukana. Rakensin ja otin käyttöön LLM-kääreitä (wrappers), mutta tunnistin nopeasti niiden rajoitukset, kuten on dokumentoitu tässä varhaisessa [2023 LLM-kääreen esittelyssä](https://www.linkedin.com/feed/update/urn:li:activity:7102930955807449088/).
 
