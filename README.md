@@ -45,7 +45,7 @@ Launched May 6, 2026. Current PyPI download statistics (sourced from the live
 
 | Metric | Value |
 |---|---|
-| Total downloads (since launch) | 1,525 |
+| Total downloads (since launch) | 2700 |
 | Top adopting countries | US, HK, CN, DE, JP |
 
 ---
