@@ -11,15 +11,7 @@
 
 ## Der Ursprung: Aus dem Schmelztiegel zum Metall
 
-Nairobi OS ist nicht das Produkt eines komfortablen Unternehmens-Inkubators oder eines von Risikokapital finanzierten Forschungslabors. Es ist das Ergebnis absoluter Notwendigkeit, geboren aus einer Reihe tiefer persönlicher Krisen und dem unerbittlichen Drang zu handeln, wo Standard-Werkzeuge der Industrie versagen.
 
-Ich bin Kevin Chege, Gründer des Sovereign Systems Lab (Nairobi, Kenia). Von 2009 bis 2022 war mein Leben von schwerem Alkoholismus geprägt. Er kostete mich mein berufliches Ansehen, Chancen und fast mein Leben. Auf dem Höhepunkt meiner Sucht arbeitete ich als Analyst im Strategiebüro der Open University in Milton Keynes, Großbritannien, nachdem ich zuvor als Gründer und Präsident von AIESEC in Ruanda (2006–2010) tätig war. Heute befinde ich mich in meinem vierten Jahr kontinuierlicher Nüchternheit.
-
-```
-                     LEGIO XIII GEMINA
-              "Die 13. Legion — 13. Juni"
-     Dreizehn verlorene Jahre. Dreizehn Jahre zum Zurückfordern.
-```
 
 Mein Programmierweg ist in der hardwarenahen Systemarchitektur und extremen Optimierung verwurzelt. Im Jahr 2015 legte ich meine Vision für den Aufbau dezentraler, hochtechnischer Kapazitäten auf dem afrikanischen Kontinent in [dieser Abhandlung über Kenias Silicon Valley](https://www.linkedin.com/pulse/building-kenyas-silicon-valley-making-work-kevin-chege/) dar. Als der LLM-Goldrausch 2023 begann, war ich früh dabei. Ich baute und implementierte LLM-Wrapper, erkannte jedoch schnell deren Grenzen, wie in dieser frühen [LLM-Wrapper-Demonstration aus dem Jahr 2023](https://www.linkedin.com/feed/update/urn:li:activity:7102930955807449088/) dokumentiert.
 
