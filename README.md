@@ -2,7 +2,7 @@
 
 # Nairobi OS: High-Performance, Zero-Copy AI & Data Science Infrastructure
 
-[![PyPI Version](https://img.shields.io/pypi/v/nairobi-os.svg)](https://pypi.org/project/nairobi-os/) [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://github.com/KevinKenya/nairobi-connector-open-source/blob/main/LICENSE) [![System](https://img.shields.io/badge/Kernel-Linux_6.17_Native-orange.svg)]() [![Arch](https://img.shields.io/badge/Architecture-x86__64_/_ARM64-red.svg)]()
+[![PyPI Version](https://img.shields.io/pypi/v/nairobi-os.svg)](https://pypi.org/project/nairobi-os/) [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://github.com/KevinKenya/nairobi-connector-open-source/blob/main/LICENSE) [![System](https://img.shields.io/badge/Kernel-Linux_6.17_Native-orange.svg)]() [![Arch](https://img.shields.io/badge/Architecture-x86__64_/_ARM64-red.svg)]() [![Open In Kaggle](https://kaggle.com/static/images/open-in-kaggle.svg)](https://www.kaggle.com/code)
 
 ---
 
