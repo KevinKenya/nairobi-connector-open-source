@@ -9,15 +9,15 @@
 
 ---
 
-## Der Ursprung: Aus dem Schmelztiegel zum Metall
+## Warum dies existiert
 
+Nairobi OS ist eine Infrastruktur zum Ausführen von KI- und Data-Science-Pipelines auf lokaler Hardware, ohne die Overhead-Kosten zu zahlen, die Pythons Standard-Tooling auf jeder Ebene verursacht:
 
+1. **Die Python-Steuer** — Durchgehende Speicher-Kopiervorgänge, GIL-Konkurrenz und Interpreter-Overhead bei datenintensiven Arbeitslasten.
+2. **Die Browser-Steuer** — Rendering-Latenz und Kommunikations-Overhead, wenn Agenten-Tools auf browserbasierten Schnittstellen für langlaufende, hochfrequente Interaktionen aufgebaut sind.
+3. **Der OS-Kernel-Flaschenhals** — Prozess-Scheduling und Display-Server-Overhead (Wayland vs. X11 Kontextwechsel), die Latenz bei Desktop-Automatisierungs-Arbeitslasten verursachen.
 
-Mein Programmierweg ist in der hardwarenahen Systemarchitektur und extremen Optimierung verwurzelt. Im Jahr 2015 legte ich meine Vision für den Aufbau dezentraler, hochtechnischer Kapazitäten auf dem afrikanischen Kontinent in [dieser Abhandlung über Kenias Silicon Valley](https://www.linkedin.com/pulse/building-kenyas-silicon-valley-making-work-kevin-chege/) dar. Als der LLM-Goldrausch 2023 begann, war ich früh dabei. Ich baute und implementierte LLM-Wrapper, erkannte jedoch schnell deren Grenzen, wie in dieser frühen [LLM-Wrapper-Demonstration aus dem Jahr 2023](https://www.linkedin.com/feed/update/urn:li:activity:7102930955807449088/) dokumentiert.
-
-Mir wurde klar, dass der Aufbau von High-Level-Wrappern auf instabilen APIs eine architektonische Sackgasse war. Der wahre Krieg wird an der Schnittstelle zwischen lokalen Hardwarebeschränkungen und Ressourcenzuweisung geführt.
-
-Das gesamte Jahr 2025 über lebte ich auf einem Lenovo X13 ThinkPad mit einem stark eingeschränkten Hardwareprofil:
+Nairobi OS ist ein auf Rust basierender Infrastruktur-Stack — Zero-Copy-Datenpipelines, hardware-native Ausführung und eine semantische (nicht-pixelbasierte) Schnittstelle für Desktop-Automatisierung —, der entwickelt wurde, um diese Overheads direkt zu beseitigen. Dieses Repository ist der Open-Source-Kern dieses Stacks.
 
 ```
 Prozessor: AMD Ryzen 5 PRO 4650U (6 Kerne, 12 Threads)
