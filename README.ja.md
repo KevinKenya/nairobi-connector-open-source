@@ -151,20 +151,19 @@ Nairobi OS は構造的に分岐しています。オープンソースリポジ
      +------------------------------+                                    +------------------------------+
 ```
 
-### オープンソース Crate ワークスペース (`crates/`)
-
-1. **`nairobi-axum-refinery`**：生のデータインジェクション、Rayon 並列化統計計算、および Polars ベクトル化クエリ実行を管理する、高性能 Rust デーモン。
-2. **`nairobi-hub`**：中央の IPC オーケストレーター。クライアントと refinery デーモン間のファイル記述子と信号の管理とルーティングを行います。
-3. **`lagos-lite`**：視覚皮層。メモリマップされたファイル記述子を直接 GPU パイプラインにマップする、ヘッドレスなイベント駆動型レンダリングエンジン。
-4. **`nairobi-protocol`**：共有プロトコルレイヤ。標準の GVariant シリアライズスキーム、エラータイプ、および共有メモリレイアウトを定義します。
-5. **`nairobi-python`**：`PyO3` を介してコンパイルされ、`Maturin` でパッケージ化された Python 拡張モジュール。
-
+### Open Source Crate Workspace (`crates/`)
+1. `nairobi-axum-refinery` — Rust daemon managing raw data ingestion, Rayon-parallelized statistics, and Polars-vectorized query execution.
+2. `nairobi-hub` — Central IPC orchestrator; routes file descriptors and signals between clients and the refinery daemon.
+3. `lagos-lite` — Local/headless rendering engine using egui/wgpu hardware acceleration with zero-copy mmap data access.
+4. `nairobi-protocol` — Shared protocol layer: GVariant serialization schemes, error types, and shared-memory layouts.
+5. `nairobi-python` — The Python extension module, compiled via PyO3 and packaged with Maturin (`nairobi-os`).
+6. `nairobi-canvas` — Immediate-mode node-graph compiler with hardware-accelerated UI (wgpu/egui), including a native file picker and SQL query presets.
+7. `nairobi-connector` — Model Context Protocol (MCP) server and AT-SPI2 semantic accessibility bridge exposing TOON representations for LLM agents.
 ### プライベートエンタープライズエコシステム (`modules/`)
 
 当社のエンタープライズ層コンポーネントは、プライベートリポジトリ（`Sovereign-Systems-Lab`）に保管されており、工業、金融、および国家インフラ用にライセンスされています。
 
 1. **`sovereign-ui`**：エンタープライズ向け AT-SPI2 エンジン。Aegis プロトコルセキュリティ、ハードウェアバインディング、および本番グレードのデスクトップ制御を実装。
-2. **`nairobi-connector`**：高度なモデルコンテキストプロトコル（MCP）サーバー。エンタープライズ向け LLM に生の低遅延 D-Bus 信号を提供。
 3. **`tactical-rtos-node`**：安全性が重要なエッジ産業オートメーション向け、超低遅延のリアルタイムオペレーティングシステム（RTOS）スケジューラー。
 4. **`industrial-guardian-rust` / `industrial-guardian-python`**：予測的OOM、メモリリーク、およびシステムクラッシュの回避機能を備えた、自律的なサイト信頼性エンジニアリング（SRE）レイヤ。
 5. **`fintech-bridge-rust`**：リアルタイムの高頻度取引パーサーおよびレガシーメインフレームブリッジ（EBCDIC/SBA 端末解析）。

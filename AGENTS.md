@@ -41,7 +41,7 @@ Tests use `memfd` for zero-copy memory mapping; no file fixtures required.
 - `dbus-broker` preferred over `dbus-daemon` for high-frequency signals
 - Optional: 1GB huge pages via `echo 1 | sudo tee /sys/kernel/mm/hugepages/hugepages-1048576kB/nr_hugepages` (falls back to THP)
 
-**Note**: Nairobi OS requires a physical display with GPU acceleration. All UI components run natively on the host machine—headless mode is not supported.
+**Note**: `lagos-vision-daemon` (in `lagos-lite`) renders fully offscreen via `wgpu` with no window created (confirmed in `crates/lagos-lite/src/main.rs` and `src/device.rs` `HeadlessContext`), and is already invoked headlessly by `nairobi-hub/src/executor.rs` during DAG execution. Desktop automation features (such as MCP/AT-SPI2 accessibility bridge) require an active X11/Wayland desktop session and D-Bus accessibility bus, whereas the rendering and data processing pipelines support headless offscreen execution.
 
 ## Key Dependencies
 

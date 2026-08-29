@@ -127,10 +127,10 @@ Details available on request.
 
 ### Requirements
 
-- **OS**: Linux (Ubuntu 22.04+ recommended) or WSL2.
-- **GPU**: Vulkan, Metal, or OpenGL-compatible driver.
-- **Python**: 3.10 or newer.
-- **Rust**: Stable toolchain (if building from source).
+- **OS**: Linux (Ubuntu 22.04+ recommended) or WSL2 (x86_64).
+- **Python**: Python 3.12 or newer (required for the PyPI binary wheel `nairobi-os`; PyPI currently ships cp312-manylinux2014_x86_64 only — no sdist, no macOS/Windows/ARM wheels).
+- **GPU**: Vulkan, Metal, or Mesa/OpenGL driver (software fallback supported).
+- **Rust**: Stable toolchain (only needed if building from source).
 
 ### Quick Install (PyPI)
 

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// File: /home/KevinKenya/nairobi-connector-open-source/crates/nairobi-protocol/tests/integration_tests.rs
+// File: crates/nairobi-protocol/tests/integration_tests.rs
 // Author: Kevin Chege. Location: Nairobi
 // Date: 2026-05-21
 
@@ -36,15 +36,16 @@ fn file_contains(path: &str, pattern: &str) -> bool {
 fn workspace_root() -> std::path::PathBuf {
     std::env::var("CARGO_MANIFEST_DIR")
         .map(|manifest_dir| std::path::PathBuf::from(manifest_dir).parent().unwrap().parent().unwrap().to_path_buf())
-        .unwrap_or_else(|_| std::path::PathBuf::from("/home/chege/nairobi-connector-open-source"))
+        .expect("CARGO_MANIFEST_DIR environment variable must be set")
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
 // 3.1 MemoryPipe Tests
 // ─────────────────────────────────────────────────────────────────────────────
 
+// TODO: Replace source text checking with runtime sealing validation by attempting to write to a sealed descriptor and asserting EPERM.
 #[test]
-fn test_memfd_forge_seal_pattern() {
+fn test_source_contains_memfd_forge_seal_pattern() {
     let path = "crates/nairobi-protocol/src/mem_pipe.rs";
     assert!(
         file_contains(path, "MemfdOptions"),
@@ -99,8 +100,9 @@ fn test_memfd_size() {
 // 3.2 GVariant Tests
 // ─────────────────────────────────────────────────────────────────────────────
 
+// TODO: Replace source text checking with runtime serialization/deserialization verification of DistilledAnalytics GVariant byte streams.
 #[test]
-fn test_distilled_analytics_structure() {
+fn test_source_contains_distilled_analytics_structure() {
     let path = "crates/nairobi-protocol/src/types.rs";
     assert!(
         file_contains(path, "struct DistilledAnalytics"),
@@ -147,8 +149,9 @@ fn test_distilled_analytics_creation() {
     assert!(true, "DistilledAnalytics struct should compile");
 }
 
+// TODO: Replace source text checking with actual zvariant GVariant serialization and deserialization roundtrip assertions.
 #[test]
-fn test_gvariant_serialization() {
+fn test_source_contains_gvariant_serialization() {
     // Verify GVariant signature matches documentation: (tdddddddddhas)
     let path = "crates/nairobi-protocol/src/types.rs";
     assert!(
@@ -161,8 +164,9 @@ fn test_gvariant_serialization() {
     );
 }
 
+// TODO: Replace source text checking with runtime construction and field extraction testing of SchemaInspection instances.
 #[test]
-fn test_schema_inspection_structure() {
+fn test_source_contains_schema_inspection_structure() {
     let path = "crates/nairobi-protocol/src/types.rs";
     assert!(
         file_contains(path, "struct SchemaInspection"),
@@ -186,8 +190,9 @@ fn test_schema_inspection_structure() {
     );
 }
 
+// TODO: Replace source text checking with runtime instantiation and serialization tests of CleanDataStrategy options.
 #[test]
-fn test_clean_data_strategy_structure() {
+fn test_source_contains_clean_data_strategy_structure() {
     let path = "crates/nairobi-protocol/src/types.rs";
     assert!(
         file_contains(path, "struct CleanDataStrategy"),
@@ -207,8 +212,9 @@ fn test_clean_data_strategy_structure() {
     );
 }
 
+// TODO: Replace source text checking with runtime computation and field evaluation of CorrelationResult structs.
 #[test]
-fn test_correlation_result_structure() {
+fn test_source_contains_correlation_result_structure() {
     let path = "crates/nairobi-protocol/src/types.rs";
     assert!(
         file_contains(path, "struct CorrelationResult"),
@@ -224,8 +230,9 @@ fn test_correlation_result_structure() {
     );
 }
 
+// TODO: Replace source text checking with zvariant Signature inspection on CorrelationResult at runtime.
 #[test]
-fn test_correlation_result_gvariant_signature() {
+fn test_source_contains_correlation_result_gvariant_signature() {
     let path = "crates/nairobi-protocol/src/types.rs";
     assert!(
         file_contains(path, "signature = \"(dd)\""),
@@ -237,8 +244,9 @@ fn test_correlation_result_gvariant_signature() {
 // 3.3 D-Bus Interface Tests
 // ─────────────────────────────────────────────────────────────────────────────
 
+// TODO: Replace source text checking with direct evaluation of imported D-Bus constants against protocol specifications.
 #[test]
-fn test_dbus_constants_match_bible() {
+fn test_source_contains_dbus_constants_match_bible() {
     let path = "crates/nairobi-protocol/src/interface.rs";
     assert!(
         file_contains(path, "org.nairobi.NairobiAxumRefinery1"),
@@ -254,8 +262,9 @@ fn test_dbus_constants_match_bible() {
     );
 }
 
+// TODO: Replace source text checking with zbus introspective XML / interface reflection analysis at runtime.
 #[test]
-fn test_dbus_method_signatures() {
+fn test_source_contains_dbus_method_signatures() {
     // Path relative to workspace root (cargo test runs from workspace root)
     let path = "crates/nairobi-axum-refinery/src/dbus_service.rs";
     assert!(

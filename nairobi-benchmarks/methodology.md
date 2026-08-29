@@ -26,10 +26,10 @@ To isolate the effects of the operating system's page cache and the engine's int
 *   **Iterations**: Minimum 10 runs per workload per engine.
 *   **Reporting**: We report the Mean and Standard Deviation of latency to ensure statistical significance.
 *   **Hardware Setup**:
-    *   **CPU**: [Placeholder: e.g., AMD Ryzen 4650U]
-    *   **RAM**: [Placeholder: e.g., 16GB]
-    *   **OS**: [Placeholder: e.g., Ubuntu 22.04 LTS]
-    *   **Disk**: [Placeholder: e.g., NVMe SSD]
+    *   **CPU**: AMD Ryzen 5 PRO 4650U (6 Cores, 12 Threads)
+    *   **RAM**: 32 GB LPDDR4x
+    *   **OS**: Ubuntu 24.04 LTS (Linux Kernel 6.8+)
+    *   **Disk**: 256 GB NVMe SSD
 
 ## 6. Workloads
 1.  **Statistical Distillation**: High-order moments (Skewness/Kurtosis) on 10M rows.

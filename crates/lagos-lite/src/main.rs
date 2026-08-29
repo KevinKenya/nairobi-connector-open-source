@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// File: /home/KevinKenya/nairobi-connector-open-source/crates/lagos-lite/src/main.rs
+// File: crates/lagos-lite/src/main.rs
 // Author: Kevin Chege. Location: Nairobi
 // Date: 2026-05-21
 

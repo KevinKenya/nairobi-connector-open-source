@@ -1,5 +1,5 @@
 name: "NBA Statistical Distillation"
 description: "Calculate Mean, Std Dev, Skewness, Kurtosis on NBA Player Statistics dataset"
-dataset: "/home/KevinKenya/nairobi-connector-open-source/simulator/PlayerStatisticsExtended.csv"
+dataset: "simulator/PlayerStatisticsExtended.csv"
 column: "points"
 iterations: 10

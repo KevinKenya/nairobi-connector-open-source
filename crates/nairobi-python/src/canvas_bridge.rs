@@ -138,7 +138,8 @@ fn populate_preset(snarl: &mut Snarl<NairobiNode>, preset_name: &str) {
             let node0 = snarl.insert_node(
                 Pos2::new(50.0, 50.0),
                 NairobiNode::Ingest {
-                    dataset_path: "/home/chege/nairobi-connector-open-source/simulator/PlayerStatisticsExtended.csv".to_string(),
+                    dataset_path: std::env::var("SIMULATOR_DATASET_PATH")
+                        .unwrap_or_else(|_| "simulator/PlayerStatisticsExtended.csv".to_string()),
                 },
             );
             let node1 = snarl.insert_node(

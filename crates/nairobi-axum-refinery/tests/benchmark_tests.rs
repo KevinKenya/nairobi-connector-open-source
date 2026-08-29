@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// File: /home/KevinKenya/nairobi-connector-open-source/crates/nairobi-axum-refinery/tests/benchmark_tests.rs
+// File: crates/nairobi-axum-refinery/tests/benchmark_tests.rs
 // Author: Kevin Chege. Location: Nairobi
 // Date: 2026-05-21
 
@@ -37,9 +37,10 @@ fn file_contains(path: &str, pattern: &str) -> bool {
 // 4.1 io_uring Tests
 // ─────────────────────────────────────────────────────────────────────────────
 
+// TODO: Measure real 1GB MemoryPipe ingestion latency using std::time::Instant and assert completion under threshold.
 #[test]
 #[ignore] // Remove to run benchmark
-fn test_1gb_ingest_latency() {
+fn test_source_contains_1gb_ingest_latency() {
     let path = "../nairobi-axum-refinery/src/ingest.rs";
 
     // Verify io_uring is configured
@@ -70,8 +71,9 @@ fn test_1gb_ingest_latency() {
     // assert!(elapsed.as_millis() < 500, "Ingest took {}ms, target <500ms", elapsed.as_millis());
 }
 
+// TODO: Construct an io_uring instance with SQPOLL flags and verify ring submission thread initialization at runtime.
 #[test]
-fn test_io_uring_sqpoll_config() {
+fn test_source_contains_io_uring_sqpoll_config() {
     let path = "../nairobi-axum-refinery/src/ingest.rs";
     assert!(
         file_contains(path, "setup_sqpoll"),
@@ -84,9 +86,10 @@ fn test_io_uring_sqpoll_config() {
 // 4.2 Polars SQL Tests
 // ─────────────────────────────────────────────────────────────────────────────
 
+// TODO: Execute an in-memory Polars SQL query over synthetic data using std::time::Instant to measure query latency.
 #[test]
 #[ignore] // Remove to run benchmark
-fn test_polars_sql_latency() {
+fn test_source_contains_polars_sql_latency() {
     let path = "../nairobi-axum-refinery/src/analyze.rs";
 
     // Verify Rayon thread pool capping
@@ -108,8 +111,9 @@ fn test_polars_sql_latency() {
     // assert!(elapsed.as_millis() < 1500, "SQL took {}ms, target <1500ms");
 }
 
+// TODO: Inspect Rayon active thread count during parallel execution to verify runtime pool size matches available_parallelism() / 2.
 #[test]
-fn test_rayon_thread_capping() {
+fn test_source_contains_rayon_thread_capping() {
     let path = "../nairobi-axum-refinery/src/analyze.rs";
     assert!(
         file_contains(path, "available_parallelism"),
@@ -121,8 +125,9 @@ fn test_rayon_thread_capping() {
     );
 }
 
+// TODO: Execute a SQL query against a registered Polars LazyFrame and verify 'dataset' table resolution.
 #[test]
-fn test_sql_table_name() {
+fn test_source_contains_sql_table_name() {
     let path = "../nairobi-axum-refinery/src/analyze.rs";
     assert!(
         file_contains(path, "register(\"dataset\""),
@@ -130,8 +135,9 @@ fn test_sql_table_name() {
     );
 }
 
+// TODO: Attempt mmap with MAP_HUGETLB and verify memory page size or fallback allocation behavior at runtime.
 #[test]
-fn test_huge_page_allocation() {
+fn test_source_contains_huge_page_allocation() {
     let path = "../nairobi-axum-refinery/src/ingest.rs";
     assert!(
         file_contains(path, "MAP_HUGE_1GB"),
@@ -147,9 +153,10 @@ fn test_huge_page_allocation() {
 // 4.3 Execution Guillotine Tests
 // ─────────────────────────────────────────────────────────────────────────────
 
+// TODO: Trigger a long-running execution task wrapped in tokio::time::timeout and verify execution guillotine cancellation.
 #[test]
 #[ignore] // Remove to run benchmark
-fn test_execution_timeout() {
+fn test_source_contains_execution_timeout() {
     let path = "../nairobi-axum-refinery/src/analyze.rs";
 
     // Verify timeout is set to 10 seconds
@@ -167,8 +174,9 @@ fn test_execution_timeout() {
     //     "Timeout should be ~10 seconds");
 }
 
+// TODO: Test execution guillotine timeout enforcement on blocking SQL tasks at runtime.
 #[test]
-fn test_execution_guillotine_exists() {
+fn test_source_contains_execution_guillotine_exists() {
     let path = "../nairobi-axum-refinery/src/analyze.rs";
     assert!(
         file_contains(path, "from_secs(10)"),
@@ -188,8 +196,9 @@ fn test_execution_guillotine_exists() {
 // 4.4 Dirac Engine Tests
 // ─────────────────────────────────────────────────────────────────────────────
 
+// TODO: Instantiate DiracEngine io_uring queues and verify submission/completion queue submission at runtime.
 #[test]
-fn test_dirac_engine_io_uring() {
+fn test_source_contains_dirac_engine_io_uring() {
     let path = "../nairobi-axum-refinery/src/ingest.rs";
     assert!(
         file_contains(path, "IoUring"),
@@ -206,8 +215,9 @@ fn test_dirac_engine_io_uring() {
     );
 }
 
+// TODO: Verify DiracEngine huge page allocation routines by inspecting mapped buffer addresses at runtime.
 #[test]
-fn test_dirac_engine_huge_pages() {
+fn test_source_contains_dirac_engine_huge_pages() {
     let path = "../nairobi-axum-refinery/src/ingest.rs";
     assert!(
         file_contains(path, "allocate_huge_page"),

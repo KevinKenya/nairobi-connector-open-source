@@ -162,19 +162,18 @@ Nairobi OS is structureel gesplitst. De open-source repository biedt de fundamen
 ```
 
 ### Open Source Crate Workspace (`crates/`)
-
-1. **`nairobi-axum-refinery`**: Krachtige Rust-daemon die ruwe data-inname, door Rayon geparallelliseerde statistieken en door Polars gevectoriseerde query-executie beheert.
-2. **`nairobi-hub`**: De centrale IPC-orchestrator. Beheert en routeert bestandsdescriptors en signalen tussen clients en de refinery-daemon.
-3. **`lagos-lite`**: De visuele cortex. Een headless, event-driven rendering engine die geheugen-gemapte bestanden direct in de GPU-pijplijn mapt.
-4. **`nairobi-protocol`**: De gedeelde protocollaag. Definieert standaard GVariant-serialisatieschema's, fouttypes en gedeelde geheugenlay-outs.
-5. **`nairobi-python`**: De Python-extensiemodule gecompileerd via `PyO3` en verpakt met `Maturin`.
-
+1. `nairobi-axum-refinery` — Rust daemon managing raw data ingestion, Rayon-parallelized statistics, and Polars-vectorized query execution.
+2. `nairobi-hub` — Central IPC orchestrator; routes file descriptors and signals between clients and the refinery daemon.
+3. `lagos-lite` — Local/headless rendering engine using egui/wgpu hardware acceleration with zero-copy mmap data access.
+4. `nairobi-protocol` — Shared protocol layer: GVariant serialization schemes, error types, and shared-memory layouts.
+5. `nairobi-python` — The Python extension module, compiled via PyO3 and packaged with Maturin (`nairobi-os`).
+6. `nairobi-canvas` — Immediate-mode node-graph compiler with hardware-accelerated UI (wgpu/egui), including a native file picker and SQL query presets.
+7. `nairobi-connector` — Model Context Protocol (MCP) server and AT-SPI2 semantic accessibility bridge exposing TOON representations for LLM agents.
 ### Privé Bedrijfsecosysteem (`modules/`)
 
 Onze enterprise-tier componenten bevinden zich in een privé-repository (`Sovereign-Systems-Lab`) en zijn gelicentieerd voor industriële, financiële en infrastructurele toepassingen op staatsniveau.
 
 1. **`sovereign-ui`**: De enterprise AT-SPI2 engine. Implementeert het Aegis Protocol voor beveiliging, hardware-binding en desktopmanipulatie van productiekwaliteit.
-2. **`nairobi-connector`**: Geavanceerde Model Context Protocol (MCP) server die ruwe, low-latency D-Bus signalen beheert voor enterprise LLM's.
 3. **`tactical-rtos-node`**: Ultra-low-latency, real-time besturingssysteem scheduler voor veiligheidskritische industriële automatisering.
 4. **`industrial-guardian-rust` / `industrial-guardian-python`**: Autonome site reliability engineering (SRE) laag met voorspellende OOM-, geheugenlek- en systeemcrash-preventie.
 5. **`fintech-bridge-rust`**: Real-time high-frequency transactie-parser en brug naar legacy mainframes (EBCDIC/SBA terminal parsing).

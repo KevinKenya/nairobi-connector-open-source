@@ -150,20 +150,19 @@ Nairobi OS está bifurcado estructuralmente. El repositorio de código abierto p
      +------------------------------+                                    +------------------------------+
 ```
 
-### Espacio de Trabajo de Crates de Código Abierto (`crates/`)
-
-1. **`nairobi-axum-refinery`**: Demonio Rust de alto rendimiento que gestiona la ingesta de datos crudos, estadísticas paralelizadas con Rayon y ejecución de consultas vectorizadas con Polars.
-2. **`nairobi-hub`**: El orquestador central de IPC. Gestiona y ruta descriptores de archivos y señales entre los clientes y el demonio refinery.
-3. **`lagos-lite`**: La corteza visual. Un motor de renderizado sin cabeza guiado por eventos que mapea archivos mapeados en memoria directamente al pipeline de la GPU.
-4. **`nairobi-protocol`**: La capa de protocolo compartida. Define esquemas estándar de serialización de GVariant, tipos de errores y diseños de memoria compartida.
-5. **`nairobi-python`**: El módulo de extensión de Python compilado a través de `PyO3` y empaquetado con `Maturin`.
-
+### Open Source Crate Workspace (`crates/`)
+1. `nairobi-axum-refinery` — Rust daemon managing raw data ingestion, Rayon-parallelized statistics, and Polars-vectorized query execution.
+2. `nairobi-hub` — Central IPC orchestrator; routes file descriptors and signals between clients and the refinery daemon.
+3. `lagos-lite` — Local/headless rendering engine using egui/wgpu hardware acceleration with zero-copy mmap data access.
+4. `nairobi-protocol` — Shared protocol layer: GVariant serialization schemes, error types, and shared-memory layouts.
+5. `nairobi-python` — The Python extension module, compiled via PyO3 and packaged with Maturin (`nairobi-os`).
+6. `nairobi-canvas` — Immediate-mode node-graph compiler with hardware-accelerated UI (wgpu/egui), including a native file picker and SQL query presets.
+7. `nairobi-connector` — Model Context Protocol (MCP) server and AT-SPI2 semantic accessibility bridge exposing TOON representations for LLM agents.
 ### Ecosistema Corporativo Privado (`modules/`)
 
 Nuestros componentes de nivel empresarial se encuentran en un repositorio privado (`Sovereign-Systems-Lab`) y tienen licencia para infraestructura industrial, financiera y estatal.
 
 1. **`sovereign-ui`**: El motor empresarial AT-SPI2. Implementa la seguridad del Protocolo Aegis, vinculación de hardware y manipulación de escritorio de nivel de producción.
-2. **`nairobi-connector`**: Servidor avanzado de Protocolo de Contexto de Modelo (MCP) que gestiona señales D-Bus crudas y de baja latencia para LLM empresariales.
 3. **`tactical-rtos-node`**: Programador de sistema operativo en tiempo real de ultra baja latencia para automatización industrial edge crítica para la seguridad.
 4. **`industrial-guardian-rust` / `industrial-guardian-python`**: Capa autónoma de ingeniería de fiabilidad del sitio (SRE) con evitación predictiva de OOM, fugas de memoria y caídas del sistema.
 5. **`fintech-bridge-rust`**: Analizador de transacciones de alta frecuencia en tiempo real y puente de mainframe heredado (análisis de terminales EBCDIC/SBA).
