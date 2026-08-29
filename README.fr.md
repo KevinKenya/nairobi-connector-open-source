@@ -9,15 +9,15 @@
 
 ---
 
-## L'Origine : Du Creuset au Métal
+## Pourquoi cela existe
 
+Nairobi OS est une infrastructure permettant d'exécuter des pipelines d'IA et de data science sur du matériel local sans payer la surcharge que les outils par défaut de Python introduisent à chaque couche :
 
+1. **La Taxe Python** — Copie de mémoire de bout en bout, contention du GIL et surcharge de l'interprète sur les charges de travail très chargées en données.
+2. **La Taxe Navigateur** — Latence de rendu et surcharge de communication lorsque les outils d'agents sont basés sur des interfaces Web pour des interactions à haute fréquence et de longue durée.
+3. **Le Goulot d'Étranglement du Noyau (Kernel)** — Ordonnancement des processus et surcharge du serveur d'affichage (commutation de contexte Wayland vs X11) qui ajoutent de la latence aux charges de travail d'automatisation du bureau.
 
-Mon parcours de programmation est enraciné dans l'architecture système de bas niveau et l'optimisation extrême. En 2015, j'ai exposé ma vision pour la construction de capacités techniques décentralisées sur le continent africain dans [ce traité sur la Silicon Valley du Kenya](https://www.linkedin.com/pulse/building-kenyas-silicon-valley-making-work-kevin-chege/). Lorsque la ruée vers l'or des LLM a commencé en 2023, j'étais en avance. J'ai construit et déployé des "wrappers" LLM, mais j'ai rapidement reconnu leurs limites, comme documenté dans cette [démonstration de 2023](https://www.linkedin.com/feed/update/urn:li:activity:7102930955807449088/).
-
-J'ai réalisé que construire des couches de haut niveau sur des API instables était une impasse architecturale. La véritable guerre se joue à l'intersection des contraintes matérielles locales et de l'allocation des ressources.
-
-Tout au long de l'année 2025, j'ai vécu sur un Lenovo X13 ThinkPad avec un profil matériel extrêmement limité :
+Nairobi OS est une pile d'infrastructure basée sur Rust — pipelines de données zéro-copie, exécution native au matériel et interface sémantique (non-pixel) pour l'automatisation du bureau — conçue pour éliminer directement ces surcharges. Ce dépôt est le cœur open-source de cette pile.
 
 ```
 Processeur : AMD Ryzen 5 PRO 4650U (6 Cœurs, 12 Threads)

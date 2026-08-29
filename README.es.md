@@ -9,14 +9,15 @@
 
 ---
 
-## El Origen: Del Crisol al Metal
+## Por qué existe esto
 
+Nairobi OS es una infraestructura para ejecutar pipelines de IA y ciencia de datos en hardware local sin pagar la sobrecarga que las herramientas predeterminadas de Python introducen en cada capa:
 
-Mi camino en la programación está arraigado en la arquitectura de sistemas de bajo nivel y la optimización extrema. En 2015, expuse mi visión para construir capacidades técnicas altamente descentralizadas en el continente africano en [este tratado sobre el Silicon Valley de Kenia](https://www.linkedin.com/pulse/building-kenyas-silicon-valley-making-work-kevin-chege/). Cuando comenzó la fiebre del oro de los LLM en 2023, fui de los primeros. Construí y desplegué wrappers de LLM, pero rápidamente reconocí sus limitaciones, tal como se documenta en esta temprana [demostración de wrapper de LLM de 2023](https://www.linkedin.com/feed/update/urn:li:activity:7102930955807449088/).
+1. **El Impuesto de Python**: copia de memoria de extremo a extremo, contención del GIL y sobrecarga del intérprete en cargas de trabajo intensivas en datos.
+2. **El Impuesto del Navegador**: latencia de renderizado y sobrecarga de comunicación cuando las herramientas de agentes se construyen sobre interfaces basadas en navegador para interacciones de alta frecuencia y larga duración.
+3. **El Cuello de Botella del Núcleo del SO**: programación de procesos y sobrecarga del servidor de pantalla (cambio de contexto Wayland vs. X11) que añade latencia a las cargas de trabajo de automatización de escritorio.
 
-Me di cuenta de que construir wrappers de alto nivel sobre APIs inestables era un callejón sin salida arquitectónico. La verdadera guerra se libra en la intersección de las limitaciones de hardware local y la asignación de recursos.
-
-A lo largo de 2025, viví en una Lenovo X13 ThinkPad con un perfil de hardware altamente restringido:
+Nairobi OS es un stack de infraestructura basado en Rust — pipelines de datos de copia cero, ejecución nativa en hardware y una interfaz semántica (sin píxeles) para la automatización de escritorio — construido para eliminar estas sobrecargas directamente. Este repositorio es el núcleo de código abierto de ese motor.
 
 ```
 Procesador: AMD Ryzen 5 PRO 4650U (6 núcleos, 12 hilos)

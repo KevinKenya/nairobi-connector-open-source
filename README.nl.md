@@ -9,17 +9,16 @@
 
 ---
 
-## De Oorsprong: Van de Smeltkroes naar het Metaal
+## Waarom dit bestaat
 
-Nairobi OS is niet het product van een comfortabele bedrijfsincubator of een door durfkapitaal gefinancierd onderzoekslab. Het is het resultaat van absolute noodzaak, geboren uit een reeks diepe persoonlijke crises en een meedogenloze drang om te presteren waar standaard industriële tools falen.
+Nairobi OS is infrastructuur voor het uitvoeren van AI- en data science-pijplijnen op lokale hardware zonder de overhead die de standaard tooling van Python op elke laag introduceert:
 
-Ik ben Kevin Chege, oprichter van Sovereign Systems Lab (Nairobi, Kenia). Van 2009 tot 2022 werd mijn leven beheerst door ernstig alcoholisme. Het kostte me mijn professionele status, kansen en bijna mijn leven. Op het hoogtepunt van mijn verslaving werkte ik als analist op het strategiebureau van The Open University in Milton Keynes (VK), na mijn tijd als oprichter en president van AIESEC in Rwanda (2006–2010). Vandaag ben ik in mijn vierde jaar van voortdurende nuchterheid.
+1. **De Python-taks** — end-to-end geheugenkopieën, GIL-contentie en interpreter-overhead bij dataintensieve workloads.
+2. **De Browser-taks** — rendering-latentie en communicatie-overhead wanneer agent-tooling is gebouwd op browserinterfaces voor langlopende, hoogfrequente interacties.
+3. **De OS Kernel-bottleneck** — procesplanning en display server-overhead (Wayland vs. X11 context switching) die latentie toevoegt aan desktop-automatisering.
 
-```
-                     LEGIO XIII GEMINA
-              "Het 13e Legioen — 13 juni"
-     Dertien verloren jaren. Dertien jaren om terug te eisen.
-```
+Nairobi OS is een op Rust gebaseerde infrastructuurstack — zero-copy datapijplijnen, hardware-native executie en een semantische (niet-pixel) interface voor desktop-automatisering — gebouwd om deze overhead rechtstreeks te elimineren. Deze repository is de open-source kern van die motor.
+
 
 Mijn programmeerreis is geworteld in low-level systeemarchitectuur en extreme optimalisatie. In 2015 legde ik mijn visie vast voor het bouwen van gedecentraliseerde, hoogtechnologische capaciteiten op het Afrikaanse continent in dit traktaat over de Silicon Valley van Kenia. Toen de LLM-goudkoorts in 2023 begon, was ik er vroeg bij. Ik bouwde en implementeerde LLM-wrappers, maar herkende al snel hun beperkingen, zoals gedocumenteerd in deze vroege LLM-wrapper demonstratie uit 2023.
 

@@ -9,15 +9,15 @@
 
 ---
 
-## Alkuperä: Upokkaasta metalliin
+## Miksi tämä on olemassa
 
+Nairobi OS on infrastruktuuri tekoäly- ja tietotiedeputkien suorittamiseen paikallisella laitteistolla ilman Pythonin oletustyökalujen eri kerroksissa aiheuttamia yleiskustannuksia:
 
+1. **Python-vero** — päästä päähän suoritettava muistin kopiointi, GIL-kilpailu ja tulkin yleiskustannukset dataintensiivisissä kuormituksissa.
+2. **Selainvero** — renderöinnin viive ja viestinnän yleiskustannukset, kun agenttityökalut on rakennettu selainpohjaisten käyttöliittymien päälle pitkäkestoisissa, korkeataajuisissa vuorovaikutuksissa.
+3. **Käyttöjärjestelmän ytimen pullonkaula** — prosessien ajoitus ja näyttöpalvelimen yleiskustannukset (Wayland vs. X11 -kontekstin vaihto), jotka lisäävät viivettä työpöytäautomaation kuormituksiin.
 
-Ohjelmointimatkani juuret ovat matalan tason järjestelmäarkkitehtuurissa ja äärimmäisessä optimoinnissa. Vuonna 2015 esitin vision hajautetun, erittäin teknisen kapasiteetin rakentamisesta Afrikan mantereelle [tässä tutkielmassa Kenian Piilaaksosta](https://www.linkedin.com/pulse/building-kenyas-silicon-valley-making-work-kevin-chege/). Kun LLM-kultaryntäys alkoi vuonna 2023, olin varhaisessa vaiheessa mukana. Rakensin ja otin käyttöön LLM-kääreitä (wrappers), mutta tunnistin nopeasti niiden rajoitukset, kuten on dokumentoitu tässä varhaisessa [2023 LLM-kääreen esittelyssä](https://www.linkedin.com/feed/update/urn:li:activity:7102930955807449088/).
-
-Tajusin, että korkean tason kääreiden rakentaminen epävakaiden API-rajapintojen päälle oli arkkitehtoninen umpikuja. Todellinen sota käydään paikallisten laiterajoitusten ja resurssien allokoinnin risteyksessä.
-
-Koko vuoden 2025 ajan elin Lenovo X13 ThinkPadilla, jossa oli erittäin rajoitettu laiteprofiili:
+Nairobi OS on Rust-pohjainen infrastruktuuripino — nollakopio-tietoputket, laitenatiivi suoritus ja semanttinen (ei-pikselipohjainen) käyttöliittymä työpöytäautomaatioon —, joka on rakennettu poistamaan nämä yleiskustannukset suoraan. Tämä arkisto on kyseisen pinon avoimen lähdekoodin ydin.
 
 ```
 Prosessori: AMD Ryzen 5 PRO 4650U (6 ydintä, 12 säiettä)
