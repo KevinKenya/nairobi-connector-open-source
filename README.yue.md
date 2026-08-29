@@ -146,20 +146,19 @@ Nairobi OS 喺結構上係分叉嘅。開源倉庫提供基礎嘅高性能數據
      +------------------------------+                                    +------------------------------+
 ```
 
-### 開源 Crate 工作區 (`crates/`)
-
-1. **`nairobi-axum-refinery`**：高性能 Rust 守護進程，管理原始數據接入、Rayon 並行化統計計算以及 Polars 向量化查詢執行。
-2. **`nairobi-hub`**：中央 IPC 協調器。管理並路由客戶端與 refinery 守護進程之間嘅文件描述符同信號。
-3. **`lagos-lite`**：視覺皮層。一個無頭、事件驅動嘅渲染引擎，將內存映射文件直接映射到 GPU 管道中。
-4. **`nairobi-protocol`**：共享協議層。定義標準嘅 GVariant 序列化方案、錯誤類型同共享內存佈局。
-5. **`nairobi-python`**：通過 `PyO3` 編譯並使用 `Maturin` 打包嘅 Python 擴展模塊。
-
+### Open Source Crate Workspace (`crates/`)
+1. `nairobi-axum-refinery` — Rust daemon managing raw data ingestion, Rayon-parallelized statistics, and Polars-vectorized query execution.
+2. `nairobi-hub` — Central IPC orchestrator; routes file descriptors and signals between clients and the refinery daemon.
+3. `lagos-lite` — Local/headless rendering engine using egui/wgpu hardware acceleration with zero-copy mmap data access.
+4. `nairobi-protocol` — Shared protocol layer: GVariant serialization schemes, error types, and shared-memory layouts.
+5. `nairobi-python` — The Python extension module, compiled via PyO3 and packaged with Maturin (`nairobi-os`).
+6. `nairobi-canvas` — Immediate-mode node-graph compiler with hardware-accelerated UI (wgpu/egui), including a native file picker and SQL query presets.
+7. `nairobi-connector` — Model Context Protocol (MCP) server and AT-SPI2 semantic accessibility bridge exposing TOON representations for LLM agents.
 ### 私有企業生態系統 (`modules/`)
 
 我哋嘅企業級組件保存在私有倉庫（`Sovereign-Systems-Lab`）入面，面向工業、金融同國家級基礎設施進行授權。
 
 1. **`sovereign-ui`**：企業級 AT-SPI2 引擎。實現 Aegis 協議安全、硬件綁定以及生產級桌面操作。
-2. **`nairobi-connector`**：高級模型上下文協議（MCP）服務器，管理企業 LLM 嘅原始、低延遲 D-Bus 信號。
 3. **`tactical-rtos-node`**：用於安全關鍵型邊緣工業自動化嘅超低延遲、實時操作系統調度器。
 4. **`industrial-guardian-rust` / `industrial-guardian-python`**：自主站點可靠性工程（SRE）層，具有預測性 OOM、內存洩漏同系統崩潰規避功能。
 5. **`fintech-bridge-rust`**：實時高頻交易解析器同傳統主機橋接器（EBCDIC/SBA 終端解析）。

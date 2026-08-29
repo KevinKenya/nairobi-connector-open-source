@@ -33,7 +33,7 @@ def main():
     print("=" * 60)
     print()
 
-    lagos_bin = Path("/home/chege/nairobi-connector-open-source/.venv/lib/python3.12/site-packages/nairobi_os/bin/lagos-vision-daemon")
+    lagos_bin = Path(nairobi_os.__file__).parent / "bin" / "lagos-vision-daemon"
     os.environ["LAGOS_VISION_DAEMON_BIN"] = str(lagos_bin)
 
     print("## Starting Nairobi Infrastructure")

@@ -147,20 +147,19 @@ Nairobi OS on rakenteellisesti kaksihaarainen. Avoimen lähdekoodin arkisto tarj
      +------------------------------+                                    +------------------------------+
 ```
 
-### Avoimen lähdekoodin Crate-työalue (`crates/`)
-
-1. **`nairobi-axum-refinery`**: Korkean suorituskyvyn Rust-taustaprosessi, joka hallitsee raakadatan sisäänottoa, Rayon-parallisoituja tilastoja ja Polars-vektorisoitua kyselysuoritusta.
-2. **`nairobi-hub`**: Keskitetty IPC-orkestraattori. Hallitsee ja reitittää tiedostokahvoja ja signaaleja asiakkaiden ja refinery-taustaprosessin välillä.
-3. **`lagos-lite`**: Visuaalinen aivokuori. Päätön, tapahtumaohjattu renderöintimoottori, joka kuvaa muistiin kuvatut tiedostot suoraan GPU-putkeen.
-4. **`nairobi-protocol`**: Jaettu protokollakerros. Määrittelee standardit GVariant-serialisointiskeemat, virhetyypit ja jaetun muistin asettelut.
-5. **`nairobi-python`**: Python-laajennusmoduuli, joka on käännetty `PyO3`-kirjastolla ja pakattu `Maturin`-työkalulla.
-
+### Open Source Crate Workspace (`crates/`)
+1. `nairobi-axum-refinery` — Rust daemon managing raw data ingestion, Rayon-parallelized statistics, and Polars-vectorized query execution.
+2. `nairobi-hub` — Central IPC orchestrator; routes file descriptors and signals between clients and the refinery daemon.
+3. `lagos-lite` — Local/headless rendering engine using egui/wgpu hardware acceleration with zero-copy mmap data access.
+4. `nairobi-protocol` — Shared protocol layer: GVariant serialization schemes, error types, and shared-memory layouts.
+5. `nairobi-python` — The Python extension module, compiled via PyO3 and packaged with Maturin (`nairobi-os`).
+6. `nairobi-canvas` — Immediate-mode node-graph compiler with hardware-accelerated UI (wgpu/egui), including a native file picker and SQL query presets.
+7. `nairobi-connector` — Model Context Protocol (MCP) server and AT-SPI2 semantic accessibility bridge exposing TOON representations for LLM agents.
 ### Yksityinen yritysekosysteemi (`modules/`)
 
 Yritystason komponenttimme pidetään yksityisessä arkistossa (`Sovereign-Systems-Lab`) ja ne on lisensoitu teolliseen, taloudelliseen ja valtiolliseen infrastruktuuriin.
 
 1. **`sovereign-ui`**: Yritystason AT-SPI2-moottori. Toteuttaa Aegis-protokollan suojauksen, laitesidonnan ja tuotantotason työpöydän hallinnan.
-2. **`nairobi-connector`**: Kehittynyt Model Context Protocol (MCP) -palvelin, joka hallitsee raakoja, matalaviiveisiä D-Bus-signaaleja yritystason LLM-malleille.
 3. **`tactical-rtos-node`**: Erittäin matalaviiveinen reaaliaikakäyttöjärjestelmän ajoitusohjelma turvallisuuskriittiseen teolliseen reunalaskenta-automaatioon.
 4. **`industrial-guardian-rust` / `industrial-guardian-python`**: Autonominen sivuston luotettavuuden hallinnan (SRE) kerros, jossa on ennakoiva OOM-muistinhallinta, muistivuotojen ja järjestelmän kaatumisen esto.
 5. **`fintech-bridge-rust`**: Reaaliaikainen korkeataajuinen transaktioparseri ja perintöjärjestelmien pääkone-silta (EBCDIC/SBA-terminaaliparsinta).

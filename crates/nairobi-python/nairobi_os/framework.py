@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# File: /home/KevinKenya/nairobi-connector-open-source/crates/nairobi-python/nairobi_os/framework.py
+# File: crates/nairobi-python/nairobi_os/framework.py
 # Author: Kevin Chege. Location: Nairobi
 # Date: 2026-05-21
 
@@ -194,9 +194,9 @@ class SovereignFrame:
 
     def plot(self, width=1000, height=400):
         """
-        Spawns the Lagos Vision widget for the current frame.
-        Note: lagos-lite requires a physical display. For headless visualization,
-        use the enterprise nairobi-lagos-vision package.
+        Spawns the Lagos Vision rendering pipeline for the current frame.
+        Supports both interactive inline display in Jupyter notebooks and
+        headless offscreen rendering via lagos-vision-daemon.
         """
         return lagos.plot_inline(self.handle_id, width=width, height=height)
 

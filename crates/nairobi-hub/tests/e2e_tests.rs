@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// File: /home/KevinKenya/nairobi-connector-open-source/crates/nairobi-hub/tests/e2e_tests.rs
+// File: crates/nairobi-hub/tests/e2e_tests.rs
 // Author: Kevin Chege. Location: Nairobi
 // Date: 2026-05-21
 
@@ -36,8 +36,9 @@ fn file_contains(path: &str, pattern: &str) -> bool {
 // 5.1 D-Bus Proxy Tests
 // ─────────────────────────────────────────────────────────────────────────────
 
+// TODO: Test D-Bus proxy creation against a live D-Bus session bus.
 #[test]
-fn test_dbus_proxy_creation() {
+fn test_source_contains_dbus_proxy_creation() {
     let path = "../nairobi-hub/src/client.rs";
 
     // Verify RefineryClient struct exists
@@ -59,8 +60,9 @@ fn test_dbus_proxy_creation() {
     );
 }
 
+// TODO: Invoke D-Bus proxy methods against an active refinery service and assert responses.
 #[test]
-fn test_dbus_proxy_methods() {
+fn test_source_contains_dbus_proxy_methods() {
     let path = "../nairobi-hub/src/client.rs";
 
     // Verify all D-Bus methods are proxied
@@ -86,8 +88,9 @@ fn test_dbus_proxy_methods() {
     );
 }
 
+// TODO: Verify live D-Bus proxy interface constants against D-Bus introspection XML.
 #[test]
-fn test_dbus_interface_constants_in_proxy() {
+fn test_source_contains_dbus_interface_constants_in_proxy() {
     let path = "../nairobi-hub/src/client.rs";
 
     // Verify the proxy uses correct interface constants
@@ -101,8 +104,9 @@ fn test_dbus_interface_constants_in_proxy() {
 // 5.2 FD Passing Tests
 // ─────────────────────────────────────────────────────────────────────────────
 
+// TODO: Test runtime zero-copy file descriptor passing via D-Bus Unix FD passing mechanism.
 #[test]
-fn test_zero_copy_fd_passing() {
+fn test_source_contains_zero_copy_fd_passing() {
     let path = "../nairobi-hub/src/client.rs";
 
     // Verify OwnedFd is used for FD passing
@@ -122,8 +126,9 @@ fn test_zero_copy_fd_passing() {
     );
 }
 
+// TODO: Instantiate Decoder and run generate_report on sample DistilledAnalytics structs at runtime.
 #[test]
-fn test_decoder_exists() {
+fn test_source_contains_decoder_exists() {
     let path = "../nairobi-hub/src/decoder.rs";
 
     assert!(
@@ -136,8 +141,9 @@ fn test_decoder_exists() {
     );
 }
 
+// TODO: Verify Markdown report formatting output by executing decoder.generate_report at runtime.
 #[test]
-fn test_decoder_markdown_output() {
+fn test_source_contains_decoder_markdown_output() {
     let path = "../nairobi-hub/src/decoder.rs";
 
     // Verify decoder generates Markdown
@@ -185,9 +191,10 @@ fn test_e2e_refinery_connection() {
     }
 }
 
+// TODO: Implement full E2E workflow runtime assertions connecting to Refinery, ingesting data, executing SQL, and validating output FDs.
 #[test]
 #[ignore] // Requires: Running Refinery + test data file
-fn test_e2e_full_workflow() {
+fn test_source_contains_e2e_full_workflow() {
     // 1. Connect to Refinery
     // 2. Call ingest with a test file
     // 3. Call sql_query with a test query

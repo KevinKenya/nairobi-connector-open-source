@@ -151,20 +151,19 @@
      +------------------------------+                                    +------------------------------+
 ```
 
-### Открытая рабочая область Crate (`crates/`)
-
-1. **`nairobi-axum-refinery`**: Высокопроизводительный демон на Rust для управления загрузкой данных, параллельными вычислениями Rayon и векторизованным выполнением запросов Polars.
-2. **`nairobi-hub`**: Центральный IPC-оркестратор. Управляет файловыми дескрипторами и сигналами между клиентами и демоном refinery.
-3. **`lagos-lite`**: Визуальный интерфейс. Событийно-ориентированный движок рендеринга, проецирующий файлы в памяти непосредственно в конвейер графического процессора.
-4. **`nairobi-protocol`**: Общий слой протокола. Определяет стандартные схемы сериализации GVariant, типы ошибок и структуру общей памяти.
-5. **`nairobi-python`**: Модуль расширения Python, скомпилированный с помощью `PyO3` и упакованный с `Maturin`.
-
+### Open Source Crate Workspace (`crates/`)
+1. `nairobi-axum-refinery` — Rust daemon managing raw data ingestion, Rayon-parallelized statistics, and Polars-vectorized query execution.
+2. `nairobi-hub` — Central IPC orchestrator; routes file descriptors and signals between clients and the refinery daemon.
+3. `lagos-lite` — Local/headless rendering engine using egui/wgpu hardware acceleration with zero-copy mmap data access.
+4. `nairobi-protocol` — Shared protocol layer: GVariant serialization schemes, error types, and shared-memory layouts.
+5. `nairobi-python` — The Python extension module, compiled via PyO3 and packaged with Maturin (`nairobi-os`).
+6. `nairobi-canvas` — Immediate-mode node-graph compiler with hardware-accelerated UI (wgpu/egui), including a native file picker and SQL query presets.
+7. `nairobi-connector` — Model Context Protocol (MCP) server and AT-SPI2 semantic accessibility bridge exposing TOON representations for LLM agents.
 ### Закрытая экосистема предприятия (`modules/`)
 
 Наши корпоративные компоненты содержатся в приватном репозитории (`Sovereign-Systems-Lab`) и лицензируются для применения в промышленности, финансах и государственной инфраструктуре.
 
 1. **`sovereign-ui`**: Корпоративный движок AT-SPI2. Реализует безопасность протокола Aegis, аппаратную привязку и управление рабочим столом промышленного класса.
-2. **`nairobi-connector`**: Расширенный сервер протокола контекста модели (MCP), обрабатывающий необработанные сигналы D-Bus с малой задержкой для корпоративных LLM.
 3. **`tactical-rtos-node`**: Планировщик операционной системы реального времени с ультранизкой задержкой для критически важной автоматизации edge-устройств.
 4. **`industrial-guardian-rust` / `industrial-guardian-python`**: Автономный уровень обеспечения надежности систем (SRE) с предиктивным предотвращением OOM, утечек памяти и сбоев системы.
 5. **`fintech-bridge-rust`**: Парсер высокочастотных транзакций в реальном времени и мост к устаревшим мейнфреймам (парсинг терминалов EBCDIC/SBA).
