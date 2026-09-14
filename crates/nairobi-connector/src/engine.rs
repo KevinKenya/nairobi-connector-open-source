@@ -91,6 +91,23 @@ impl DFSEngine {
             .await.unwrap_or_else(|_| Ok(Vec::new())).unwrap_or_default()
     }
 
+    /// Get the parent (destination, object path) of a node, if it has one.
+    /// The AT-SPI2 root application object has no parent and returns `None`.
+    pub async fn get_parent(proxy: &AccessibleProxy<'_>) -> Option<(String, String)> {
+        match timeout(DFS_TIMEOUT, proxy.parent()).await {
+            Ok(Ok(object_ref)) => {
+                let dest = object_ref.name.to_string();
+                let path = object_ref.path.to_string();
+                if path.is_empty() || path == "/org/a11y/atspi/null" {
+                    None
+                } else {
+                    Some((dest, path))
+                }
+            }
+            _ => None,
+        }
+    }
+
     pub async fn get_state_set(proxy: &AccessibleProxy<'_>) -> atspi::StateSet {
         timeout(DFS_TIMEOUT, proxy.get_state())
             .await.unwrap_or_else(|_| Ok(atspi::StateSet::empty())).unwrap_or_else(|_| atspi::StateSet::empty())
