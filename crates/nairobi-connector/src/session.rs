@@ -336,3 +336,151 @@ impl NeuralSession {
         }
     }
 
+/// Execute a semantic action on a node identified by TOON ID.
+    /// Requires that `get_ui_map()` was called first to populate the ID map.
+    pub async fn interact_by_id(&self, node_id: u32, action_name: &str) -> Result<String> {
+        // Resolve node ID to D-Bus coordinates
+        let (dest, path) = {
+            let map = self.id_map.read().await;
+            map.get(&node_id)
+                .cloned()
+                .ok_or_else(|| NeuralError::NodeNotFound(format!(
+                    "Node ID {} not found — call nairobi_get_ui_map first to refresh IDs",
+                    node_id
+                )))?
+        };
+
+        match action_name {
+            "click" | "activate" => {
+                action::do_action(
+                    &self.connection,
+                    &dest,
+                    &path,
+                    0,
+                )
+                .await?;
+                self.touch_activity().await;
+                Ok(format!("Action '{}' executed on node {} (path={})", action_name, node_id, path))
+            }
+            "focus" => {
+                action::grab_focus(
+                    &self.connection,
+                    &dest,
+                    &path,
+                )
+                .await?;
+                self.touch_activity().await;
+                Ok(format!("Focus set on node {} (path={})", node_id, path))
+            }
+            _ => Err(NeuralError::ActionFailed(format!("Unknown action: {}", action_name))),
+        }
+    }
+
+    /// Wait for a human to save an edit staged via `nairobi_type_text`.
+    ///
+    /// This does not save anything itself — it is a read-only observer. Starting
+    /// from the given node, it walks up the accessibility tree to the nearest
+    /// `Frame` or `PageTab` ancestor (the level at which most editors surface an
+    /// "unsaved changes" indicator) and polls that ancestor's name for the
+    /// disappearance of a dirty-buffer marker (`•` or `*`), which is how GTK,
+    /// GNOME Text Editor, and most GtkSourceView-based apps signal an unsaved
+    /// document. Returns once the marker clears, or times out.
+    ///
+    /// This lets an agent stage an edit and then wait for explicit human
+    /// confirmation (the human pressing Ctrl+S) before treating the edit as
+    /// committed, rather than assuming a `set_text` call succeeded.
+    pub async fn wait_for_save(&self, node_id: u32, timeout_secs: u64) -> Result<(bool, String, String)> {
+        let (dest, path) = {
+            let map = self.id_map.read().await;
+            map.get(&node_id)
+                .cloned()
+                .ok_or_else(|| NeuralError::NodeNotFound(format!(
+                    "Node ID {} not found — call nairobi_get_ui_map first to refresh IDs",
+                    node_id
+                )))?
+        };
+
+        // Walk up to the nearest Frame or PageTab ancestor, capped at 32 hops
+        // to guard against a malformed or cyclic accessibility tree.
+        let mut current_dest = dest;
+        let mut current_path = path;
+        let mut ancestor: Option<(String, String)> = None;
+
+        for _ in 0..32 {
+            let proxy = DFSEngine::timeout_proxy_build(&self.connection, &current_dest, &current_path).await?;
+            let role = DFSEngine::get_role(&proxy).await;
+
+            if is_save_boundary_role(role) {
+                ancestor = Some((current_dest.clone(), current_path.clone()));
+                break;
+            }
+
+            match DFSEngine::get_parent(&proxy).await {
+                Some((pd, pp)) => {
+                    current_dest = pd;
+                    current_path = pp;
+                }
+                None => break,
+            }
+        }
+
+        let (a_dest, a_path) = ancestor.ok_or_else(|| {
+            NeuralError::NodeNotFound(
+                "Could not resolve a Frame or PageTab ancestor for node — is it inside an editor window?".to_string(),
+            )
+        })?;
+
+        let ancestor_proxy = DFSEngine::timeout_proxy_build(&self.connection, &a_dest, &a_path).await?;
+        let initial_name = DFSEngine::get_name(&ancestor_proxy).await;
+
+        tracing::info!(
+            "[SESSION] wait_for_save watching ancestor: {} (name: '{}')",
+            a_path, initial_name
+        );
+
+        let start = Instant::now();
+        let timeout_dur = Duration::from_secs(timeout_secs);
+
+        while start.elapsed() < timeout_dur {
+            let proxy = DFSEngine::timeout_proxy_build(&self.connection, &a_dest, &a_path).await?;
+            let current_name = DFSEngine::get_name(&proxy).await;
+
+            if !has_dirty_marker(&current_name) {
+                self.touch_activity().await;
+                return Ok((true, initial_name, current_name));
+            }
+
+            sleep(Duration::from_millis(500)).await;
+        }
+
+        let final_name = DFSEngine::get_name(&ancestor_proxy).await;
+        Ok((false, initial_name, final_name))
+    }
+
+    /// Type text into an editable field identified by TOON ID.
+    /// Requires that `get_ui_map()` was called first to populate the ID map.
+    pub async fn type_text_by_id(&self, node_id: u32, text: &str) -> Result<String> {
+        // Resolve node ID to D-Bus coordinates
+        let (dest, path) = {
+            let map = self.id_map.read().await;
+            map.get(&node_id)
+                .cloned()
+                .ok_or_else(|| NeuralError::NodeNotFound(format!(
+                    "Node ID {} not found — call nairobi_get_ui_map first to refresh IDs",
+                    node_id
+                )))?
+        };
+
+        action::set_text(
+            &self.connection,
+            &dest,
+            &path,
+            text,
+        )
+        .await?;
+        self.touch_activity().await;
+        Ok(format!("Text set on node {} (path={}): {}", node_id, path, text))
+    }
+}
+
+
