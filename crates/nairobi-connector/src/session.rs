@@ -483,4 +483,95 @@ impl NeuralSession {
     }
 }
 
+// ─── Unit tests ──────────────────────────────────────────────────────────────
+//
+// These cover the pure, D-Bus-free logic in this module. They run in any
+// environment (CI included) with no AT-SPI2 registry or session bus required.
+//
+// Live-desktop behavior (does `wait_for_save` actually observe a real GNOME
+// Text Editor save?) is NOT something a unit test can honestly claim to prove —
+// that needs a real accessibility tree. See
+// `tests/verify_save_manual.rs` for the `#[ignore]`d manual harness for that.
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn dirty_marker_bullet_detected() {
+        assert!(has_dirty_marker("\u{2022} untitled.txt"));
+    }
+
+    #[test]
+    fn dirty_marker_asterisk_detected() {
+        assert!(has_dirty_marker("*untitled.txt"));
+    }
+
+    #[test]
+    fn dirty_marker_asterisk_mid_title_detected() {
+        // Some editors put the marker after the name, not before it —
+        // this must not assume a fixed position.
+        assert!(has_dirty_marker("untitled.txt *"));
+    }
+
+    #[test]
+    fn clean_title_has_no_marker() {
+        assert!(!has_dirty_marker("untitled.txt"));
+    }
+
+    #[test]
+    fn empty_title_has_no_marker() {
+        assert!(!has_dirty_marker(""));
+    }
+
+    #[test]
+    fn asterisk_in_title_text_is_a_documented_false_positive() {
+        // A title like "3 * 4 = 12.txt" WILL be flagged as dirty even when it
+        // isn't. This is a known limitation, not a bug: substring matching on
+        // '*' can't distinguish a dirty-marker from a literal asterisk without
+        // also cross-checking the AT-SPI STATE_MODIFIED bit, which is a real
+        // follow-up (see module doc). Asserted here so the limitation stays a
+        // visible, tested fact instead of a silent gap discovered in the field.
+        assert!(has_dirty_marker("3 * 4 = 12.txt"));
+    }
+
+    #[test]
+    fn frame_is_a_save_boundary() {
+        assert!(is_save_boundary_role(atspi::Role::Frame));
+    }
+
+    #[test]
+    fn page_tab_is_a_save_boundary() {
+        assert!(is_save_boundary_role(atspi::Role::PageTab));
+    }
+
+    #[test]
+    fn panel_is_not_a_save_boundary() {
+        assert!(!is_save_boundary_role(atspi::Role::Panel));
+    }
+
+    #[test]
+    fn push_button_is_not_a_save_boundary() {
+        assert!(!is_save_boundary_role(atspi::Role::PushButton));
+    }
+
+    #[tokio::test]
+    async fn wait_for_save_rejects_unknown_node_id_before_touching_dbus() {
+        // establish() opens a real session-bus connection, which is available
+        // in effectively every Linux CI runner (a session bus doesn't require
+        // AT-SPI2 or a display) — unlike find_window/get_ui_map, this path
+        // never talks to the AT-SPI2 registry, so it's safe to run unconditionally.
+        let session = match NeuralSession::establish().await {
+            Ok(s) => s,
+            Err(_) => {
+                eprintln!("skipping: no D-Bus session bus available in this environment");
+                return;
+            }
+        };
+
+        let result = session.wait_for_save(999, 1).await;
+        assert!(matches!(result, Err(NeuralError::NodeNotFound(_))));
+    }
+}
+
+
 
