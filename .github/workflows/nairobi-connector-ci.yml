@@ -1,0 +1,81 @@
+name: nairobi-connector CI
+
+# Runs on every push and PR that touches the nairobi-connector crate, plus a
+# manual trigger. Scoped to this one crate (not the whole workspace) so CI
+# stays fast and doesn't gate this crate's PRs on unrelated crates' build
+# health.
+on:
+  pull_request:
+    paths:
+      - "crates/nairobi-connector/**"
+      - ".github/workflows/nairobi-connector-ci.yml"
+  push:
+    branches: [main]
+    paths:
+      - "crates/nairobi-connector/**"
+      - ".github/workflows/nairobi-connector-ci.yml"
+  workflow_dispatch: {}
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build-and-test:
+    name: Build & test (ubuntu-latest)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install stable Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy, rustfmt
+
+      - name: Cache cargo registry and build artifacts
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: "."
+          shared-key: "nairobi-connector"
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            build-essential \
+            pkg-config \
+            libdbus-1-dev \
+            dbus-x11
+
+      - name: Check formatting
+        # Soft-fail: the existing codebase predates this workflow and hasn't
+        # been run through rustfmt yet. This reports drift without blocking
+        # merges until a dedicated formatting pass is done. Remove
+        # `continue-on-error` once that pass lands.
+        continue-on-error: true
+        run: cargo fmt -p nairobi-connector -- --check
+
+      - name: Clippy
+        # Soft-fail for the same reason as the formatting check above: the
+        # existing code hasn't been run through clippy yet, so treat this as
+        # a report, not a gate, until a cleanup pass lands. Remove
+        # `continue-on-error` once that pass lands.
+        continue-on-error: true
+        run: cargo clippy -p nairobi-connector --all-targets -- -D warnings
+
+      - name: Build
+        run: cargo build -p nairobi-connector --all-targets
+
+      # `dbus-run-session` spins up a throwaway session bus so the one test
+      # that opens a real D-Bus connection (NeuralSession::establish) exercises
+      # its actual code path instead of always hitting the "no bus available"
+      # skip branch. Tests that also need a live AT-SPI2 registry / display
+      # (in tests/verify_save_manual.rs) are #[ignore]'d and correctly do NOT
+      # run here — those stay a manual, on-machine verification step.
+      - name: Run tests
+        run: dbus-run-session -- cargo test -p nairobi-connector --all-targets
+
+      - name: Report ignored (manual-only) tests
+        if: always()
+        run: cargo test -p nairobi-connector --all-targets -- --ignored --list
+
