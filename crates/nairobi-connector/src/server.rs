@@ -21,6 +21,7 @@
 //! - `nairobi_get_ui_map` — returns a TOON-compressed accessibility tree
 //! - `nairobi_interact` — executes semantic actions (click, focus, activate) on UI nodes
 //! - `nairobi_type_text` — injects text into editable fields
+//! - `nairobi_verify_save` — waits for a human to confirm a staged edit by saving it
 //!
 //! The server includes a heartbeat watcher that auto-releases the RegistryLock
 //! if the stdio pipe hangs, preventing OS paralysis.
@@ -78,6 +79,31 @@ pub struct TypeTextParams {
 pub struct FindWindowParams {
     /// A substring to match against window titles (case-insensitive).
     pub title: String,
+}
+
+/// Parameters for `nairobi_verify_save`.
+#[derive(Debug, Deserialize, JsonSchema)]
+pub struct VerifySaveParams {
+    /// The TOON node ID that was previously edited via `nairobi_type_text`.
+    pub node_id: u32,
+    /// How long to wait for the human to save, in seconds (default: 30).
+    #[serde(default = "default_save_timeout")]
+    pub timeout_seconds: Option<u64>,
+}
+
+fn default_save_timeout() -> Option<u64> {
+    Some(30)
+}
+
+/// Structured response from `nairobi_verify_save`.
+#[derive(Debug, Serialize)]
+pub struct VerifySaveResponse {
+    /// Whether the human saved the file before the timeout.
+    pub saved: bool,
+    /// The watched ancestor window/tab's title before waiting (may show a dirty marker).
+    pub title_before: String,
+    /// The watched ancestor window/tab's title when polling stopped.
+    pub title_after: String,
 }
 
 /// Structured response from `nairobi_get_ui_map`.
@@ -352,13 +378,65 @@ impl NairobiServer {
             }
         }
     }
+
+    /// Wait for a human to save an edit made via `nairobi_type_text`.
+    ///
+    /// This is read-only — it never saves anything itself. It watches the
+    /// nearest Frame/PageTab ancestor of the given node for the disappearance
+    /// of an unsaved-changes marker (the `•` or `*` most GTK/GtkSourceView
+    /// editors prepend to the window or tab title), which fires when the human
+    /// actually presses save. Use this after `nairobi_type_text` to confirm an
+    /// edit was committed before reporting success back to the calling agent,
+    /// rather than assuming the text-injection call alone means the file changed.
+    #[tool(description = "Wait for a human to save an edit previously staged with nairobi_type_text. Polls the parent window/tab title for the disappearance of an unsaved-changes marker ('•' or '*'). Read-only — never saves anything itself. Returns saved=false on timeout without erroring, since a timeout is a valid outcome (the human may still be editing).")]
+    async fn nairobi_verify_save(
+        &self,
+        Parameters(params): Parameters<VerifySaveParams>,
+    ) -> CallToolResult {
+        self.neural.touch_activity().await;
+        let timeout_secs = params.timeout_seconds.unwrap_or(30);
+
+        match self.neural.wait_for_save(params.node_id, timeout_secs).await {
+            Ok((saved, title_before, title_after)) => {
+                tracing::info!(
+                    "[TOOL] nairobi_verify_save: node={} saved={} before='{}' after='{}'",
+                    params.node_id, saved, title_before, title_after
+                );
+
+                let response = VerifySaveResponse {
+                    saved,
+                    title_before,
+                    title_after,
+                };
+
+                match serde_json::to_value(&response) {
+                    Ok(structured) => CallToolResult::structured(structured),
+                    Err(_) => CallToolResult::success(toon_bridge::wrap_text(if saved {
+                        "Save confirmed"
+                    } else {
+                        "Timed out waiting for save"
+                    })),
+                }
+            }
+            Err(e) => {
+                tracing::error!(
+                    "[TOOL] nairobi_verify_save failed: node={} error={}",
+                    params.node_id, e
+                );
+                CallToolResult::error(toon_bridge::wrap_error(&format!(
+                    "Verify save failed (node={}): {}",
+                    params.node_id, e
+                )))
+            }
+        }
+    }
 }
 
 /// `#[tool_handler]` auto-generates `list_tools()`, `call_tool()`, `get_tool()`,
 /// and `get_info()` on the `ServerHandler` impl using the tool router above.
 #[tool_handler(
     name = "nairobi-connector",
-    version = "0.4.0",
-    instructions = "Nairobi Connector — Computer Use without pixels.\n\nUse nairobi_get_ui_map to see all interactive UI elements as a TOON tree.\nEach element has a sequential [ID: N] you can reference in actions.\nUse nairobi_interact to click/focus elements.\nUse nairobi_type_text to type into editable fields.\n\nAlways call nairobi_get_ui_map first to get fresh IDs before interacting."
+    version = "0.6.0",
+    instructions = "Nairobi Connector — Computer Use without pixels.\n\nUse nairobi_get_ui_map to see all interactive UI elements as a TOON tree.\nEach element has a sequential [ID: N] you can reference in actions.\nUse nairobi_interact to click/focus elements.\nUse nairobi_type_text to type into editable fields.\nUse nairobi_verify_save after nairobi_type_text to wait for explicit human confirmation (a real save) before treating an edit as committed.\n\nAlways call nairobi_get_ui_map first to get fresh IDs before interacting."
 )]
 impl ServerHandler for NairobiServer {}
